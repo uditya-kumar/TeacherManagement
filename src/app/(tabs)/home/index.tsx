@@ -97,7 +97,7 @@ const index = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 12,
+    paddingHorizontal: 12,
     flex: 1,
     backgroundColor: Colors.light.background,
   },
