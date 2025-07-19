@@ -27,7 +27,6 @@ export default function TabLayout() {
           paddingBottom: insets.bottom,
         },
         tabBarLabelStyle: {
-          paddingBottom: 5,
           fontSize: 12,
         },
         // Disable the static render of the header on web
