@@ -25,6 +25,8 @@ export default function TabLayout() {
          tabBarStyle: {
           height: 55 + insets.bottom,
           paddingBottom: insets.bottom,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
         },
         tabBarLabelStyle: {
           fontSize: 12,
