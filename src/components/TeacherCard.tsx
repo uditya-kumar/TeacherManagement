@@ -63,6 +63,7 @@ const TeacherCard = ({
           backgroundColor="#0C1120"
           icon="UserCheck"
           onPress={onRateTeacher}
+          paddingVertical={11}
         />
         <CustomButton
           text="View Details"
@@ -71,6 +72,7 @@ const TeacherCard = ({
           borderColor="#E5E7EB"
           icon="Eye"
           onPress={onViewDetails}
+          paddingVertical={11}
         />
       </View>
     </View>

@@ -111,6 +111,7 @@ const RateTeacher = () => {
         backgroundColor="#0C1120"
         icon="SendHorizontal"
         onPress={onSubmitRating}
+        paddingVertical={13}
       />
       </View>
     </ScrollView>

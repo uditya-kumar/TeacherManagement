@@ -11,6 +11,7 @@ interface ButtonProps {
   borderColor?: string;
   icon: keyof typeof LucideIcons;
   onPress?: () => void;
+  paddingVertical?: number;
 }
 
 const CustomButton: React.FC<ButtonProps> = ({
@@ -20,6 +21,7 @@ const CustomButton: React.FC<ButtonProps> = ({
   borderColor = 'transparent',
   icon,
   onPress,
+  paddingVertical = 11,
 }) => {
   const IconComponent = LucideIcons[icon] as LucideIcon;
 
@@ -28,6 +30,7 @@ const CustomButton: React.FC<ButtonProps> = ({
       style={({ pressed }) => [
         styles.button,
         {
+          paddingVertical,
           backgroundColor,
           borderColor,
           borderWidth: borderColor !== 'transparent' ? 1 : 0,
@@ -46,7 +49,6 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
     paddingHorizontal: 15,
     borderRadius: 10,
     justifyContent: 'center'
