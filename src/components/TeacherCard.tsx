@@ -38,7 +38,11 @@ const TeacherCard = ({
         </Pressable>
       </View>
       <View style={styles.ratingContainer}>
-        <Star size={20} color={Colors.light.starColor} fill={Colors.light.starColor} />
+        <Star
+          size={20}
+          color={Colors.light.starColor}
+          fill={Colors.light.starColor}
+        />
         <Text style={styles.ratingText}>{teacher.rating}</Text>
         <Text style={styles.details}>({teacher.totalRatings} reviews)</Text>
       </View>

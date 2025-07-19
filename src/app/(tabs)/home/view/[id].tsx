@@ -2,6 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { teachers } from "@assets/data/teachers";
+import TeacherCard from "@/components/TeacherCard";
 
 const ViewTeacherDetails = () => {
   const { id } = useLocalSearchParams();

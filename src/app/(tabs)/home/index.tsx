@@ -12,10 +12,11 @@ import Colors from "@/constants/Colors";
 import TeacherCard from "@/components/TeacherCard";
 import { teachers } from "@assets/data/teachers";
 import { router } from "expo-router";
+import { useFavorite } from "@/app/providers/FavoriteProvider";
 
 const index = () => {
   const [search, setSearch] = useState("");
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const { favorites, toggleFavorite } = useFavorite();
 
   const filteredTeachers = useMemo(() => {
     return teachers.filter((teacher) =>
@@ -27,23 +28,13 @@ const index = () => {
     setSearch("");
   };
 
-  const toggleFavorite = (teacherId: string, teacherName: string) => {
-    const isFavorite = favorites.includes(teacherId);
-
-    if (isFavorite) {
-      setFavorites(favorites.filter((id) => id !== teacherId));
-    } else {
-      setFavorites([...favorites, teacherId]);
-    }
-  };
-
   const handleRateTeacher = (teacherId: string) => {
     router.push(`./home/rate/${teacherId}`);
   };
 
   const handleViewDetails = (teacherId: string) => {
     router.push(`./home/view/${teacherId}`);
-  }
+  };
 
   const renderHeader = useMemo(
     () => (
@@ -81,9 +72,9 @@ const index = () => {
           <TeacherCard
             teacher={item}
             isFavorite={favorites.includes(item.id)}
-            onToggleFavorite={() => toggleFavorite(item.id, item.name)}
+            onToggleFavorite={() => toggleFavorite(item.id)}
             onRateTeacher={() => handleRateTeacher(item.id)}
-            onViewDetails={()=> handleViewDetails(item.id)}
+            onViewDetails={() => handleViewDetails(item.id)}
           />
         )}
         ListHeaderComponent={renderHeader}

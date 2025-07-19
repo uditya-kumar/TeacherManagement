@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { teachers } from "@assets/data/teachers";
 import Colors from "@/constants/Colors";
-import { Star, Circle, SendHorizontal } from "lucide-react-native";
+import { Star, Circle} from "lucide-react-native";
 import CustomButton from "@/components/Button";
 
 const RateTeacher = () => {
