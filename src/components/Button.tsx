@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 10,
+    justifyContent: 'center'
   },
   icon: {
     marginRight: 10,
