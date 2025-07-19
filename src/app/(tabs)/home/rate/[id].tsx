@@ -103,7 +103,7 @@ const RateTeacher = () => {
       </View>
 
       {/* Submit Button */}
-      <View style = {{marginHorizontal: 15, marginVertical: 15}}>
+      <View style = {{marginHorizontal: 15, marginTop: 15}}>
 
       <CustomButton
         text="Submit Rating"

@@ -23,10 +23,11 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: "black",
          tabBarStyle: {
-          height: 55 + insets.bottom,
+          height: 60 + insets.bottom,
           paddingBottom: insets.bottom,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
+          borderTopWidth: 1,
         },
         tabBarLabelStyle: {
           fontSize: 12,
