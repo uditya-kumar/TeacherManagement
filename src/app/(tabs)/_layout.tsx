@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { View } from 'react-native';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -16,9 +17,11 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
   const insets = useSafeAreaInsets();
 
   return (
+    <View style={{ backgroundColor: Colors.light.background, flex: 1 }}>
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "black",
@@ -28,6 +31,8 @@ export default function TabLayout() {
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           borderTopWidth: 1,
+          borderColor: Colors.light.borderColor,
+          backgroundColor: Colors.light.background, 
         },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -53,5 +58,6 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    </View>
   );
 }

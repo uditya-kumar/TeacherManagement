@@ -7,12 +7,13 @@ import {
   Pressable,
 } from "react-native";
 import React, { useMemo, useState } from "react";
-import { X } from "lucide-react-native";
+import { X, UserPlus} from "lucide-react-native";
 import Colors from "@/constants/Colors";
-import TeacherCard from "@/components/teacherManagement/TeacherCard"
+import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import { teachers } from "@assets/data/teachers";
 import { router } from "expo-router";
 import { useFavorite } from "@/app/providers/FavoriteProvider";
+import CustomButton from "@/components/teacherManagement/Button";
 
 const index = () => {
   const [search, setSearch] = useState("");
@@ -36,6 +37,13 @@ const index = () => {
     router.push(`/home/view/${teacherId}`);
   };
 
+  const truncate = (str: string, n: number) =>
+    str.length > n ? str.slice(0, n) + "..." : str;
+
+  const onAddTeacher = () => {
+    console.log("Adding Teacher");
+  };
+
   const renderHeader = useMemo(
     () => (
       <>
@@ -55,7 +63,13 @@ const index = () => {
         </View>
 
         <View style={styles.headingContainer}>
-          <Text style={styles.heading}>All Teachers</Text>
+          {search.length > 0 ? (
+            <Text style={styles.heading}>
+              Results for {truncate(search, 8)}
+            </Text>
+          ) : (
+            <Text style={styles.heading}>All Teachers</Text>
+          )}
           <Text>{filteredTeachers.length} Teachers</Text>
         </View>
       </>
@@ -63,6 +77,38 @@ const index = () => {
     [search]
   );
 
+  if (filteredTeachers.length === 0) {
+    return (
+      <>
+        <View
+          style={{
+            backgroundColor: Colors.light.background,
+            paddingHorizontal: 12,
+          }}
+        >
+          {renderHeader}
+        </View>
+        <View style={styles.noTeacherContainer}>
+          <View style={styles.icon}>
+            <UserPlus size={40} color="#9ca3af" />
+          </View>
+          <Text style={{ color: "#6b7280", fontSize: 17, textAlign: "center", paddingBottom: 15 }}>
+            We couldn't find any teacher matching "{search}"
+          </Text>
+
+          {/* Add teacher Button */}
+          <CustomButton
+            text="Add Teacher"
+            textColor="#FFFFFF"
+            backgroundColor="#0C1120"
+            icon="Plus"
+            onPress={onAddTeacher}
+            paddingVertical={13}
+          />
+        </View>
+      </>
+    );
+  }
   return (
     <View style={styles.container}>
       <FlatList
@@ -88,15 +134,31 @@ const index = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     flex: 1,
     backgroundColor: Colors.light.background,
+  },
+  noTeacherContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.light.background,
+    alignItems: "center",
+    justifyContent: "center",
   },
   headingContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginTop: 30,
+  },
+  icon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#f4f4f4ff", // light gray
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
   },
   heading: {
     fontSize: 17,
@@ -105,9 +167,9 @@ const styles = StyleSheet.create({
   searchInput: {
     marginTop: 10,
     height: 47,
-    backgroundColor: Colors.light.background,
     borderRadius: 10,
     borderWidth: 1,
+    backgroundColor: 'white',
     borderColor: Colors.light.borderColor,
     paddingLeft: 15,
     fontSize: 15,

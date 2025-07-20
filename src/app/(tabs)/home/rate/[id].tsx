@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   ratingContainer: {
-    backgroundColor: Colors.light.cardBackground,
+    backgroundColor: Colors.light.background,
     padding: 16,
     marginTop: 10,
     borderColor: Colors.light.borderColor,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   overallContainer: {
-    backgroundColor: Colors.light.cardBackground,
+    backgroundColor: Colors.light.background,
     paddingVertical: 16,
     paddingHorizontal: 0,
     marginTop: 10,

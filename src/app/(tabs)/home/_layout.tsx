@@ -21,6 +21,9 @@ export default function TabLayout() {
   return (
     <Stack
       screenOptions={{
+        headerStyle: { backgroundColor: Colors.light.background },
+        headerTitleStyle: { color: 'black' },
+        headerTintColor: "black",
         headerRight: () => (
           <Link href="/home/favorites" asChild>
             <Pressable>
