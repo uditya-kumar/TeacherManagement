@@ -38,7 +38,7 @@ export default function TabLayout() {
     >
       <Stack.Screen name="index" options={{ title: "Teacher Directory" }} />
       <Stack.Screen name="view/[id]" options={{ title: "View Detail" }} />
-      <Stack.Screen name="favorites" options={{ title: "Favorite Teachers" }} />
+      <Stack.Screen name="favorites" options={{ title: "Favorite Teachers", headerRight: undefined }} />
     </Stack>
   );
 }
