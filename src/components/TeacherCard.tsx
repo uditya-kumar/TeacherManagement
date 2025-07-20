@@ -4,13 +4,15 @@ import Colors from "@/constants/Colors";
 import { Star, Phone, MapPin, Heart } from "lucide-react-native";
 import CustomButton from "./Button";
 import { Teacher } from "@/types";
+import { useSegments } from "expo-router";
 
 type TeacherCard = {
   teacher: Teacher;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onRateTeacher: () => void;
-  onViewDetails: () => void;
+  onViewDetails?: () => void;
+  showViewDetailsButton?: boolean; 
 };
 const TeacherCard = ({
   teacher,
@@ -18,7 +20,9 @@ const TeacherCard = ({
   onToggleFavorite,
   onRateTeacher,
   onViewDetails,
+  showViewDetailsButton = true,
 }: TeacherCard) => {
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -69,15 +73,17 @@ const TeacherCard = ({
           onPress={onRateTeacher}
           paddingVertical={11}
         />
-        <CustomButton
-          text="View Details"
-          textColor="#0C1120"
-          backgroundColor="#FFFFFF"
-          borderColor="#E5E7EB"
-          icon="Eye"
-          onPress={onViewDetails}
-          paddingVertical={11}
-        />
+        {showViewDetailsButton && (
+          <CustomButton
+            text="View Details"
+            textColor="#0C1120"
+            backgroundColor="#FFFFFF"
+            borderColor="#E5E7EB"
+            icon="Eye"
+            onPress={onViewDetails}
+            paddingVertical={11}
+          />
+        )}
       </View>
     </View>
   );

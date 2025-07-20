@@ -1,4 +1,3 @@
-
 import { Teacher } from "@/types";
 
 export const teachers: Teacher[] = [
@@ -9,7 +8,91 @@ export const teachers: Teacher[] = [
     totalRatings: 127,
     cabinNumber: 'AB-203',
     mobileNumber: '9923234534',
-    email: 'anderson@school.edu'
+    email: 'anderson@school.edu',
+    teachingQuality: [{
+      stars: 5,
+      percentage: 60,
+      count: 76000000
+    }, {
+      stars: 4,
+      percentage: 25,
+      count: 32
+    }, {
+      stars: 3,
+      percentage: 10,
+      count: 13
+    }, {
+      stars: 2,
+      percentage: 3,
+      count: 4
+    }, {
+      stars: 1,
+      percentage: 2,
+      count: 2
+    }],
+    evaluationFairness: [{
+      stars: 5,
+      percentage: 55,
+      count: 70
+    }, {
+      stars: 4,
+      percentage: 30,
+      count: 38
+    }, {
+      stars: 3,
+      percentage: 12,
+      count: 15
+    }, {
+      stars: 2,
+      percentage: 2,
+      count: 3
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 1
+    }],
+    behaviorAttitude: [{
+      stars: 5,
+      percentage: 65,
+      count: 83
+    }, {
+      stars: 4,
+      percentage: 22,
+      count: 28
+    }, {
+      stars: 3,
+      percentage: 8,
+      count: 10
+    }, {
+      stars: 2,
+      percentage: 3,
+      count: 4
+    }, {
+      stars: 1,
+      percentage: 2,
+      count: 2
+    }],
+    internalAssessment: [{
+      stars: 5,
+      percentage: 50,
+      count: 64
+    }, {
+      stars: 4,
+      percentage: 35,
+      count: 44
+    }, {
+      stars: 3,
+      percentage: 10,
+      count: 13
+    }, {
+      stars: 2,
+      percentage: 3,
+      count: 4
+    }, {
+      stars: 1,
+      percentage: 2,
+      count: 2
+    }]
   },
   {
     id: '2',
@@ -18,7 +101,91 @@ export const teachers: Teacher[] = [
     totalRatings: 203,
     cabinNumber: 'AB-201',
     mobileNumber: '7923234534',
-    email: 'johnson@school.edu'
+    email: 'johnson@school.edu',
+    teachingQuality: [{
+      stars: 5,
+      percentage: 80,
+      count: 162
+    }, {
+      stars: 4,
+      percentage: 15,
+      count: 30
+    }, {
+      stars: 3,
+      percentage: 3,
+      count: 6
+    }, {
+      stars: 2,
+      percentage: 1,
+      count: 3
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 2
+    }],
+    evaluationFairness: [{
+      stars: 5,
+      percentage: 75,
+      count: 152
+    }, {
+      stars: 4,
+      percentage: 20,
+      count: 41
+    }, {
+      stars: 3,
+      percentage: 3,
+      count: 6
+    }, {
+      stars: 2,
+      percentage: 1,
+      count: 2
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 2
+    }],
+    behaviorAttitude: [{
+      stars: 5,
+      percentage: 85,
+      count: 173
+    }, {
+      stars: 4,
+      percentage: 12,
+      count: 24
+    }, {
+      stars: 3,
+      percentage: 2,
+      count: 4
+    }, {
+      stars: 2,
+      percentage: 1,
+      count: 1
+    }, {
+      stars: 1,
+      percentage: 0,
+      count: 1
+    }],
+    internalAssessment: [{
+      stars: 5,
+      percentage: 70,
+      count: 142
+    }, {
+      stars: 4,
+      percentage: 25,
+      count: 51
+    }, {
+      stars: 3,
+      percentage: 3,
+      count: 6
+    }, {
+      stars: 2,
+      percentage: 1,
+      count: 2
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 2
+    }]
   },
   {
     id: '3',
@@ -27,7 +194,91 @@ export const teachers: Teacher[] = [
     totalRatings: 89,
     cabinNumber: 'AB-303',
     mobileNumber: '6923234534',
-    email: 'williams@school.edu'
+    email: 'williams@school.edu',
+    teachingQuality: [{
+      stars: 5,
+      percentage: 45,
+      count: 40
+    }, {
+      stars: 4,
+      percentage: 35,
+      count: 31
+    }, {
+      stars: 3,
+      percentage: 15,
+      count: 13
+    }, {
+      stars: 2,
+      percentage: 3,
+      count: 3
+    }, {
+      stars: 1,
+      percentage: 2,
+      count: 2
+    }],
+    evaluationFairness: [{
+      stars: 5,
+      percentage: 40,
+      count: 36
+    }, {
+      stars: 4,
+      percentage: 40,
+      count: 36
+    }, {
+      stars: 3,
+      percentage: 15,
+      count: 13
+    }, {
+      stars: 2,
+      percentage: 3,
+      count: 3
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 1
+    }],
+    behaviorAttitude: [{
+      stars: 5,
+      percentage: 50,
+      count: 45
+    }, {
+      stars: 4,
+      percentage: 30,
+      count: 27
+    }, {
+      stars: 3,
+      percentage: 15,
+      count: 13
+    }, {
+      stars: 2,
+      percentage: 3,
+      count: 3
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 1
+    }],
+    internalAssessment: [{
+      stars: 5,
+      percentage: 35,
+      count: 31
+    }, {
+      stars: 4,
+      percentage: 45,
+      count: 40
+    }, {
+      stars: 3,
+      percentage: 15,
+      count: 13
+    }, {
+      stars: 2,
+      percentage: 3,
+      count: 3
+    }, {
+      stars: 1,
+      percentage: 2,
+      count: 2
+    }]
   },
   {
     id: '4',
@@ -36,7 +287,91 @@ export const teachers: Teacher[] = [
     totalRatings: 156,
     cabinNumber: 'AB-503',
     mobileNumber: '8923234534',
-    email: 'brown@school.edu'
+    email: 'brown@school.edu',
+    teachingQuality: [{
+      stars: 5,
+      percentage: 65,
+      count: 101
+    }, {
+      stars: 4,
+      percentage: 25,
+      count: 39
+    }, {
+      stars: 3,
+      percentage: 7,
+      count: 11
+    }, {
+      stars: 2,
+      percentage: 2,
+      count: 3
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 2
+    }],
+    evaluationFairness: [{
+      stars: 5,
+      percentage: 60,
+      count: 94
+    }, {
+      stars: 4,
+      percentage: 30,
+      count: 47
+    }, {
+      stars: 3,
+      percentage: 8,
+      count: 12
+    }, {
+      stars: 2,
+      percentage: 1,
+      count: 2
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 1
+    }],
+    behaviorAttitude: [{
+      stars: 5,
+      percentage: 70,
+      count: 109
+    }, {
+      stars: 4,
+      percentage: 22,
+      count: 34
+    }, {
+      stars: 3,
+      percentage: 6,
+      count: 9
+    }, {
+      stars: 2,
+      percentage: 1,
+      count: 2
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 2
+    }],
+    internalAssessment: [{
+      stars: 5,
+      percentage: 55,
+      count: 86
+    }, {
+      stars: 4,
+      percentage: 35,
+      count: 55
+    }, {
+      stars: 3,
+      percentage: 8,
+      count: 12
+    }, {
+      stars: 2,
+      percentage: 1,
+      count: 2
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 1
+    }]
   },
   {
     id: '5',
@@ -45,6 +380,90 @@ export const teachers: Teacher[] = [
     totalRatings: 112,
     cabinNumber: 'AB-213',
     mobileNumber: '8123234534',
-    email: 'davis@school.edu'
+    email: 'davis@school.edu',
+    teachingQuality: [{
+      stars: 5,
+      percentage: 50,
+      count: 56
+    }, {
+      stars: 4,
+      percentage: 35,
+      count: 39
+    }, {
+      stars: 3,
+      percentage: 10,
+      count: 11
+    }, {
+      stars: 2,
+      percentage: 3,
+      count: 4
+    }, {
+      stars: 1,
+      percentage: 2,
+      count: 2
+    }],
+    evaluationFairness: [{
+      stars: 5,
+      percentage: 45,
+      count: 50
+    }, {
+      stars: 4,
+      percentage: 40,
+      count: 45
+    }, {
+      stars: 3,
+      percentage: 12,
+      count: 13
+    }, {
+      stars: 2,
+      percentage: 2,
+      count: 3
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 1
+    }],
+    behaviorAttitude: [{
+      stars: 5,
+      percentage: 55,
+      count: 62
+    }, {
+      stars: 4,
+      percentage: 30,
+      count: 34
+    }, {
+      stars: 3,
+      percentage: 12,
+      count: 13
+    }, {
+      stars: 2,
+      percentage: 2,
+      count: 2
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 1
+    }],
+    internalAssessment: [{
+      stars: 5,
+      percentage: 40,
+      count: 45
+    }, {
+      stars: 4,
+      percentage: 45,
+      count: 50
+    }, {
+      stars: 3,
+      percentage: 12,
+      count: 13
+    }, {
+      stars: 2,
+      percentage: 2,
+      count: 3
+    }, {
+      stars: 1,
+      percentage: 1,
+      count: 1
+    }]
   }
 ];
