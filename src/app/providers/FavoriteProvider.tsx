@@ -1,24 +1,26 @@
 import { createContext, PropsWithChildren, useContext, useState } from "react";
+import { Teacher } from "@/types";
 
 type FavoriteData = {
-  favorites: string[];
-  toggleFavorite: (teacherId: string) => void;
+  favorites: Teacher[];
+  toggleFavorite: (teacher: Teacher) => void;
 };
+
 const FavoriteContext = createContext<FavoriteData>({
   favorites: [],
   toggleFavorite: () => {},
 });
 
 export default function FavoriteProvider({ children }: PropsWithChildren) {
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<Teacher[]>([]);
 
-  const toggleFavorite = (teacherId: string) => {
-    const isFavorite = favorites.includes(teacherId);
+  const toggleFavorite = (teacher: Teacher) => {
+    const isFavorite = favorites.some((fav) => fav.id === teacher.id);
 
     if (isFavorite) {
-      setFavorites(favorites.filter((id) => id !== teacherId));
+      setFavorites(favorites.filter((fav) => fav.id !== teacher.id));
     } else {
-      setFavorites([...favorites, teacherId]);
+      setFavorites([...favorites, teacher]);
     }
   };
 

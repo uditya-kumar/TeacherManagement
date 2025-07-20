@@ -71,8 +71,8 @@ const index = () => {
         renderItem={({ item }) => (
           <TeacherCard
             teacher={item}
-            isFavorite={favorites.includes(item.id)}
-            onToggleFavorite={() => toggleFavorite(item.id)}
+            isFavorite={favorites.includes(item)}
+            onToggleFavorite={() => toggleFavorite(item)}
             onRateTeacher={() => handleRateTeacher(item.id)}
             onViewDetails={() => handleViewDetails(item.id)}
           />

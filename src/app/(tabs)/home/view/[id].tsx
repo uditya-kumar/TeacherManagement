@@ -13,9 +13,9 @@ const ViewTeacherDetails = () => {
   const teacher = teachers.find((item) => item.id === id);
   const { favorites, toggleFavorite } = useFavorite();
 
-  const handleRateTeacher = (teacherId: string) => {
-    router.push(`/(tabs)/home/rate/[id].tsx`);
-  };
+ const handleRateTeacher = (teacherId: string) => {
+     router.push(`/home/rate/${teacherId}`);
+   };
 
   if (!teacher) {
     return <Text>Teacher Not Found</Text>;
@@ -26,8 +26,8 @@ const ViewTeacherDetails = () => {
       <View style={{ marginTop: 10 }}>
         <TeacherCard
           teacher={teacher as Teacher}
-          isFavorite={favorites.includes(teacher?.id)}
-          onToggleFavorite={() => toggleFavorite(teacher.id)}
+          isFavorite={favorites.includes(teacher)}
+          onToggleFavorite={() => toggleFavorite(teacher)}
           onRateTeacher={() => handleRateTeacher(teacher.id)}
           showViewDetailsButton={false}
         />
