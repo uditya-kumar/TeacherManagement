@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import React, { useState } from "react";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { teachers } from "@assets/data/teachers";
 import Colors from "@/constants/Colors";
 import { Star, Circle} from "lucide-react-native";
@@ -13,6 +13,7 @@ const RateTeacher = () => {
 
   const onSubmitRating = () => {
     console.log("Submitting rating...");
+    router.back();
   };
   const [ratings, setRatings] = useState({
     teachingQuality: 0,
