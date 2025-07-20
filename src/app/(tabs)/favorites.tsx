@@ -9,13 +9,27 @@ import TeacherCard from "@/components/TeacherCard";
 const favorites = () => {
   const { favorites, toggleFavorite } = useFavorite();
 
+  const renderHeader = () => {
+    return (
+      <Text
+        style={{
+          paddingTop: 24,
+          fontSize: 17,
+          color: "#6B7280",
+        }}
+      >
+        {favorites.length} teachers
+      </Text>
+    );
+  };
+
   const handleRateTeacher = (teacherId: string) => {
-      router.push(`./home/rate/${teacherId}`);
-    };
-  
-    const handleViewDetails = (teacherId: string) => {
-      router.push(`./home/view/${teacherId}`);
-    };
+    router.push(`./home/rate/${teacherId}`);
+  };
+
+  const handleViewDetails = (teacherId: string) => {
+    router.push(`./home/view/${teacherId}`);
+  };
 
   if (favorites.length === 0) {
     return (
@@ -51,32 +65,22 @@ const favorites = () => {
   } else {
     return (
       <View style={styles.emptyContainer}>
-        <Text
-          style={{
-            paddingTop: 24,
-            paddingBottom: 20,
-            fontSize: 17,
-            color: "#6B7280",
-          }}
-        >
-          {favorites.length} teachers
-        </Text>
-
         <FlatList
-        data={favorites}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TeacherCard
-            teacher={item}
-            isFavorite={favorites.includes(item)}
-            onToggleFavorite={() => toggleFavorite(item)}
-            onRateTeacher={() => handleRateTeacher(item.id)}
-            onViewDetails={() => handleViewDetails(item.id)}
-          />
-        )}
-        contentContainerStyle={{ gap: 25, paddingBottom: 10 }}
-        initialNumToRender={10}
-      />
+          data={favorites}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TeacherCard
+              teacher={item}
+              isFavorite={favorites.includes(item)}
+              onToggleFavorite={() => toggleFavorite(item)}
+              onRateTeacher={() => handleRateTeacher(item.id)}
+              onViewDetails={() => handleViewDetails(item.id)}
+            />
+          )}
+          contentContainerStyle={{ gap: 25, paddingBottom: 10 }}
+          ListHeaderComponent={renderHeader}
+          initialNumToRender={10}
+        />
       </View>
     );
   }
