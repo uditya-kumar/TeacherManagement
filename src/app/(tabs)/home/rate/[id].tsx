@@ -3,24 +3,38 @@ import React, { useState } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { teachers } from "@assets/data/teachers";
 import Colors from "@/constants/Colors";
-import { Star, Circle} from "lucide-react-native";
+import { Star, Circle } from "lucide-react-native";
 import CustomButton from "@/components/Button";
 
 const RateTeacher = () => {
   const { id } = useLocalSearchParams();
   const teacher = teachers.find((item) => item.id === id);
   const [classAverage, setClassAverage] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
-  const onSubmitRating = () => {
-    console.log("Submitting rating...");
-    router.back();
-  };
   const [ratings, setRatings] = useState({
     teachingQuality: 0,
     evaluationMethods: 0,
-    behaviourAttitude: 0,
+    behaviorAttitude: 0,
     internalAssessment: 0,
   });
+
+  const onSubmitRating = () => {
+    setError("");
+    // Validation
+    if (
+      ratings.teachingQuality === 0 ||
+      ratings.evaluationMethods === 0 ||
+      ratings.behaviorAttitude === 0 ||
+      ratings.internalAssessment === 0 ||
+      !classAverage
+    ) {
+      setError("Please provide all ratings");
+      return;
+    }
+    console.log("Submitting rating...");
+    router.back();
+  };
 
   const handleRating = (category: keyof typeof ratings, rating: number) => {
     setRatings((prev) => ({ ...prev, [category]: rating }));
@@ -70,7 +84,7 @@ const RateTeacher = () => {
       <Circle
         size={20}
         color={Colors.light.borderColor}
-        fill={classAverage === value ? 'black' : "transparent"}
+        fill={classAverage === value ? "black" : "transparent"}
       />
       <View style={styles.radioTextContainer}>
         <Text style={styles.radioLabel}>{label}</Text>
@@ -90,7 +104,7 @@ const RateTeacher = () => {
       {/*Rating*/}
       {renderStarRating("teachingQuality", "Teaching Quality")}
       {renderStarRating("evaluationMethods", "Evaluation Methods")}
-      {renderStarRating("behaviourAttitude", "Behaviour & Attitude")}
+      {renderStarRating("behaviorAttitude", "Behavior & Attitude")}
       {renderStarRating("internalAssessment", "Internal Assessment")}
 
       {/* Overall Class Average */}
@@ -103,17 +117,18 @@ const RateTeacher = () => {
         </View>
       </View>
 
+      {/* Error Message */}
+      <Text style={styles.errorText}>{error}</Text>
       {/* Submit Button */}
-      <View style = {{marginHorizontal: 15, marginTop: 15}}>
-
-      <CustomButton
-        text="Submit Rating"
-        textColor="#FFFFFF"
-        backgroundColor="#0C1120"
-        icon="SendHorizontal"
-        onPress={onSubmitRating}
-        paddingVertical={13}
-      />
+      <View style={{ marginHorizontal: 15, marginTop: 15 }}>
+        <CustomButton
+          text="Submit Rating"
+          textColor="#FFFFFF"
+          backgroundColor="#0C1120"
+          icon="SendHorizontal"
+          onPress={onSubmitRating}
+          paddingVertical={13}
+        />
       </View>
     </ScrollView>
   );
@@ -195,6 +210,13 @@ const styles = StyleSheet.create({
   radioRange: {
     fontSize: 12,
     color: Colors.light.text,
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 16,
+    marginBottom: -8,
+    fontWeight: "500",
   },
 });
 
