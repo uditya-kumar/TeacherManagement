@@ -99,7 +99,7 @@ const RateTeacher = () => {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
     >
-      <Stack.Screen options={{ title: `Rate ${teacher?.name}` }} />
+      <Stack.Screen options={{ title: `Rate ${teacher?.name}`, headerRight: undefined }} />
 
       {/*Rating*/}
       {renderStarRating("teachingQuality", "Teaching Quality")}
