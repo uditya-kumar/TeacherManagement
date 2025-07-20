@@ -21,7 +21,6 @@ export default function TabLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ title: "Teacher Directory" }} />
-      <Stack.Screen name="view/[id]" options={{ title: "View Details" }} />
     </Stack>
   );
 }

@@ -59,6 +59,14 @@ function RootLayoutNav() {
         <FavoriteProvider>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="view/[id]"
+              options={{ title: "View Details" }}
+            />
+            <Stack.Screen
+              name="rate/[id]"
+              options={{ title: "Rate Teacher" }}
+            />
           </Stack>
         </FavoriteProvider>
       </ThemeProvider>

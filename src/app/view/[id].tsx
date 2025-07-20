@@ -14,7 +14,7 @@ const ViewTeacherDetails = () => {
   const { favorites, toggleFavorite } = useFavorite();
 
   const handleRateTeacher = (teacherId: string) => {
-    router.push(`/home/rate/${teacherId}`);
+    router.push(`/rate/${teacherId}`);
   };
 
   if (!teacher) {
