@@ -9,7 +9,7 @@ import {
 import React, { useMemo, useState } from "react";
 import { X } from "lucide-react-native";
 import Colors from "@/constants/Colors";
-import TeacherCard from "@/components/TeacherCard";
+import TeacherCard from "@/components/teacherManagement/TeacherCard"
 import { teachers } from "@assets/data/teachers";
 import { router } from "expo-router";
 import { useFavorite } from "@/app/providers/FavoriteProvider";

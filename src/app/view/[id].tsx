@@ -2,8 +2,8 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import React from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { teachers } from "@assets/data/teachers";
-import TeacherCard from "@/components/TeacherCard";
-import RatingBarChart from "@/components/RatingBarChart";
+import TeacherCard from "@/components/teacherManagement/TeacherCard"
+import RatingBarChart from "@/components/teacherManagement/RatingBarChart";
 import Colors from "@/constants/Colors";
 import { Teacher } from "@/types";
 import { useFavorite } from "@/app/providers/FavoriteProvider";

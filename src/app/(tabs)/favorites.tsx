@@ -4,7 +4,7 @@ import { router, Stack } from "expo-router";
 import { useFavorite } from "../providers/FavoriteProvider";
 import Colors from "@/constants/Colors";
 import { Heart } from "lucide-react-native";
-import TeacherCard from "@/components/TeacherCard";
+import TeacherCard from "@/components/teacherManagement/TeacherCard"
 
 const favorites = () => {
   const { favorites, toggleFavorite } = useFavorite();
