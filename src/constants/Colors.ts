@@ -10,7 +10,8 @@ export default {
     tabIconSelected: tintColorLight,
     borderColor: '#e5e7eb',
     cardBackground : 'white',
-    starColor: '#FFD700'
+    starColor: '#FFD700',
+    error: "#ef4444"
   },
   dark: {
     text: '#fff',
