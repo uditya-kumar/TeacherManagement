@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import React from "react";
 import { router, Stack } from "expo-router";
-import { useFavorite } from "../providers/FavoriteProvider";
+import { useFavorite } from "../../providers/FavoriteProvider";
 import Colors from "@/constants/Colors";
 import { Heart } from "lucide-react-native";
 import TeacherCard from "@/components/teacherManagement/TeacherCard"
