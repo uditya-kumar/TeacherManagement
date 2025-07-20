@@ -4,7 +4,7 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { teachers } from "@assets/data/teachers";
 import Colors from "@/constants/Colors";
 import { Star, Circle } from "lucide-react-native";
-import CustomButton from "@/components/Button";
+import CustomButton from "@/components/teacherManagement/Button";
 
 const RateTeacher = () => {
   const { id } = useLocalSearchParams();
