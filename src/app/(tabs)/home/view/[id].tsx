@@ -13,9 +13,9 @@ const ViewTeacherDetails = () => {
   const teacher = teachers.find((item) => item.id === id);
   const { favorites, toggleFavorite } = useFavorite();
 
- const handleRateTeacher = (teacherId: string) => {
-     router.push(`/home/rate/${teacherId}`);
-   };
+  const handleRateTeacher = (teacherId: string) => {
+    router.push(`/home/rate/${teacherId}`);
+  };
 
   if (!teacher) {
     return <Text>Teacher Not Found</Text>;
