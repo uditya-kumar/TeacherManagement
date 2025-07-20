@@ -29,11 +29,11 @@ const index = () => {
   };
 
   const handleRateTeacher = (teacherId: string) => {
-    router.push(`./home/rate/${teacherId}`);
+    router.push(`/home/rate/${teacherId}`);
   };
 
   const handleViewDetails = (teacherId: string) => {
-    router.push(`./home/view/${teacherId}`);
+    router.push(`/home/view/${teacherId}`);
   };
 
   const renderHeader = useMemo(
