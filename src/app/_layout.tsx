@@ -10,6 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "@/components/useColorScheme";
 import FavoriteProvider from "./providers/FavoriteProvider";
 
@@ -52,10 +53,18 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  
+  // Ensure we have a consistent color scheme
+  const isDark = colorScheme === "dark";
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <StatusBar 
+        style={isDark ? "light" : "dark"} 
+        backgroundColor={isDark ? "#000000" : "#ffffff"}
+        translucent={false}
+      />
+      <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
         <FavoriteProvider>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

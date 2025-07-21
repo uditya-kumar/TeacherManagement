@@ -17,20 +17,21 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
 
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: Colors.light.background },
-        headerTitleStyle: { color: 'black' },
-        headerTintColor: "black",
+        headerStyle: { backgroundColor: colors.background },
+        headerTitleStyle: { color: colors.text },
+        headerTintColor: colors.text,
         headerRight: () => (
           <Link href="/home/favorites" asChild>
             <Pressable>
               {({ pressed }) => (
                 <FolderHeart
                   size={25}
-                  color='black'
+                  color={colors.text}
                   style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                 />
               )}

@@ -17,22 +17,23 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
 
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ backgroundColor: Colors.light.background, flex: 1 }}>
+    <View style={{ backgroundColor: colors.background, flex: 1 }}>
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "black",
+        tabBarActiveTintColor: colors.text,
          tabBarStyle: {
           height: 60 + insets.bottom,
           paddingBottom: insets.bottom,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           borderTopWidth: 1,
-          borderColor: Colors.light.borderColor,
-          backgroundColor: Colors.light.background, 
+          borderColor: colorScheme === 'dark' ? Colors.dark.borderColor : Colors.light.borderColor,
+          backgroundColor: colors.background, 
         },
         tabBarLabelStyle: {
           fontSize: 12,
