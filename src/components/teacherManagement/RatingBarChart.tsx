@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 import { RatingBreakdown } from '@/types';
+import { useColorScheme } from '@/components/useColorScheme';
 
 interface RatingBarChartProps {
   title: string;
@@ -9,6 +10,15 @@ interface RatingBarChartProps {
 }
 
 const RatingBarChart: React.FC<RatingBarChartProps> = ({ title, data }) => {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+  const isDark = colorScheme === 'dark';
+
+  // Theme-aware colors
+  const barBackgroundColor = isDark ? '#374151' : '#F0F0F0';
+  const activeBarColor = isDark ? colors.text : '#000000';
+  const inactiveBarColor = isDark ? '#4b5563' : '#E5E5E5';
+  const secondaryTextColor = isDark ? '#9ca3af' : colors.tabIconDefault;
 
   const formatCount = (count: number): string => {
     if (count >= 1000000000) {
@@ -28,25 +38,25 @@ const RatingBarChart: React.FC<RatingBarChartProps> = ({ title, data }) => {
     return (
       <View key={breakdown.stars} style={styles.starRow}>
         <View style={styles.starLabelContainer}>
-          <Text style={styles.starNumber}>{breakdown.stars}</Text>
+          <Text style={[styles.starNumber, { color: colors.text }]}>{breakdown.stars}</Text>
           <Text style={styles.starIcon}>⭐</Text>
         </View>
         
-        <View style={styles.barContainer}>
+        <View style={[styles.barContainer, { backgroundColor: barBackgroundColor }]}>
           <View 
             style={[
               styles.bar, 
               { 
                 width: `${breakdown.percentage}%`,
-                backgroundColor: breakdown.percentage > 0 ? 'black' : '#E5E5E5'
+                backgroundColor: breakdown.percentage > 0 ? activeBarColor : inactiveBarColor
               }
             ]} 
           />
         </View>
         
         <View style={styles.percentageContainer}>
-          <Text style={styles.percentageText}>{breakdown.percentage}%</Text>
-          <Text style={styles.countText}>({formatCount(breakdown.count)})</Text>
+          <Text style={[styles.percentageText, { color: colors.text }]}>{breakdown.percentage}%</Text>
+          <Text style={[styles.countText, { color: secondaryTextColor }]}>({formatCount(breakdown.count)})</Text>
         </View>
       </View>
     );
@@ -56,8 +66,14 @@ const RatingBarChart: React.FC<RatingBarChartProps> = ({ title, data }) => {
   const sortedData = [...data].sort((a, b) => b.stars - a.stars);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+    <View style={[
+      styles.container,
+      {
+        backgroundColor: colors.cardBackground,
+        borderColor: colors.borderColor,
+      }
+    ]}>
+      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       <View style={styles.chartContainer}>
         {sortedData.map(renderStarRow)}
       </View>
@@ -68,17 +84,14 @@ const RatingBarChart: React.FC<RatingBarChartProps> = ({ title, data }) => {
 const styles = StyleSheet.create({
   container: {
     marginVertical: 15,
-    backgroundColor: 'white',
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: Colors.light.borderColor
   },
   title: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 12,
-    color: Colors.light.text,
   },
   chartContainer: {
     gap: 8,
@@ -96,7 +109,6 @@ const styles = StyleSheet.create({
   starNumber: {
     fontSize: 14,
     fontWeight: '500',
-    color: Colors.light.text,
     marginRight: 4,
   },
   starIcon: {
@@ -105,7 +117,6 @@ const styles = StyleSheet.create({
   barContainer: {
     flex: 1,
     height: 16,
-    backgroundColor: '#F0F0F0',
     borderRadius: 8,
     marginHorizontal: 12,
     overflow: 'hidden',
@@ -124,12 +135,10 @@ const styles = StyleSheet.create({
   percentageText: {
     fontSize: 14,
     fontWeight: '500',
-    color: Colors.light.text,
     marginRight: 4,
   },
   countText: {
     fontSize: 12,
-    color: Colors.light.tabIconDefault,
   },
 });
 
