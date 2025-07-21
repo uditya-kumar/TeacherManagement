@@ -5,6 +5,7 @@ import { Star, Phone, MapPin, Heart } from "lucide-react-native";
 import CustomButton from "./Button";
 import { Teacher } from "@/types";
 import { useSegments } from "expo-router";
+import { useColorScheme } from "@/components/useColorScheme";
 
 type TeacherCard = {
   teacher: Teacher;
@@ -22,11 +23,24 @@ const TeacherCard = ({
   onViewDetails,
   showViewDetailsButton = true,
 }: TeacherCard) => {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+  const isDark = colorScheme === 'dark';
+
+  // Theme-aware colors for better contrast
+  const iconColor = isDark ? '#9ca3af' : '#6b7280';
+  const detailsColor = isDark ? '#d1d5db' : '#6b7280';
 
   return (
-    <View style={styles.container}>
+    <View style={[
+      styles.container,
+      {
+        backgroundColor: colors.cardBackground,
+        borderColor: colors.borderColor,
+      }
+    ]}>
       <View style={styles.header}>
-        <Text style={styles.teacherName}>{teacher.name}</Text>
+        <Text style={[styles.teacherName, { color: colors.text }]}>{teacher.name}</Text>
         <Pressable
           onPress={onToggleFavorite}
           style={({ pressed }) => [
@@ -36,7 +50,7 @@ const TeacherCard = ({
         >
           <Heart
             size={22}
-            color={isFavorite ? "#E91E63" : "gray"}
+            color={isFavorite ? "#E91E63" : iconColor}
             fill={isFavorite ? "#E91E63" : "transparent"}
           />
         </Pressable>
@@ -44,21 +58,21 @@ const TeacherCard = ({
       <View style={styles.ratingContainer}>
         <Star
           size={20}
-          color={Colors.light.starColor}
-          fill={Colors.light.starColor}
+          color={colors.starColor}
+          fill={colors.starColor}
         />
-        <Text style={styles.ratingText}>{teacher.rating}</Text>
-        <Text style={styles.details}>({teacher.totalRatings} reviews)</Text>
+        <Text style={[styles.ratingText, { color: colors.text }]}>{teacher.rating}</Text>
+        <Text style={[styles.details, { color: detailsColor }]}>({teacher.totalRatings} reviews)</Text>
       </View>
       <View style={styles.detailsContainer}>
         <View style={styles.detailRow}>
-          <MapPin size={15} color="gray" style={styles.icon} />
-          <Text style={styles.details}>{teacher.cabinNumber}</Text>
+          <MapPin size={15} color={iconColor} style={styles.icon} />
+          <Text style={[styles.details, { color: detailsColor }]}>{teacher.cabinNumber}</Text>
         </View>
 
         <View style={styles.detailRowWithMargin}>
-          <Phone size={15} color="gray" style={styles.icon} />
-          <Text style={styles.details} selectable>
+          <Phone size={15} color={iconColor} style={styles.icon} />
+          <Text style={[styles.details, { color: detailsColor }]} selectable>
             {teacher.mobileNumber}
           </Text>
         </View>
@@ -68,7 +82,7 @@ const TeacherCard = ({
         <CustomButton
           text="Rate Teacher"
           textColor="#FFFFFF"
-          backgroundColor="#0C1120"
+          backgroundColor={isDark ? '#374151' : '#0C1120'}
           icon="UserCheck"
           onPress={onRateTeacher}
           paddingVertical={11}
@@ -76,9 +90,9 @@ const TeacherCard = ({
         {showViewDetailsButton && (
           <CustomButton
             text="View Details"
-            textColor="#0C1120"
-            backgroundColor="#FFFFFF"
-            borderColor="#E5E7EB"
+            textColor={isDark ? colors.text : '#0C1120'}
+            backgroundColor={isDark ? 'transparent' : '#FFFFFF'}
+            borderColor={colors.borderColor}
             icon="Eye"
             onPress={onViewDetails}
             paddingVertical={11}
@@ -91,10 +105,8 @@ const TeacherCard = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.light.cardBackground,
     padding: 16,
     borderWidth: 1,
-    borderColor: Colors.light.borderColor,
     borderRadius: 10,
   },
   header: {
@@ -138,7 +150,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   details: {
-    color: "gray",
+    // Color will be set dynamically
   },
   heartButton: {
     padding: 4,

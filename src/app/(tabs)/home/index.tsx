@@ -14,10 +14,13 @@ import { teachers } from "@assets/data/teachers";
 import { router } from "expo-router";
 import { useFavorite } from "@/app/providers/FavoriteProvider";
 import CustomButton from "@/components/teacherManagement/Button";
+import { useColorScheme } from "@/components/useColorScheme";
 
 const index = () => {
   const [search, setSearch] = useState("");
   const { favorites, toggleFavorite } = useFavorite();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
 
   const filteredTeachers = useMemo(() => {
     return teachers.filter((teacher) =>
@@ -52,29 +55,37 @@ const index = () => {
             value={search}
             onChangeText={setSearch}
             placeholder="Search Teachers.."
+            placeholderTextColor={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'}
             autoCorrect={false}
-            style={styles.searchInput}
+            style={[
+              styles.searchInput,
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.borderColor,
+                color: colors.text,
+              }
+            ]}
           />
           {search.length > 0 && (
             <Pressable onPress={clearSearch} style={styles.clearButton}>
-              <X size={22} color="black" />
+              <X size={22} color={colors.text} />
             </Pressable>
           )}
         </View>
 
         <View style={styles.headingContainer}>
           {search.length > 0 ? (
-            <Text style={styles.heading}>
+            <Text style={[styles.heading, { color: colors.text }]}>
               Results for {truncate(search, 8)}
             </Text>
           ) : (
-            <Text style={styles.heading}>All Teachers</Text>
+            <Text style={[styles.heading, { color: colors.text }]}>All Teachers</Text>
           )}
-          <Text>{filteredTeachers.length} Teachers</Text>
+          <Text style={{ color: colors.text }}>{filteredTeachers.length} Teachers</Text>
         </View>
       </>
     ),
-    [search]
+    [search, colors, colorScheme]
   );
 
   if (filteredTeachers.length === 0) {
@@ -82,17 +93,25 @@ const index = () => {
       <>
         <View
           style={{
-            backgroundColor: Colors.light.background,
+            backgroundColor: colors.background,
             paddingHorizontal: 12,
           }}
         >
           {renderHeader}
         </View>
-        <View style={styles.noTeacherContainer}>
-          <View style={styles.icon}>
+        <View style={[styles.noTeacherContainer, { backgroundColor: colors.background }]}>
+          <View style={[
+            styles.icon,
+            { backgroundColor: colorScheme === 'dark' ? '#374151' : '#f4f4f4ff' }
+          ]}>
             <UserPlus size={40} color="#9ca3af" />
           </View>
-          <Text style={{ color: "#6b7280", fontSize: 17, textAlign: "center", paddingBottom: 15 }}>
+          <Text style={{ 
+            color: colorScheme === 'dark' ? '#9ca3af' : '#6b7280', 
+            fontSize: 17, 
+            textAlign: "center", 
+            paddingBottom: 15 
+          }}>
             We couldn't find any teacher matching "{search}"
           </Text>
 
@@ -100,7 +119,7 @@ const index = () => {
           <CustomButton
             text="Add Teacher"
             textColor="#FFFFFF"
-            backgroundColor="#0C1120"
+            backgroundColor={colorScheme === 'dark' ? '#1f2937' : '#0C1120'}
             icon="Plus"
             onPress={onAddTeacher}
             paddingVertical={13}
@@ -110,7 +129,7 @@ const index = () => {
     );
   }
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
         data={filteredTeachers}
         keyExtractor={(item) => item.id}
@@ -136,12 +155,10 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     flex: 1,
-    backgroundColor: Colors.light.background,
   },
   noTeacherContainer: {
     flex: 1,
     paddingHorizontal: 16,
-    backgroundColor: Colors.light.background,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -155,7 +172,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#f4f4f4ff", // light gray
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
@@ -169,8 +185,6 @@ const styles = StyleSheet.create({
     height: 47,
     borderRadius: 10,
     borderWidth: 1,
-    backgroundColor: 'white',
-    borderColor: Colors.light.borderColor,
     paddingLeft: 15,
     fontSize: 15,
   },
