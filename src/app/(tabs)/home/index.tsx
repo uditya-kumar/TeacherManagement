@@ -88,46 +88,32 @@ const index = () => {
     [search, colors, colorScheme]
   );
 
-  if (filteredTeachers.length === 0) {
-    return (
-      <>
-        <View
-          style={{
-            backgroundColor: colors.background,
-            paddingHorizontal: 12,
-          }}
-        >
-          {renderHeader}
-        </View>
-        <View style={[styles.noTeacherContainer, { backgroundColor: colors.background }]}>
-          <View style={[
-            styles.icon,
-            { backgroundColor: colorScheme === 'dark' ? '#374151' : '#f4f4f4ff' }
-          ]}>
-            <UserPlus size={40} color="#9ca3af" />
-          </View>
-          <Text style={{ 
-            color: colorScheme === 'dark' ? '#9ca3af' : '#6b7280', 
-            fontSize: 17, 
-            textAlign: "center", 
-            paddingBottom: 15 
-          }}>
-            We couldn't find any teacher matching "{search}"
-          </Text>
+  const renderEmptyComponent = () => (
+    <View style={[styles.noTeacherContainer, { backgroundColor: colors.background, marginTop: 25 }]}>
+      <View style={[styles.icon, { backgroundColor: colorScheme === 'dark' ? '#374151' : '#f4f4f4ff' }]}>
+        <UserPlus size={40} color="#9ca3af" />
+      </View>
+      <Text style={{
+        color: colorScheme === 'dark' ? '#9ca3af' : '#6b7280',
+        fontSize: 17,
+        textAlign: "center",
+        paddingBottom: 15
+      }}>
+        We couldn't find any teacher matching "{search}"
+      </Text>
 
-          {/* Add teacher Button */}
-          <CustomButton
-            text="Add Teacher"
-            textColor="#FFFFFF"
-            backgroundColor={colorScheme === 'dark' ? '#1f2937' : '#0C1120'}
-            icon="Plus"
-            onPress={onAddTeacher}
-            paddingVertical={13}
-          />
-        </View>
-      </>
-    );
-  }
+      {/* Add teacher Button */}
+      <CustomButton
+        text="Add Teacher"
+        textColor="#FFFFFF"
+        backgroundColor={colorScheme === 'dark' ? '#1f2937' : '#0C1120'}
+        icon="Plus"
+        onPress={onAddTeacher}
+        paddingVertical={13}
+      />
+    </View>
+  );
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
@@ -143,7 +129,9 @@ const index = () => {
           />
         )}
         ListHeaderComponent={renderHeader}
-        contentContainerStyle={{ gap: 25, paddingBottom: 10 }}
+        ListEmptyComponent={renderEmptyComponent}
+        contentContainerStyle={[{ gap: 25, paddingBottom: 10 }
+        ]}
         keyboardShouldPersistTaps="handled"
         initialNumToRender={10}
       />
