@@ -1,23 +1,15 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TextInput } from "react-native";
 import React, { useState } from "react";
-import { router, Stack, useLocalSearchParams } from "expo-router";
-import { teachers } from "@assets/data/teachers";
-import Colors from "@/constants/Colors";
-
-import CustomButton from "@/components/teacherManagement/Button";
 import RatingCategories from "@/components/teacherManagement/RatingCategories";
+import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
+import CustomButton from "@/components/teacherManagement/Button";
+import { router } from "expo-router";
 
-const RateTeacher = () => {
-  const { id } = useLocalSearchParams();
-  const teacher = teachers.find((item) => item.id === id);
-  const [error, setError] = useState<string>("");
-  
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"];
-  const isDark = colorScheme === "dark";
-  
+const addTeacher = () => {
   const [classAverage, setClassAverage] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [teacherName, setTeacherName] = useState<string>("");
   const [ratings, setRatings] = useState({
     teachingQuality: 0,
     evaluationMethods: 0,
@@ -25,13 +17,20 @@ const RateTeacher = () => {
     internalAssessment: 0,
   });
 
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
+  const isDark = colorScheme === "dark";
+
   const handleRating = (category: keyof typeof ratings, rating: number) => {
     setRatings((prev) => ({ ...prev, [category]: rating }));
   };
 
-  const onSubmitRating = () => {
+  const onAddTeacher = () => {
     setError("");
-    // Validation
+    if (!teacherName) {
+      setError("Enter Teacher Name");
+      return;
+    }
     if (
       ratings.teachingQuality === 0 ||
       ratings.evaluationMethods === 0 ||
@@ -43,13 +42,11 @@ const RateTeacher = () => {
       return;
     }
 
-    // Submit Rating Logic
-    console.log("Submitting rating...");
+    // Add teacher Logic
+    console.log("Adding teacher...");
     
-    router.back();
+    router.replace('/home');
   };
-
-  
 
   return (
     <ScrollView
@@ -57,11 +54,26 @@ const RateTeacher = () => {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
     >
-      <Stack.Screen
-        options={{ title: `Rate ${teacher?.name}`, headerRight: undefined }}
+      <Text style={[styles.label, { color: colors.text }]}>Teacher Name *</Text>
+      <TextInput
+        value={teacherName}
+        onChangeText={setTeacherName}
+        placeholder="Enter Teacher's Full Name"
+        placeholderTextColor={colorScheme === "dark" ? "#9ca3af" : "#6b7280"}
+        autoCorrect={false}
+        style={[
+          styles.searchInput,
+          {
+            backgroundColor: colors.cardBackground,
+            borderColor: colors.borderColor,
+            color: colors.text,
+          },
+        ]}
       />
 
-      {/* rating categories component rendering */}
+      <Text style={[styles.label, { color: colors.text }]}>
+        Rate Teacher *
+      </Text>
       <RatingCategories
         ratings={ratings}
         classAverage={classAverage}
@@ -83,7 +95,7 @@ const RateTeacher = () => {
           textColor="#FFFFFF"
           backgroundColor={isDark ? "#374151" : "#0C1120"}
           icon="SendHorizontal"
-          onPress={onSubmitRating}
+          onPress={onAddTeacher}
           paddingVertical={13}
         />
       </View>
@@ -94,9 +106,9 @@ const RateTeacher = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: 16,
   },
   scrollContent: {
-    padding: 16,
     paddingBottom: 32,
   },
   errorText: {
@@ -106,6 +118,19 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 14,
   },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 25,
+  },
+  searchInput: {
+    marginTop: 10,
+    height: 47,
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingLeft: 15,
+    fontSize: 15,
+  },
 });
 
-export default RateTeacher;
+export default addTeacher;

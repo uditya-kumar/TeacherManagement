@@ -44,7 +44,7 @@ const index = () => {
     str.length > n ? str.slice(0, n) + "..." : str;
 
   const onAddTeacher = () => {
-    console.log("Adding Teacher");
+    router.push(`/home/addTeacher`);
   };
 
   const renderHeader = useMemo(
