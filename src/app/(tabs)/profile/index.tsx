@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
+import { Link, router } from "expo-router";
 import {
   User,
   BookOpen,
@@ -40,32 +41,42 @@ const ProfilePage = () => {
           borderColor: colors.borderColor,
         }
       ]}>
+
+        {/* Teachers Reviewed */}
         <Pressable style={[
           styles.row,
           { borderBottomColor: colors.borderColor }
-        ]}>
+        ]}
+        onPress={() => router.push('/profile/teachersReviewed')}
+        >
           <View style={styles.rowLeft}>
             <BookOpen size={20} color={iconColor} style={styles.icon} />
             <Text style={[styles.rowText, { color: colors.text }]}>Teachers Reviewed</Text>
           </View>
           <ChevronRight size={20} color={chevronColor} />
         </Pressable>
-
+        
+        {/* Teachers Created */}
         <Pressable style={[
           styles.row,
           { borderBottomColor: colors.borderColor }
-        ]}>
+        ]}
+        onPress={() => router.push('/profile/teachersCreated')}
+        >
           <View style={styles.rowLeft}>
             <Plus size={20} color={iconColor} style={styles.icon} />
             <Text style={[styles.rowText, { color: colors.text }]}>Teachers Created</Text>
           </View>
           <ChevronRight size={20} color={chevronColor} />
         </Pressable>
-
+        
+        {/* Report Bug */}
         <Pressable style={[
           styles.row,
           { borderBottomColor: colors.borderColor }
-        ]}>
+        ]}
+        onPress={() => router.push('/profile/reportBug')}
+        >
           <View style={styles.rowLeft}>
             <Bug size={20} color={iconColor} style={styles.icon} />
             <Text style={[styles.rowText, { color: colors.text }]}>Report a Bug</Text>
@@ -73,6 +84,7 @@ const ProfilePage = () => {
           <ChevronRight size={20} color={chevronColor} />
         </Pressable>
 
+        {/* About Dev */}
         <Pressable style={[styles.row, styles.lastRow]}>
           <View style={styles.rowLeft}>
             <Info size={20} color={iconColor} style={styles.icon} />
@@ -82,7 +94,7 @@ const ProfilePage = () => {
         </Pressable>
       </View>
 
-      <Pressable style={styles.signOutButton}>
+      <Pressable style={styles.signOutButton} onPress={() => console.log('signing out')}>
         <View style={styles.rowLeft}>
           <LogOut size={20} color={colors.error} style={styles.icon} />
           <Text style={[styles.signOutText, { color: colors.error }]}>Sign Out</Text>

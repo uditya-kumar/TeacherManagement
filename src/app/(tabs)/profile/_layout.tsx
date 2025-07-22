@@ -27,6 +27,9 @@ export default function TabLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: "Profile" }} />
+      <Stack.Screen name="reportBug" options={{ title: "Report Bug" }} />
+      <Stack.Screen name="teachersCreated" options={{ title: "Teachers Created" }} />
+      <Stack.Screen name="teachersReviewed" options={{ title: "Teachers Reviewed" }} />
     </Stack>
   );
 }
