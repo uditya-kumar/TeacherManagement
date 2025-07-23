@@ -5,6 +5,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import CustomButton from "@/components/teacherManagement/Button";
 import { router } from "expo-router";
+import CustomTextInput from "@/components/teacherManagement/CustomTextInput";
 
 const addTeacher = () => {
   const [classAverage, setClassAverage] = useState<string>("");
@@ -44,8 +45,8 @@ const addTeacher = () => {
 
     // Add teacher Logic
     console.log("Adding teacher...");
-    
-    router.replace('/home');
+
+    router.replace("/home");
   };
 
   return (
@@ -55,25 +56,14 @@ const addTeacher = () => {
       contentContainerStyle={styles.scrollContent}
     >
       <Text style={[styles.label, { color: colors.text }]}>Teacher Name *</Text>
-      <TextInput
+
+      <CustomTextInput
         value={teacherName}
         onChangeText={setTeacherName}
         placeholder="Enter Teacher's Full Name"
-        placeholderTextColor={colorScheme === "dark" ? "#9ca3af" : "#6b7280"}
-        autoCorrect={false}
-        style={[
-          styles.searchInput,
-          {
-            backgroundColor: colors.cardBackground,
-            borderColor: colors.borderColor,
-            color: colors.text,
-          },
-        ]}
       />
 
-      <Text style={[styles.label, { color: colors.text }]}>
-        Rate Teacher *
-      </Text>
+      <Text style={[styles.label, { color: colors.text }]}>Rate Teacher *</Text>
       <RatingCategories
         ratings={ratings}
         classAverage={classAverage}

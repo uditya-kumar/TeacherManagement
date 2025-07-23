@@ -7,7 +7,7 @@ import {
   Pressable,
 } from "react-native";
 import React, { useMemo, useState } from "react";
-import { X, UserPlus} from "lucide-react-native";
+import { X, UserPlus } from "lucide-react-native";
 import Colors from "@/constants/Colors";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import { teachers } from "@assets/data/teachers";
@@ -15,12 +15,13 @@ import { router } from "expo-router";
 import { useFavorite } from "@/app/providers/FavoriteProvider";
 import CustomButton from "@/components/teacherManagement/Button";
 import { useColorScheme } from "@/components/useColorScheme";
+import CustomTextInput from "@/components/teacherManagement/CustomTextInput";
 
 const index = () => {
   const [search, setSearch] = useState("");
   const { favorites, toggleFavorite } = useFavorite();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors[colorScheme ?? "light"];
 
   const filteredTeachers = useMemo(() => {
     return teachers.filter((teacher) =>
@@ -51,21 +52,13 @@ const index = () => {
     () => (
       <>
         <View style={styles.searchContainer}>
-          <TextInput
+          
+          <CustomTextInput
             value={search}
             onChangeText={setSearch}
             placeholder="Search Teachers.."
-            placeholderTextColor={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'}
-            autoCorrect={false}
-            style={[
-              styles.searchInput,
-              {
-                backgroundColor: colors.cardBackground,
-                borderColor: colors.borderColor,
-                color: colors.text,
-              }
-            ]}
           />
+
           {search.length > 0 && (
             <Pressable onPress={clearSearch} style={styles.clearButton}>
               <X size={22} color={colors.text} />
@@ -79,9 +72,13 @@ const index = () => {
               Results for {truncate(search, 8)}
             </Text>
           ) : (
-            <Text style={[styles.heading, { color: colors.text }]}>All Teachers</Text>
+            <Text style={[styles.heading, { color: colors.text }]}>
+              All Teachers
+            </Text>
           )}
-          <Text style={{ color: colors.text }}>{filteredTeachers.length} Teachers</Text>
+          <Text style={{ color: colors.text }}>
+            {filteredTeachers.length} Teachers
+          </Text>
         </View>
       </>
     ),
@@ -89,16 +86,28 @@ const index = () => {
   );
 
   const renderEmptyComponent = () => (
-    <View style={[styles.noTeacherContainer, { backgroundColor: colors.background, marginTop: 25 }]}>
-      <View style={[styles.icon, { backgroundColor: colorScheme === 'dark' ? '#374151' : '#f4f4f4ff' }]}>
+    <View
+      style={[
+        styles.noTeacherContainer,
+        { backgroundColor: colors.background, marginTop: 25 },
+      ]}
+    >
+      <View
+        style={[
+          styles.icon,
+          { backgroundColor: colorScheme === "dark" ? "#374151" : "#f4f4f4ff" },
+        ]}
+      >
         <UserPlus size={40} color="#9ca3af" />
       </View>
-      <Text style={{
-        color: colorScheme === 'dark' ? '#9ca3af' : '#6b7280',
-        fontSize: 17,
-        textAlign: "center",
-        paddingBottom: 15
-      }}>
+      <Text
+        style={{
+          color: colorScheme === "dark" ? "#9ca3af" : "#6b7280",
+          fontSize: 17,
+          textAlign: "center",
+          paddingBottom: 15,
+        }}
+      >
         We couldn't find any teacher matching "{search}"
       </Text>
 
@@ -106,7 +115,7 @@ const index = () => {
       <CustomButton
         text="Add Teacher"
         textColor="#FFFFFF"
-        backgroundColor={colorScheme === 'dark' ? '#1f2937' : '#0C1120'}
+        backgroundColor={colorScheme === "dark" ? "#1f2937" : "#0C1120"}
         icon="Plus"
         onPress={onAddTeacher}
         paddingVertical={13}
@@ -130,8 +139,7 @@ const index = () => {
         )}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmptyComponent}
-        contentContainerStyle={[{ gap: 25, paddingBottom: 10 }
-        ]}
+        contentContainerStyle={[{ gap: 25, paddingBottom: 10 }]}
         keyboardShouldPersistTaps="handled"
         initialNumToRender={10}
       />

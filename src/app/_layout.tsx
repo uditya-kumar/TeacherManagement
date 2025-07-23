@@ -60,9 +60,7 @@ function RootLayoutNav() {
   return (
     <SafeAreaProvider>
       <StatusBar 
-        style={isDark ? "light" : "dark"} 
-        backgroundColor={isDark ? "#000000" : "#ffffff"}
-        translucent={false}
+        style={isDark ? "light" : "dark"}
       />
       <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
         <FavoriteProvider>
