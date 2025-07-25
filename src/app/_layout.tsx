@@ -65,6 +65,7 @@ function RootLayoutNav() {
       <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
         <FavoriteProvider>
           <Stack>
+            <Stack.Screen name="(auth)/signin" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           </Stack>
         </FavoriteProvider>
