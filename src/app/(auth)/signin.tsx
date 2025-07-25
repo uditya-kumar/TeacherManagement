@@ -1,17 +1,28 @@
-import { View, Text, useColorScheme, StyleSheet, Pressable, Image } from "react-native";
+import {
+  View,
+  Text,
+  useColorScheme,
+  StyleSheet,
+  Pressable,
+  Image,
+} from "react-native";
 import React from "react";
 import Colors from "@/constants/Colors";
 
-
 const GoogleButton = ({ onPress }: { onPress: () => void }) => {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
   return (
-    <Pressable style={styles.button} onPress={onPress}>
+    <Pressable
+      style={[styles.button, { borderColor: colors.borderColor , backgroundColor: colors.cardBackground }]}
+      onPress={onPress}
+    >
       <View style={styles.content}>
         <Image
-          source={require('@assets/images/googleLogo.png')}
+          source={require("@assets/images/googleLogo.png")}
           style={styles.icon}
         />
-        <Text style={styles.text}>Continue with Google</Text>
+        <Text style={[styles.text, {color: colors.text}]}>Continue with Google</Text>
       </View>
     </Pressable>
   );
@@ -24,7 +35,7 @@ const signin = () => {
     console.log("Signing In");
   };
   return (
-    <View style = {[styles.container, {backgroundColor: colors.background}]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.centerContent}>
         <Text style={styles.title}>Helooo</Text>
       </View>
@@ -35,20 +46,17 @@ const signin = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
-    button: {
+  button: {
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 30,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -63,7 +71,7 @@ const styles = StyleSheet.create({
   },
   bottomButton: {
     paddingBottom: 40,
-    width: '90%'
+    width: "90%",
   },
   content: {
     flexDirection: "row",
@@ -75,9 +83,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   text: {
-    color: "#000",
     fontSize: 16,
     fontWeight: "500",
   },
-})
+});
 export default signin;
