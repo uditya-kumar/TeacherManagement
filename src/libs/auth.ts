@@ -2,46 +2,56 @@
 import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
-import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { supabase, supabaseUrl } from "./supabase";
+import { useEffect } from "react";
 
 WebBrowser.maybeCompleteAuthSession();
 
 // Build ONE redirect URI that matches what you whitelisted in Supabase
 const redirectTo = makeRedirectUri({
   scheme: "vitsify",
-  path: "auth/callback",
+  path: "/",
   preferLocalhost: false, // don't fall back to exp://localhost
 });
 console.log("🔗 redirectTo =", redirectTo);
 
 const createSessionFromUrl = async (url: string) => {
-  const { params, errorCode } = QueryParams.getQueryParams(url);
-  if (errorCode) throw new Error(errorCode);
+  try {
+    const parsedUrl = new URL(url);
+    const fragment = parsedUrl.hash.startsWith("#")
+      ? parsedUrl.hash.slice(1)
+      : parsedUrl.hash;
 
-  const { access_token, refresh_token } = params;
-  if (!access_token || !refresh_token) throw new Error("Missing token(s)");
+    const fragmentParams = new URLSearchParams(fragment);
+    const access_token = fragmentParams.get("access_token");
+    const refresh_token = fragmentParams.get("refresh_token");
 
-  const { error } = await supabase.auth.setSession({
-    access_token,
-    refresh_token,
-  });
-  if (error) throw error;
+    if (!access_token || !refresh_token) throw new Error("Missing token(s)");
+
+    const { error } = await supabase.auth.setSession({
+      access_token,
+      refresh_token,
+    });
+
+    if (error) throw error;
+  } catch (err) {
+    console.error("❌ Error creating session from URL:", err);
+    throw err;
+  }
 };
 
 export const googleSignIn = async () => {
-  // Ask supabase for the OAuth URL
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo,              // MUST equal the one in Supabase list
+      redirectTo,
       skipBrowserRedirect: true,
     },
   });
+
   if (error) throw error;
   if (!data?.url) throw new Error("No auth URL from Supabase");
 
-  // Open the auth session
   const res = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
   console.log("AuthSession result:", res);
 
@@ -49,13 +59,17 @@ export const googleSignIn = async () => {
     await createSessionFromUrl(res.url);
     return;
   }
+
   throw new Error("Authentication cancelled or failed");
 };
 
-// Optional: call at app start to catch magic links / password reset etc.
 export const useInitialUrlHandler = () => {
   const url = Linking.useURL();
-  if (url) {
-    createSessionFromUrl(url).catch(console.error);
-  }
+
+  useEffect(() => {
+    if (url?.startsWith("vitsify:///")) {
+      console.log("🔁 Handling auth callback from deep link");
+      createSessionFromUrl(url).catch(console.error);
+    }
+  }, [url]);
 };

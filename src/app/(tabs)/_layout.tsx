@@ -1,11 +1,12 @@
 import React from 'react';
 import Feather from '@expo/vector-icons/Feather';
-import { Tabs } from 'expo-router';
+import { Tabs, Redirect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { View } from 'react-native';
+import { useAuth } from "../providers/AuthProvider";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -20,6 +21,13 @@ export default function TabLayout() {
   const colors = Colors[colorScheme ?? 'light'];
 
   const insets = useSafeAreaInsets();
+
+  const {session} = useAuth();
+
+
+  if (!session){
+    return <Redirect href={'/(auth)/signin'}/>
+  }
 
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>

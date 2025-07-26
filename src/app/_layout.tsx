@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
@@ -23,7 +23,8 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
+  // Start the app at the root index screen. It will handle redirecting based on auth state.
+  initialRouteName: "index",
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -58,16 +59,19 @@ function RootLayoutNav() {
 
   // Ensure we have a consistent color scheme
   const isDark = colorScheme === "dark";
+  const segments = useSegments();
+  console.log("Currently opened page is:- " + segments);
 
   useEffect(() => {
-  const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-    console.log("Auth event:", event);
-    console.log("New session:", session);
-  });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log("Auth event:", event);
+        console.log("New session:", session);
+      }
+    );
 
-  return () => listener.subscription?.unsubscribe();
-}, []);
-
+    return () => listener.subscription?.unsubscribe();
+  }, []);
 
   return (
     <SafeAreaProvider>
@@ -76,10 +80,8 @@ function RootLayoutNav() {
         <AuthProvider>
           <FavoriteProvider>
             <Stack>
-              <Stack.Screen
-                name="(auth)/signin"
-                options={{ headerShown: false }}
-              />
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             </Stack>
           </FavoriteProvider>
