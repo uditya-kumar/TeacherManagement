@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "TeacherManagement",
-    "slug": "TeacherManagement",
+    "name": "Vitsify",
+    "slug": "Vitsify",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "teachermanagement",
+    "scheme": "Vitsify",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
