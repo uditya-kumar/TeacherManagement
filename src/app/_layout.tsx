@@ -13,6 +13,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "@/components/useColorScheme";
 import FavoriteProvider from "./providers/FavoriteProvider";
+import AuthProvider from "./providers/AuthProvider";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -53,22 +54,25 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  
+
   // Ensure we have a consistent color scheme
   const isDark = colorScheme === "dark";
 
   return (
     <SafeAreaProvider>
-      <StatusBar 
-        style={isDark ? "light" : "dark"}
-      />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-        <FavoriteProvider>
-          <Stack>
-            <Stack.Screen name="(auth)/signin" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack>
-        </FavoriteProvider>
+        <AuthProvider>
+          <FavoriteProvider>
+            <Stack>
+              <Stack.Screen
+                name="(auth)/signin"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+          </FavoriteProvider>
+        </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
