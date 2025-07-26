@@ -7,6 +7,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { View } from 'react-native';
 import { useAuth } from "../providers/AuthProvider";
+import { ActivityIndicator } from 'react-native';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -16,17 +17,24 @@ function TabBarIcon(props: {
   return <Feather size={17} style={{ marginBottom: -3 }} {...props} />;
 }
 
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
 
   const insets = useSafeAreaInsets();
 
-  const {session} = useAuth();
+  const { session, loading } = useAuth();
+  console.log('(tabs)/_layout render:', { session, loading });
 
+  if (loading) {
+    console.log('(tabs)/_layout: Auth is loading, showing ActivityIndicator');
+    return <ActivityIndicator />;
+  }
 
-  if (!session){
-    return <Redirect href={'/(auth)/signin'}/>
+  if (!session) {
+    console.log('No session in (tabs)/_layout, redirecting to /auth/signin');
+    return <Redirect href={'/(auth)/signin'} />;
   }
 
   return (

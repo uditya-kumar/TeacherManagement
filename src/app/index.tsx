@@ -6,14 +6,18 @@ import { ActivityIndicator } from 'react-native';
 // to our intended initial screen. Adjust the destination as needed.
 export default function Index() {
   const { session, loading } = useAuth();
+  console.log('Index render:', { session, loading });
 
   if (loading) {
+    console.log('Auth is loading, showing ActivityIndicator');
     return <ActivityIndicator />;
   }
 
   if (session) {
-    return <Redirect href={'/(tabs)'} />;
+    console.log('Session found, redirecting to (tabs)');
+    return <Redirect href={'/(tabs)/home'} />;
   }
 
-  return <Redirect href={'/(auth)'} />;
+  console.log('No session, redirecting to (auth)');
+  return <Redirect href={'/(auth)/signin'} />;
 } 

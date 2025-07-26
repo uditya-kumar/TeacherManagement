@@ -24,7 +24,7 @@ export {
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   // Start the app at the root index screen. It will handle redirecting based on auth state.
-  initialRouteName: "index",
+  initialRouteName: "(tabs)",
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
