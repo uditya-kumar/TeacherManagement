@@ -53,10 +53,24 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
     fetchSession();
 
-    // Subscribe to auth state changes
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    // ✅ Subscribe to auth changes
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setSession(session);
+        if (session) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+          setProfile(data || null);
+        }
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe(); // ✅ Cleanup
+    };
   }, []);
 
   return (

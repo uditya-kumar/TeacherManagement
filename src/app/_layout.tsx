@@ -14,6 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "@/components/useColorScheme";
 import FavoriteProvider from "./providers/FavoriteProvider";
 import AuthProvider from "./providers/AuthProvider";
+import { supabase } from "@/libs/supabase";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -57,6 +58,16 @@ function RootLayoutNav() {
 
   // Ensure we have a consistent color scheme
   const isDark = colorScheme === "dark";
+
+  useEffect(() => {
+  const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+    console.log("Auth event:", event);
+    console.log("New session:", session);
+  });
+
+  return () => listener.subscription?.unsubscribe();
+}, []);
+
 
   return (
     <SafeAreaProvider>
