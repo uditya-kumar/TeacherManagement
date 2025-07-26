@@ -2,8 +2,10 @@
 import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
-import { supabase, supabaseUrl } from "./supabase";
+import { supabase } from "./supabase";
 import { useEffect } from "react";
+import { useLinkingURL } from "expo-linking"; // ✅ New hook
+
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -13,7 +15,6 @@ const redirectTo = makeRedirectUri({
   path: "/",
   preferLocalhost: false, // don't fall back to exp://localhost
 });
-console.log("🔗 redirectTo =", redirectTo);
 
 const createSessionFromUrl = async (url: string) => {
   try {
@@ -64,7 +65,7 @@ export const googleSignIn = async () => {
 };
 
 export const useInitialUrlHandler = () => {
-  const url = Linking.useURL();
+  const url = useLinkingURL(); 
 
   useEffect(() => {
     if (url?.startsWith("vitsify:///")) {
@@ -73,3 +74,4 @@ export const useInitialUrlHandler = () => {
     }
   }, [url]);
 };
+

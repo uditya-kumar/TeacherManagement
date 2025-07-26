@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
@@ -14,7 +14,6 @@ import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "@/components/useColorScheme";
 import FavoriteProvider from "./providers/FavoriteProvider";
 import AuthProvider from "./providers/AuthProvider";
-import { supabase } from "@/libs/supabase";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -59,19 +58,6 @@ function RootLayoutNav() {
 
   // Ensure we have a consistent color scheme
   const isDark = colorScheme === "dark";
-  const segments = useSegments();
-  console.log("Currently opened page is:- " + segments);
-
-  useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log("Auth event:", event);
-        console.log("New session:", session);
-      }
-    );
-
-    return () => listener.subscription?.unsubscribe();
-  }, []);
 
   return (
     <SafeAreaProvider>

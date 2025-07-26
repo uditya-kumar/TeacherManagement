@@ -25,15 +25,12 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
   const { session, loading } = useAuth();
-  console.log('(tabs)/_layout render:', { session, loading });
 
   if (loading) {
-    console.log('(tabs)/_layout: Auth is loading, showing ActivityIndicator');
     return <ActivityIndicator />;
   }
 
   if (!session) {
-    console.log('No session in (tabs)/_layout, redirecting to /auth/signin');
     return <Redirect href={'/(auth)/signin'} />;
   }
 
