@@ -14,6 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "@/components/useColorScheme";
 import FavoriteProvider from "./providers/FavoriteProvider";
 import AuthProvider from "./providers/AuthProvider";
+import QueryProvider from "./providers/QueryProvider";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -64,13 +65,15 @@ function RootLayoutNav() {
       <StatusBar style={isDark ? "light" : "dark"} />
       <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
         <AuthProvider>
-          <FavoriteProvider>
-            <Stack>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            </Stack>
-          </FavoriteProvider>
+          <QueryProvider>
+            <FavoriteProvider>
+              <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              </Stack>
+            </FavoriteProvider>
+          </QueryProvider>
         </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>
