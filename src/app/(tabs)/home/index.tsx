@@ -2,20 +2,20 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   FlatList,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import React, { useMemo, useState } from "react";
 import { X, UserPlus } from "lucide-react-native";
 import Colors from "@/constants/Colors";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
-import { teachers } from "@assets/data/teachers";
 import { router } from "expo-router";
 import { useFavorite } from "@/app/providers/FavoriteProvider";
 import CustomButton from "@/components/teacherManagement/Button";
 import { useColorScheme } from "@/components/useColorScheme";
 import CustomTextInput from "@/components/teacherManagement/CustomTextInput";
+import { useTeacherList } from "@/api/teachers";
 
 const index = () => {
   const [search, setSearch] = useState("");
@@ -23,11 +23,16 @@ const index = () => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
+  // fetch teacher data from database
+  const { data: teachers, error, isLoading } = useTeacherList();
+
   const filteredTeachers = useMemo(() => {
-    return teachers.filter((teacher) =>
-      teacher.name.toLowerCase().includes(search.toLowerCase())
+    return (teachers ?? []).filter(
+      (teacher) =>
+        typeof teacher.full_name === "string" &&
+        teacher.full_name.toLowerCase().includes(search.toLowerCase())
     );
-  }, [search]);
+  }, [search, teachers]);
 
   const clearSearch = () => {
     setSearch("");
@@ -52,7 +57,6 @@ const index = () => {
     () => (
       <>
         <View style={styles.searchContainer}>
-          
           <CustomTextInput
             value={search}
             onChangeText={setSearch}
@@ -123,6 +127,13 @@ const index = () => {
     </View>
   );
 
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error || !teachers) {
+    return <Text>Failed to fetch teachers</Text>;
+  }
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList

@@ -1,15 +1,15 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Stack, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
-import { FolderHeart } from 'lucide-react-native';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import React from "react";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Link, Stack, Tabs, useSegments } from "expo-router";
+import { Pressable } from "react-native";
+import { FolderHeart } from "lucide-react-native";
+import Colors from "@/constants/Colors";
+import { useColorScheme } from "@/components/useColorScheme";
+import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
+  name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
@@ -17,7 +17,10 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors[colorScheme ?? "light"];
+  const segments = useSegments();
+
+  console.log(segments);
 
   return (
     <Stack
@@ -42,8 +45,14 @@ export default function TabLayout() {
     >
       <Stack.Screen name="index" options={{ title: "Teacher Directory" }} />
       <Stack.Screen name="view/[id]" options={{ title: "View Detail" }} />
-      <Stack.Screen name="favorites" options={{ title: "Favorite Teachers", headerRight: undefined }} />
-      <Stack.Screen name="addTeacher" options={{ title: "Add Teacher", headerRight: undefined }} />
+      <Stack.Screen
+        name="favorites"
+        options={{ title: "Favorite Teachers", headerRight: undefined }}
+      />
+      <Stack.Screen
+        name="addTeacher"
+        options={{ title: "Add Teacher", headerRight: undefined }}
+      />
     </Stack>
   );
 }

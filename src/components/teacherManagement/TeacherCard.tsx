@@ -1,10 +1,9 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import Colors from "@/constants/Colors";
 import { Star, Phone, MapPin, Heart } from "lucide-react-native";
 import CustomButton from "./Button";
 import { Teacher } from "@/types";
-import { useSegments } from "expo-router";
 import { useColorScheme } from "@/components/useColorScheme";
 
 type TeacherCard = {
@@ -13,7 +12,7 @@ type TeacherCard = {
   onToggleFavorite: () => void;
   onRateTeacher: () => void;
   onViewDetails?: () => void;
-  showViewDetailsButton?: boolean; 
+  showViewDetailsButton?: boolean;
 };
 const TeacherCard = ({
   teacher,
@@ -24,23 +23,27 @@ const TeacherCard = ({
   showViewDetailsButton = true,
 }: TeacherCard) => {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-  const isDark = colorScheme === 'dark';
+  const colors = Colors[colorScheme ?? "light"];
+  const isDark = colorScheme === "dark";
 
   // Theme-aware colors for better contrast
-  const iconColor = isDark ? '#9ca3af' : '#6b7280';
-  const detailsColor = isDark ? '#d1d5db' : '#6b7280';
+  const iconColor = isDark ? "#9ca3af" : "#6b7280";
+  const detailsColor = isDark ? "#d1d5db" : "#6b7280";
 
   return (
-    <View style={[
-      styles.container,
-      {
-        backgroundColor: colors.cardBackground,
-        borderColor: colors.borderColor,
-      }
-    ]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.cardBackground,
+          borderColor: colors.borderColor,
+        },
+      ]}
+    >
       <View style={styles.header}>
-        <Text style={[styles.teacherName, { color: colors.text }]}>{teacher.name}</Text>
+        <Text style={[styles.teacherName, { color: colors.text }]}>
+          {teacher.full_name}
+        </Text>
         <Pressable
           onPress={onToggleFavorite}
           style={({ pressed }) => [
@@ -56,24 +59,36 @@ const TeacherCard = ({
         </Pressable>
       </View>
       <View style={styles.ratingContainer}>
-        <Star
-          size={20}
-          color={colors.starColor}
-          fill={colors.starColor}
-        />
-        <Text style={[styles.ratingText, { color: colors.text }]}>{teacher.rating}</Text>
-        <Text style={[styles.details, { color: detailsColor }]}>({teacher.totalRatings} reviews)</Text>
+        <Star size={20} color={colors.starColor} fill={colors.starColor} />
+
+        {teacher.rating_count === 0 ? (
+          <Text style={[styles.details, { color: detailsColor, paddingLeft: 10, fontWeight: '600' }]}>
+            No Reviews
+          </Text>
+        ) : (
+          <>
+            <Text style={[styles.ratingText, { color: colors.text }]}>
+              {teacher.average_rating}
+            </Text>
+            <Text style={[styles.details, { color: detailsColor }]}>
+              ({teacher.rating_count} reviews)
+            </Text>
+          </>
+        )}
+        
       </View>
       <View style={styles.detailsContainer}>
         <View style={styles.detailRow}>
           <MapPin size={15} color={iconColor} style={styles.icon} />
-          <Text style={[styles.details, { color: detailsColor }]}>{teacher.cabinNumber}</Text>
+          <Text style={[styles.details, { color: detailsColor }]}>
+            {teacher.cabin_no?.trim() || "N/A"}
+          </Text>
         </View>
 
         <View style={styles.detailRowWithMargin}>
           <Phone size={15} color={iconColor} style={styles.icon} />
           <Text style={[styles.details, { color: detailsColor }]} selectable>
-            {teacher.mobileNumber}
+            {teacher.mobile_no?.trim() || "N/A"}
           </Text>
         </View>
       </View>
@@ -82,7 +97,7 @@ const TeacherCard = ({
         <CustomButton
           text="Rate Teacher"
           textColor="#FFFFFF"
-          backgroundColor={isDark ? '#374151' : '#0C1120'}
+          backgroundColor={isDark ? "#374151" : "#0C1120"}
           icon="UserCheck"
           onPress={onRateTeacher}
           paddingVertical={11}
@@ -90,8 +105,8 @@ const TeacherCard = ({
         {showViewDetailsButton && (
           <CustomButton
             text="View Details"
-            textColor={isDark ? colors.text : '#0C1120'}
-            backgroundColor={isDark ? 'transparent' : '#FFFFFF'}
+            textColor={isDark ? colors.text : "#0C1120"}
+            backgroundColor={isDark ? "transparent" : "#FFFFFF"}
             borderColor={colors.borderColor}
             icon="Eye"
             onPress={onViewDetails}
