@@ -1,31 +1,54 @@
-import { createContext, PropsWithChildren, useContext, useState } from "react";
+import React, { createContext, useContext, useMemo } from "react";
 import { Teacher } from "@/types";
+import { useAuth } from "./AuthProvider";
+import {
+  useTeacherList,
+  useFavoriteTeacherIds,
+  useToggleFavoriteTeacher,
+} from "@/api/teachers";
 
-type FavoriteData = {
+type FavoriteCtx = {
   favorites: Teacher[];
-  toggleFavorite: (teacher: Teacher) => void;
+  favoriteIds: string[];
+  toggleFavorite: (t: Teacher) => void;
+  loading: boolean;
 };
 
-const FavoriteContext = createContext<FavoriteData>({
+const FavoriteContext = createContext<FavoriteCtx>({
   favorites: [],
+  favoriteIds: [],
   toggleFavorite: () => {},
+  loading: true,
 });
 
-export default function FavoriteProvider({ children }: PropsWithChildren) {
-  const [favorites, setFavorites] = useState<Teacher[]>([]);
+export default function FavoriteProvider({ children }: React.PropsWithChildren) {
+  const { session, loading: authLoading } = useAuth();
+  const userId = session?.user.id;
+
+  // Don’t query until we know the user
+  const { data: favoriteIds = [], isLoading: favLoading } = useFavoriteTeacherIds(userId);
+  const { data: teachers = [] } = useTeacherList();
+  const { mutate: toggle } = useToggleFavoriteTeacher(userId);
+
+  const favorites = useMemo(
+    () => teachers.filter((t) => favoriteIds.includes(t.id)),
+    [teachers, favoriteIds]
+  );
 
   const toggleFavorite = (teacher: Teacher) => {
-    const isFavorite = favorites.some((fav) => fav.id === teacher.id);
-
-    if (isFavorite) {
-      setFavorites(favorites.filter((fav) => fav.id !== teacher.id));
-    } else {
-      setFavorites([...favorites, teacher]);
-    }
+    const isFav = favoriteIds.includes(teacher.id);
+    toggle({ teacherId: teacher.id, isFavorite: !isFav });
   };
 
   return (
-    <FavoriteContext.Provider value={{ favorites, toggleFavorite }}>
+    <FavoriteContext.Provider
+      value={{
+        favorites,
+        favoriteIds,
+        toggleFavorite,
+        loading: authLoading || favLoading,
+      }}
+    >
       {children}
     </FavoriteContext.Provider>
   );

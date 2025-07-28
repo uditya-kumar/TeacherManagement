@@ -2,7 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   Pressable,
   ActivityIndicator,
 } from "react-native";
@@ -16,12 +15,20 @@ import CustomButton from "@/components/teacherManagement/Button";
 import { useColorScheme } from "@/components/useColorScheme";
 import CustomTextInput from "@/components/teacherManagement/CustomTextInput";
 import { useTeacherList } from "@/api/teachers";
+import {
+  LegendList,
+  LegendListRenderItemProps,
+  LegendListRef,
+} from "@legendapp/list";
+import { useRef, useCallback } from "react";
+
 
 const index = () => {
   const [search, setSearch] = useState("");
-  const { favorites, toggleFavorite } = useFavorite();
+  const { favorites, favoriteIds, toggleFavorite } = useFavorite();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const listRef = useRef<LegendListRef | null>(null); // For scroll control (optional)
 
   // fetch teacher data from database
   const { data: teachers, error, isLoading } = useTeacherList();
@@ -35,8 +42,13 @@ const index = () => {
   }, [search, teachers]);
 
   const clearSearch = () => {
-    setSearch("");
-  };
+  setSearch("");
+  // Reset scroll to top after state update
+  setTimeout(() => {
+    listRef.current?.scrollToOffset?.({ offset: 0, animated: false });
+  }, 0);
+};
+
 
   const handleRateTeacher = (teacherId: string) => {
     router.push(`/home/rate/${teacherId}`);
@@ -127,6 +139,20 @@ const index = () => {
     </View>
   );
 
+  // Memoized renderItem for performance
+  const renderItem = useCallback(
+  ({ item }: LegendListRenderItemProps<any>) => (
+    <TeacherCard
+      teacher={item}
+      isFavorite={favoriteIds.includes(item.id)}
+      onToggleFavorite={() => toggleFavorite(item)}
+      onRateTeacher={() => handleRateTeacher(item.id)}
+      onViewDetails={() => handleViewDetails(item.id)}
+    />
+  ),
+  [favoriteIds, toggleFavorite]
+);
+
   if (isLoading) {
     return <ActivityIndicator />;
   }
@@ -136,23 +162,17 @@ const index = () => {
   }
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <FlatList
+      <LegendList
+        ref={listRef}
         data={filteredTeachers}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TeacherCard
-            teacher={item}
-            isFavorite={favorites.includes(item)}
-            onToggleFavorite={() => toggleFavorite(item)}
-            onRateTeacher={() => handleRateTeacher(item.id)}
-            onViewDetails={() => handleViewDetails(item.id)}
-          />
-        )}
+        renderItem={renderItem}
+        extraData={favoriteIds}              
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmptyComponent}
         contentContainerStyle={[{ gap: 25, paddingBottom: 10 }]}
         keyboardShouldPersistTaps="handled"
-        initialNumToRender={10}
+        recycleItems={true}
       />
     </View>
   );
@@ -173,7 +193,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 30,
+    marginTop: 27,
+    marginVertical: 22,
   },
   icon: {
     width: 80,
@@ -202,7 +223,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     position: "relative",
-    marginTop: 10,
+    marginTop: 20,
   },
 });
 

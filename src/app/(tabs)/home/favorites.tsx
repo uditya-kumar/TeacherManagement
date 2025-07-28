@@ -10,20 +10,15 @@ import { useColorScheme } from "@/components/useColorScheme";
 const favorites = () => {
   const { favorites, toggleFavorite } = useFavorite();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-  const isDark = colorScheme === 'dark';
-  
+  const colors = Colors[colorScheme ?? "light"];
+  const isDark = colorScheme === "dark";
+
   // Theme-aware colors
-  const secondaryTextColor = isDark ? '#9ca3af' : '#6B7280';
+  const secondaryTextColor = isDark ? "#9ca3af" : "#6B7280";
 
   const renderHeader = () => {
     return (
-      <Text
-        style={[
-          styles.headerText,
-          { color: secondaryTextColor }
-        ]}
-      >
+      <Text style={[styles.headerText, { color: secondaryTextColor }]}>
         {favorites.length} teachers
       </Text>
     );
@@ -39,27 +34,16 @@ const favorites = () => {
 
   if (favorites.length === 0) {
     return (
-      <View style={[styles.emptyContainer, { backgroundColor: colors.background }]}>
-        <Text
-          style={[
-            styles.headerText,
-            { color: secondaryTextColor }
-          ]}
-        >
+      <View
+        style={[styles.emptyContainer, { backgroundColor: colors.background }]}
+      >
+        <Text style={[styles.headerText, { color: secondaryTextColor }]}>
           0 teachers
         </Text>
 
         <View style={styles.emptyStateContainer}>
-          <Heart 
-            size={70} 
-            color={isDark ? '#4b5563' : colors.borderColor} 
-          />
-          <Text
-            style={[
-              styles.emptyStateText,
-              { color: secondaryTextColor }
-            ]}
-          >
+          <Heart size={70} color={isDark ? "#4b5563" : colors.borderColor} />
+          <Text style={[styles.emptyStateText, { color: secondaryTextColor }]}>
             Tap the heart icon on any teacher to add them to your favorites
           </Text>
         </View>
@@ -74,7 +58,7 @@ const favorites = () => {
           renderItem={({ item }) => (
             <TeacherCard
               teacher={item}
-              isFavorite={favorites.includes(item)}
+              isFavorite={true}
               onToggleFavorite={() => toggleFavorite(item)}
               onRateTeacher={() => handleRateTeacher(item.id)}
               onViewDetails={() => handleViewDetails(item.id)}

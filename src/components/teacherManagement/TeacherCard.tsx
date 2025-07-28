@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, Pressable, Animated } from "react-native";
+import React, { useRef } from "react";
 import Colors from "@/constants/Colors";
 import { Star, Phone, MapPin, Heart } from "lucide-react-native";
 import CustomButton from "./Button";
@@ -25,10 +25,26 @@ const TeacherCard = ({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   // Theme-aware colors for better contrast
   const iconColor = isDark ? "#9ca3af" : "#6b7280";
   const detailsColor = isDark ? "#d1d5db" : "#6b7280";
+
+  const animateHeart = () => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.3,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 3,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   return (
     <View
@@ -45,24 +61,34 @@ const TeacherCard = ({
           {teacher.full_name}
         </Text>
         <Pressable
-          onPress={onToggleFavorite}
+          onPress={() => {
+            animateHeart();
+            onToggleFavorite();
+          }}
           style={({ pressed }) => [
             styles.heartButton,
             { opacity: pressed ? 0.7 : 1 },
           ]}
         >
-          <Heart
-            size={22}
-            color={isFavorite ? "#E91E63" : iconColor}
-            fill={isFavorite ? "#E91E63" : "transparent"}
-          />
+          <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+            <Heart
+              size={22}
+              color={isFavorite ? "#E91E63" : iconColor}
+              fill={isFavorite ? "#E91E63" : "transparent"}
+            />
+          </Animated.View>
         </Pressable>
       </View>
       <View style={styles.ratingContainer}>
         <Star size={20} color={colors.starColor} fill={colors.starColor} />
 
         {teacher.rating_count === 0 ? (
-          <Text style={[styles.details, { color: detailsColor, paddingLeft: 10, fontWeight: '600' }]}>
+          <Text
+            style={[
+              styles.details,
+              { color: detailsColor, paddingLeft: 10, fontWeight: "600" },
+            ]}
+          >
             No Reviews
           </Text>
         ) : (
@@ -75,7 +101,6 @@ const TeacherCard = ({
             </Text>
           </>
         )}
-        
       </View>
       <View style={styles.detailsContainer}>
         <View style={styles.detailRow}>

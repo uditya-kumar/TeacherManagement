@@ -1,6 +1,6 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Stack, Tabs, useSegments } from "expo-router";
+import { Link, Stack } from "expo-router";
 import { Pressable } from "react-native";
 import { FolderHeart } from "lucide-react-native";
 import Colors from "@/constants/Colors";
@@ -18,9 +18,6 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-  const segments = useSegments();
-
-  console.log(segments);
 
   return (
     <Stack
