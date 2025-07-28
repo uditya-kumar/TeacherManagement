@@ -32,18 +32,13 @@ const TeacherCard = ({
   const detailsColor = isDark ? "#d1d5db" : "#6b7280";
 
   const animateHeart = () => {
-    Animated.sequence([
-      Animated.timing(scaleAnim, {
-        toValue: 1.3,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 3,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    scaleAnim.setValue(1.5);
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 12,
+    }).start();
   };
 
   return (
