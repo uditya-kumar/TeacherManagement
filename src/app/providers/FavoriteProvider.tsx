@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo } from "react";
-import { Teacher } from "@/types";
+import { Tables} from "@/types";
 import { useAuth } from "./AuthProvider";
 import {
   useTeacherList,
@@ -8,9 +8,9 @@ import {
 } from "@/api/teachers";
 
 type FavoriteCtx = {
-  favorites: Teacher[];
+  favorites: Tables<'teachers'>[];
   favoriteIds: string[];
-  toggleFavorite: (t: Teacher) => void;
+  toggleFavorite: (t: Tables<'teachers'>) => void;
   loading: boolean;
 };
 
@@ -35,7 +35,7 @@ export default function FavoriteProvider({ children }: React.PropsWithChildren) 
     [teachers, favoriteIds]
   );
 
-  const toggleFavorite = (teacher: Teacher) => {
+  const toggleFavorite = (teacher: Tables<'teachers'>) => {
     const isFav = favoriteIds.includes(teacher.id);
     toggle({ teacherId: teacher.id, isFavorite: !isFav });
   };

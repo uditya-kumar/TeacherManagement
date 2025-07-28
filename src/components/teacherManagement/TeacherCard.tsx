@@ -5,9 +5,10 @@ import { Star, Phone, MapPin, Heart } from "lucide-react-native";
 import CustomButton from "./Button";
 import { Teacher } from "@/types";
 import { useColorScheme } from "@/components/useColorScheme";
+import { Tables } from "@/types";
 
 type TeacherCard = {
-  teacher: Teacher;
+  teacher: Tables<'teachers'>;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onRateTeacher: () => void;

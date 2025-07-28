@@ -11,6 +11,40 @@ export const useTeacherList = () =>
     },
   });
 
+// fetching teacher details
+export const useTeacher = (id: string) =>
+  useQuery({
+    queryKey: ["teacher", id],
+    enabled: !!id, // only run when we actually have an ID
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("teachers")
+        .select("*")
+        .eq("id", id)   // id is now a UUID string
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  });
+
+
+export const useTeacherRating = (id: string) =>
+  useQuery({
+    queryKey: ["ratings", id],
+    enabled: !!id, // only run when we actually have an ID
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ratings")
+        .select("*")
+        .eq("teacher_id", id)   // id is now a UUID string
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  });
+
 export const useFavoriteTeacherIds = (userId?: string) =>
   useQuery({
     queryKey: ["favoriteIds", userId],

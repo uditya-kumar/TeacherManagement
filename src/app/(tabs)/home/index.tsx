@@ -21,6 +21,7 @@ import {
   LegendListRef,
 } from "@legendapp/list";
 import { useRef, useCallback } from "react";
+import { Tables } from "@/types";
 
 
 const index = () => {
@@ -141,7 +142,7 @@ const index = () => {
 
   // Memoized renderItem for performance
   const renderItem = useCallback(
-  ({ item }: LegendListRenderItemProps<any>) => (
+  ({ item }: LegendListRenderItemProps<Tables<'teachers'>>) => (
     <TeacherCard
       teacher={item}
       isFavorite={favoriteIds.includes(item.id)}

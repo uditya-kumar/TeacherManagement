@@ -4,12 +4,12 @@ import Colors from '@/constants/Colors';
 import { RatingBreakdown } from '@/types';
 import { useColorScheme } from '@/components/useColorScheme';
 
-interface RatingBarChartProps {
+type RatingBarChartProps = {
   title: string;
   data: RatingBreakdown[];
 }
 
-const RatingBarChart: React.FC<RatingBarChartProps> = ({ title, data }) => {
+const RatingBarChart = ({ title, data }: RatingBarChartProps) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const isDark = colorScheme === 'dark';

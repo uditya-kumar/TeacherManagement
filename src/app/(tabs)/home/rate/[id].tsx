@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import React, { useState } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { teachers } from "@assets/data/teachers";
@@ -7,16 +13,17 @@ import Colors from "@/constants/Colors";
 import CustomButton from "@/components/teacherManagement/Button";
 import RatingCategories from "@/components/teacherManagement/RatingCategories";
 import { useColorScheme } from "@/components/useColorScheme";
+import { useTeacher } from "@/api/teachers";
 
 const RateTeacher = () => {
-  const { id } = useLocalSearchParams();
-  const teacher = teachers.find((item) => item.id === id);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: teacher, error: errorTeacher, isLoading } = useTeacher(id);
   const [error, setError] = useState<string>("");
-  
+
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
-  
+
   const [classAverage, setClassAverage] = useState<string>("");
   const [ratings, setRatings] = useState({
     teachingQuality: 0,
@@ -45,11 +52,15 @@ const RateTeacher = () => {
 
     // Submit Rating Logic
     console.log("Submitting rating...");
-    
+
     router.back();
   };
 
   
+
+  if (errorTeacher || !teachers) {
+    return <Text>Failed to fetch teachers</Text>;
+  }
 
   return (
     <ScrollView
@@ -58,7 +69,10 @@ const RateTeacher = () => {
       contentContainerStyle={styles.scrollContent}
     >
       <Stack.Screen
-        options={{ title: `Rate ${teacher?.name}`, headerRight: undefined }}
+        options={{
+          title: `Rate ${teacher?.full_name}`,
+          headerRight: undefined,
+        }}
       />
 
       {/* rating categories component rendering */}
