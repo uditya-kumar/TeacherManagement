@@ -30,6 +30,7 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    // 1️⃣ The actual server request
     mutationFn: async ({
       teacherId,
       isFavorite,
@@ -38,8 +39,8 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
       isFavorite: boolean;
     }) => {
       if (!userId) throw new Error("No auth user");
-
-      if (isFavorite) { // If the desired state is "favorite", add the record
+      if (isFavorite) {
+        // Already favorite → upsert (idempotent)
         const { error } = await supabase
           .from("teacher_favorites")
           .upsert(
@@ -47,7 +48,8 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
             { onConflict: "user_id,teacher_id" }
           );
         if (error) throw error;
-      } else { // If the desired state is "not favorite", delete the record
+      } else {
+        // Remove favorite
         const { error } = await supabase
           .from("teacher_favorites")
           .delete()
@@ -56,8 +58,36 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
         if (error) throw error;
       }
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["favoriteIds", userId] });
+    // 2️⃣ Before the mutation fires, optimistically update the cache
+    onMutate: async ({ teacherId, isFavorite }) => {
+      const key = ["favoriteIds", userId];
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: key });
+
+      // Snapshot the previous value
+      const previous: string[] | undefined = queryClient.getQueryData(key);
+
+      // Compute the new optimistic value
+      const newIds = isFavorite
+        ? [...(previous ?? []), teacherId]
+        : (previous ?? []).filter((id) => id !== teacherId);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(key, newIds);
+
+      // Return context containing the snapshot, so we can rollback if needed
+      return { previous };
+    },
+    // 3️⃣ On error, rollback to the snapshot
+    onError: (_err, _variables, context: any) => {
+      const key = ["favoriteIds", userId];
+      if (context?.previous) {
+        queryClient.setQueryData(key, context.previous);
+      }
+    },
+    // 4️⃣ In any case, refetch so we're in sync with the server
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["favoriteIds", userId] });
     },
   });
 };
