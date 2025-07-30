@@ -25,7 +25,7 @@ import { Tables } from "@/types";
 
 const index = () => {
   const [search, setSearch] = useState("");
-  const { favorites, favoriteIds, toggleFavorite } = useFavorite();
+  const { favoriteIds, toggleFavorite } = useFavorite();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const listRef = useRef<LegendListRef | null>(null); // For scroll control (optional)
@@ -43,10 +43,6 @@ const index = () => {
 
   const clearSearch = () => {
     setSearch("");
-    // Reset scroll to top after state update
-    setTimeout(() => {
-      listRef.current?.scrollToOffset?.({ offset: 0, animated: false });
-    }, 0);
   };
 
   const handleRateTeacher = (teacherId: string) => {
@@ -138,21 +134,6 @@ const index = () => {
           </Pressable>
         )}
       </View>
-
-      <View style={styles.headingContainer}>
-        {search.length > 0 ? (
-          <Text style={[styles.heading, { color: colors.text }]}>
-            Results for {truncate(search, 8)}
-          </Text>
-        ) : (
-          <Text style={[styles.heading, { color: colors.text }]}>
-            All Teachers
-          </Text>
-        )}
-        <Text style={{ color: colors.text }}>
-          {filteredTeachers.length} Teachers
-        </Text>
-      </View>
       <LegendList
         ref={listRef}
         data={filteredTeachers}
@@ -160,6 +141,22 @@ const index = () => {
         renderItem={renderItem}
         extraData={favoriteIds}
         ListEmptyComponent={renderEmptyComponent}
+        ListHeaderComponent={
+          <View style={styles.headingContainer}>
+            {search.length > 0 ? (
+              <Text style={[styles.heading, { color: colors.text }]}>
+                Results for {truncate(search, 8)}
+              </Text>
+            ) : (
+              <Text style={[styles.heading, { color: colors.text }]}>
+                All Teachers
+              </Text>
+            )}
+            <Text style={{ color: colors.text }}>
+              {filteredTeachers.length} Teachers
+            </Text>
+          </View>
+        }
         contentContainerStyle={[{ gap: 25, paddingBottom: 10 }]}
         keyboardShouldPersistTaps="handled"
         recycleItems={true}
@@ -213,7 +210,8 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     position: "relative",
-    marginTop: 20,
+    marginTop: 15,
+    paddingBottom: 10,
   },
 });
 

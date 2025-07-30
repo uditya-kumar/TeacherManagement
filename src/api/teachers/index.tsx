@@ -1,6 +1,7 @@
 import { supabase } from "@/libs/supabase";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+//Fetch all teachers list
 export const useTeacherList = () =>
   useQuery({
     queryKey: ["teachers"],
@@ -28,7 +29,7 @@ export const useTeacher = (id: string) =>
     },
   });
 
-
+// fetch teacher ratings
 export const useTeacherRating = (id: string) =>
   useQuery({
     queryKey: ["ratings", id],
@@ -45,6 +46,7 @@ export const useTeacherRating = (id: string) =>
     },
   });
 
+  // Fetch user favorite marked teachers
 export const useFavoriteTeacherIds = (userId?: string) =>
   useQuery({
     queryKey: ["favoriteIds", userId],
@@ -60,18 +62,13 @@ export const useFavoriteTeacherIds = (userId?: string) =>
     },
   });
 
+// handling favorite toggle
 export const useToggleFavoriteTeacher = (userId?: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     // 1️⃣ The actual server request
-    mutationFn: async ({
-      teacherId,
-      isFavorite,
-    }: {
-      teacherId: string;
-      isFavorite: boolean;
-    }) => {
+    mutationFn: async ({ teacherId, isFavorite }: { teacherId: string; isFavorite: boolean }) => {
       if (!userId) throw new Error("No auth user");
       if (isFavorite) {
         // Already favorite → upsert (idempotent)
@@ -92,6 +89,7 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
         if (error) throw error;
       }
     },
+
     // 2️⃣ Before the mutation fires, optimistically update the cache
     onMutate: async ({ teacherId, isFavorite }) => {
       const key = ["favoriteIds", userId];
