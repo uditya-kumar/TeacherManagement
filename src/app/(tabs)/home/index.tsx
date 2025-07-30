@@ -122,7 +122,7 @@ const index = () => {
         onViewDetails={() => handleViewDetails(item.id)}
       />
     ),
-    [favoriteIds, toggleFavorite]
+    [favoriteIds, toggleFavorite, ratedTeacherIds]
   );
 
   if (isLoading) {
@@ -152,7 +152,7 @@ const index = () => {
         data={filteredTeachers}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        extraData={favoriteIds}
+        extraData={[favoriteIds, ratedTeacherIds]}
         ListEmptyComponent={renderEmptyComponent}
         ListHeaderComponent={
           <View style={styles.headingContainer}>

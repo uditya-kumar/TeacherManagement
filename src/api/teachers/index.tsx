@@ -88,7 +88,7 @@ export const useUserRatingForTeacher = (teacherId?: string, userId?: string) =>
     },
   });
 
-// Insert teacher rating
+
 // Insert teacher rating
 export const useUpsertRating = () => {
   const queryClient = useQueryClient();
