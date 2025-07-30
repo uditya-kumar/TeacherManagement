@@ -89,6 +89,7 @@ export const useUserRatingForTeacher = (teacherId?: string, userId?: string) =>
   });
 
 // Insert teacher rating
+// Insert teacher rating
 export const useUpsertRating = () => {
   const queryClient = useQueryClient();
 
@@ -145,6 +146,39 @@ export const useUpsertRating = () => {
       return updatedRating as Rating;
     },
 
+    // Optimistic update: Before mutation, snapshot and update cache
+    onMutate: async (variables) => {
+      const { teacher_id, user_id, existingRatingId } = variables;
+      const ratedKey = ["ratedTeachers", user_id];
+
+      // Cancel ongoing queries to avoid overwrites
+      await queryClient.cancelQueries({ queryKey: ratedKey });
+
+      // Snapshot current ratedTeachers
+      const previousRated: string[] | undefined = queryClient.getQueryData(ratedKey);
+
+      let optimisticRated = previousRated ? [...previousRated] : [];
+
+      // If this is a new rating (insert), optimistically add the teacher_id
+      if (!existingRatingId && !optimisticRated.includes(teacher_id)) {
+        optimisticRated.push(teacher_id);
+      }
+
+      // Set optimistic cache
+      queryClient.setQueryData(ratedKey, optimisticRated);
+
+      // Return snapshot for rollback
+      return { previousRated, ratedKey };
+    },
+
+    // On error, rollback to snapshot
+    onError: (_err, _variables, context) => {
+      if (context?.previousRated && context?.ratedKey) {
+        queryClient.setQueryData(context.ratedKey, context.previousRated);
+      }
+    },
+
+    // On success, set individual rating data (as before)
     onSuccess: (newRating) => {
       if (!newRating) return;
 
@@ -153,12 +187,22 @@ export const useUpsertRating = () => {
         newRating
       );
       queryClient.setQueryData(["ratings", newRating.teacher_id], newRating);
+    },
 
-      queryClient.invalidateQueries({ queryKey: ["teachers"] });
-      queryClient.invalidateQueries({ queryKey: ["ratedTeachers", newRating.user_id] });
+    // Always invalidate/refetch for server sync (regardless of success/error)
+    onSettled: (newRating, error, variables) => {
+      if (newRating) {
+        queryClient.invalidateQueries({ queryKey: ["teachers"] });
+        queryClient.invalidateQueries({ queryKey: ["ratedTeachers", newRating.user_id] });
+      } else if (variables) {
+        // Fallback if no newRating (e.g., on error)
+        queryClient.invalidateQueries({ queryKey: ["teachers"] });
+        queryClient.invalidateQueries({ queryKey: ["ratedTeachers", variables.user_id] });
+      }
     },
   });
 };
+
 
 // Fetch user favorite marked teachers
 export const useFavoriteTeacherIds = (userId?: string) =>
