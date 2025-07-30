@@ -13,6 +13,7 @@ type TeacherCard = {
   onRateTeacher: () => void;
   onViewDetails?: () => void;
   showViewDetailsButton?: boolean;
+  isAlreadyRated?: boolean;
 };
 const TeacherCard = ({
   teacher,
@@ -21,6 +22,7 @@ const TeacherCard = ({
   onRateTeacher,
   onViewDetails,
   showViewDetailsButton = true,
+  isAlreadyRated,
 }: TeacherCard) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -115,7 +117,7 @@ const TeacherCard = ({
 
       <View style={styles.buttonContainer}>
         <CustomButton
-          text="Rate Teacher"
+          text={isAlreadyRated ? "Update Rating" : "Rate Teacher"}
           textColor="#FFFFFF"
           backgroundColor={isDark ? "#374151" : "#0C1120"}
           icon="UserCheck"

@@ -102,6 +102,9 @@ const RateTeacher = () => {
         onSuccess: async () => {
           await queryClient.invalidateQueries({ queryKey: ["teachers"] });
           await queryClient.refetchQueries({ queryKey: ["teachers"] });
+
+          await queryClient.invalidateQueries({ queryKey: ["ratedTeachers", profile.id] });
+          await queryClient.refetchQueries({ queryKey: ["ratedTeachers", profile.id] });
           router.back();
         },
       }

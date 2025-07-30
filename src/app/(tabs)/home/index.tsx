@@ -23,6 +23,8 @@ import {
 import { useRef, useCallback } from "react";
 import { Tables } from "@/types";
 import { useRealtimeTeachers } from "@/hooks/useRealtimeTeachers";
+import { useUserRatedTeacherIds } from "@/api/teachers";
+import { useAuth } from "@/app/providers/AuthProvider"; // if not already imported
 
 const index = () => {
   const [search, setSearch] = useState("");
@@ -31,6 +33,9 @@ const index = () => {
   const colors = Colors[colorScheme ?? "light"];
   const listRef = useRef<LegendListRef | null>(null); // For scroll control (optional)
   const { data: teachers, error, isLoading } = useTeacherList();
+  const { profile } = useAuth();
+  const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
+
   useRealtimeTeachers();
 
   const filteredTeachers = useMemo(() => {
@@ -104,6 +109,7 @@ const index = () => {
       <TeacherCard
         teacher={item}
         isFavorite={favoriteIds.includes(item.id)}
+        isAlreadyRated={ratedTeacherIds.includes(item.id)}
         onToggleFavorite={() => toggleFavorite(item)}
         onRateTeacher={() => handleRateTeacher(item.id)}
         onViewDetails={() => handleViewDetails(item.id)}

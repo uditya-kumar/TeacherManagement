@@ -17,6 +17,21 @@ export const useTeacherList = () =>
     refetchOnWindowFocus: true,
   });
 
+// ✅ New hook to fetch all rated teacher IDs by current user
+export const useUserRatedTeacherIds = (userId?: string) =>
+  useQuery({
+    queryKey: ["ratedTeachers", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ratings")
+        .select("teacher_id")
+        .eq("user_id", userId!);
+
+      if (error) throw new Error(error.message);
+      return data.map((r) => r.teacher_id as string);
+    },
+  });
 
 // fetching teacher details
 export const useTeacher = (id: string) =>
@@ -135,16 +150,13 @@ export const useUpsertRating = () => {
         ["userRating", newRating.teacher_id, newRating.user_id],
         newRating
       );
-      queryClient.setQueryData(
-        ["ratings", newRating.teacher_id],
-        newRating
-      );
+      queryClient.setQueryData(["ratings", newRating.teacher_id], newRating);
 
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
+      queryClient.invalidateQueries({ queryKey: ["ratedTeachers", newRating.user_id] });
     },
   });
 };
-
 
 // Fetch user favorite marked teachers
 export const useFavoriteTeacherIds = (userId?: string) =>
