@@ -56,12 +56,12 @@ const RateTeacher = () => {
   }, [existingRating]);
 
   if (isLoading) {
-    console.log("home\rate\[id].tsx:- Fetching teacher from id")
+    console.log("home\rate[id].tsx:- Fetching teacher from id");
     return <ActivityIndicator style={{ marginTop: 50 }} />;
   }
-  
+
   if (isLoadingRating) {
-    console.log("home\rate\[id].tsx:- Fetching Rating of the teacher")
+    console.log("home\rate[id].tsx:- Fetching Rating of the teacher");
     return <ActivityIndicator style={{ marginTop: 50 }} />;
   }
 
@@ -106,7 +106,6 @@ const RateTeacher = () => {
       },
       {
         onSuccess: async () => {
-          
           router.back();
         },
       }

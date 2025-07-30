@@ -155,7 +155,8 @@ export const useUpsertRating = () => {
       await queryClient.cancelQueries({ queryKey: ratedKey });
 
       // Snapshot current ratedTeachers
-      const previousRated: string[] | undefined = queryClient.getQueryData(ratedKey);
+      const previousRated: string[] | undefined =
+        queryClient.getQueryData(ratedKey);
 
       let optimisticRated = previousRated ? [...previousRated] : [];
 
@@ -193,16 +194,19 @@ export const useUpsertRating = () => {
     onSettled: (newRating, error, variables) => {
       if (newRating) {
         queryClient.invalidateQueries({ queryKey: ["teachers"] });
-        queryClient.invalidateQueries({ queryKey: ["ratedTeachers", newRating.user_id] });
+        queryClient.invalidateQueries({
+          queryKey: ["ratedTeachers", newRating.user_id],
+        });
       } else if (variables) {
         // Fallback if no newRating (e.g., on error)
         queryClient.invalidateQueries({ queryKey: ["teachers"] });
-        queryClient.invalidateQueries({ queryKey: ["ratedTeachers", variables.user_id] });
+        queryClient.invalidateQueries({
+          queryKey: ["ratedTeachers", variables.user_id],
+        });
       }
     },
   });
 };
-
 
 // Fetch user favorite marked teachers
 export const useFavoriteTeacherIds = (userId?: string) =>
