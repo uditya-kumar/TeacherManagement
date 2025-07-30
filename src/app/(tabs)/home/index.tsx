@@ -39,12 +39,19 @@ const index = () => {
   useRealtimeTeachers();
 
   const filteredTeachers = useMemo(() => {
-    return (teachers ?? []).filter(
+  return (teachers ?? [])
+    .filter(
       (teacher) =>
         typeof teacher.full_name === "string" &&
         teacher.full_name.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [search, teachers]);
+    )
+    .sort((a, b) => {
+      const nameA = a.full_name?.toLowerCase() ?? "";
+      const nameB = b.full_name?.toLowerCase() ?? "";
+      return nameA.localeCompare(nameB);
+    }); // ✅ Sorted alphabetically by full_name
+}, [search, teachers]);
+
 
   const clearSearch = () => {
     setSearch("");
