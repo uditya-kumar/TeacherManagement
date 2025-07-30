@@ -7,18 +7,21 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { teachers } from "@assets/data/teachers";
 import Colors from "@/constants/Colors";
 
 import CustomButton from "@/components/teacherManagement/Button";
 import RatingCategories from "@/components/teacherManagement/RatingCategories";
 import { useColorScheme } from "@/components/useColorScheme";
-import { useTeacher } from "@/api/teachers";
+import { useSubmitRating, useTeacher } from "@/api/teachers";
+import { Tables } from "@/types";
+import { useAuth } from "@/app/providers/AuthProvider";
 
 const RateTeacher = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: teacher, error: errorTeacher, isLoading } = useTeacher(id);
   const [error, setError] = useState<string>("");
+  const { mutate: insertRating } = useSubmitRating();
+  const { profile} = useAuth();
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -36,6 +39,10 @@ const RateTeacher = () => {
     setRatings((prev) => ({ ...prev, [category]: rating }));
   };
 
+  if (errorTeacher || !teacher) {
+    return <Text>Failed to fetch teachers</Text>;
+  }
+
   const onSubmitRating = () => {
     setError("");
     // Validation
@@ -50,17 +57,38 @@ const RateTeacher = () => {
       return;
     }
 
+    // if (!teacher?.id) {
+    //   setError("Missing teacher ID info.");
+    //   return;
+    // }
+
+    if (!profile?.id) {
+      setError("Missing user profile info.");
+      return;
+    }
+
     // Submit Rating Logic
-    console.log("Submitting rating...");
+    insertRating(
+      {
+        teacher_id: teacher?.id,
+        user_id: profile?.id,
+        teaching: ratings.teachingQuality,
+        evaluation: ratings.evaluationMethods,
+        behaviour: ratings.behaviorAttitude,
+        internals: ratings.internalAssessment,
+        class_average: classAverage,
+      },
+      {
+        onSuccess: () => {
+          router.back();
+        },
+      }
+    );
 
     router.back();
   };
 
   
-
-  if (errorTeacher || !teachers) {
-    return <Text>Failed to fetch teachers</Text>;
-  }
 
   return (
     <ScrollView

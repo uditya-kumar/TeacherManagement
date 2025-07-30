@@ -59,8 +59,6 @@ function RootLayoutNav() {
 
   // Ensure we have a consistent color scheme
   const isDark = colorScheme === "dark";
-  const { session, loading } = useAuth();
-  console.log("srcapp_layout.tsx:- " + session);
 
   return (
     <SafeAreaProvider>

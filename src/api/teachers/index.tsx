@@ -21,7 +21,7 @@ export const useTeacher = (id: string) =>
       const { data, error } = await supabase
         .from("teachers")
         .select("*")
-        .eq("id", id)   // id is now a UUID string
+        .eq("id", id) // id is now a UUID string
         .single();
 
       if (error) throw new Error(error.message);
@@ -38,7 +38,7 @@ export const useTeacherRating = (id: string) =>
       const { data, error } = await supabase
         .from("ratings")
         .select("*")
-        .eq("teacher_id", id)   // id is now a UUID string
+        .eq("teacher_id", id) // id is now a UUID string
         .single();
 
       if (error) throw new Error(error.message);
@@ -46,7 +46,50 @@ export const useTeacherRating = (id: string) =>
     },
   });
 
-  // Fetch user favorite marked teachers
+
+// Insert teacher rating
+export const useSubmitRating = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn(data: {
+      teacher_id: string;
+      user_id: string;
+      teaching: number;
+      evaluation: number;
+      behaviour: number;
+      internals: number;
+      class_average: string;
+    }) {
+      const { data: newRating, error } = await supabase
+        .from("ratings")
+        .insert({
+          teacher_id: data.teacher_id,
+          user_id: data.user_id,
+          teaching: data.teaching,
+          evaluation: data.evaluation,
+          behaviour: data.behaviour,
+          internals: data.internals,
+          class_average: data.class_average,
+        })
+        .single(); // assuming you want a single inserted row
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return newRating;
+    },
+
+    // Optional: Refetch any relevant queries or handle caching
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({ queryKey: ["ratings"] });
+    // },
+  });
+};
+
+
+// Fetch user favorite marked teachers
 export const useFavoriteTeacherIds = (userId?: string) =>
   useQuery({
     queryKey: ["favoriteIds", userId],
@@ -68,7 +111,13 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
 
   return useMutation({
     // 1️⃣ The actual server request
-    mutationFn: async ({ teacherId, isFavorite }: { teacherId: string; isFavorite: boolean }) => {
+    mutationFn: async ({
+      teacherId,
+      isFavorite,
+    }: {
+      teacherId: string;
+      isFavorite: boolean;
+    }) => {
       if (!userId) throw new Error("No auth user");
       if (isFavorite) {
         // Already favorite → upsert (idempotent)
