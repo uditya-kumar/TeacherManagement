@@ -1,29 +1,48 @@
-// src/hooks/useRealtimeTeachers.ts
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/libs/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 
+// Module-level singleton and flags (persist across hook calls/mounts, reset on full reload)
+let teachersChannel: ReturnType<typeof supabase.channel> | null = null;
+let isListenerAdded = false;
+
 export const useRealtimeTeachers = () => {
   const queryClient = useQueryClient();
+  const [realtimeStatus, setRealtimeStatus] = useState<string | null>(null);
+  const subscribedRef = useRef(false);
 
   useEffect(() => {
-    const channel = supabase
-      .channel("teachers-realtime")
-      .on(
+    if (subscribedRef.current) return;
+
+    if (!teachersChannel) {
+      teachersChannel = supabase.channel("realtime:public:teachers");
+    }
+
+    if (!isListenerAdded) {
+      teachersChannel.on(
         "postgres_changes",
         {
-          event: "*", // listen to INSERT, UPDATE, DELETE
+          event: "*",
           schema: "public",
-          table: "ratings", // the table that affects ratings
+          table: "teachers",
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ["teachers"] });
         }
-      )
-      .subscribe();
+      );
+      isListenerAdded = true;
+    }
+
+    teachersChannel.subscribe((status) => {
+      setRealtimeStatus(status);
+    });
+
+    subscribedRef.current = true;
 
     return () => {
-      supabase.removeChannel(channel);
+      teachersChannel?.unsubscribe();
     };
   }, [queryClient]);
+
+  return { status: realtimeStatus };
 };

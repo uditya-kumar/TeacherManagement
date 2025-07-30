@@ -15,6 +15,8 @@ export const useTeacherList = () =>
     },
     staleTime: 0, // always fetch fresh when invalidated
     refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
   });
 
 // ✅ New hook to fetch all rated teacher IDs by current user
