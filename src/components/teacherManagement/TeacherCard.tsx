@@ -89,7 +89,7 @@ const TeacherCard = ({
         ) : (
           <>
             <Text style={[styles.ratingText, { color: colors.text }]}>
-              {teacher.average_rating}
+              {Number(teacher.average_rating).toFixed(1)}
             </Text>
             <Text style={[styles.details, { color: detailsColor }]}>
               ({teacher.rating_count} reviews)

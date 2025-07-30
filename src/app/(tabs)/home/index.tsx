@@ -22,6 +22,7 @@ import {
 } from "@legendapp/list";
 import { useRef, useCallback } from "react";
 import { Tables } from "@/types";
+import { useRealtimeTeachers } from "@/hooks/useRealtimeTeachers";
 
 const index = () => {
   const [search, setSearch] = useState("");
@@ -29,9 +30,8 @@ const index = () => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const listRef = useRef<LegendListRef | null>(null); // For scroll control (optional)
-
-  // fetch teacher data from database
   const { data: teachers, error, isLoading } = useTeacherList();
+  useRealtimeTeachers();
 
   const filteredTeachers = useMemo(() => {
     return (teachers ?? []).filter(

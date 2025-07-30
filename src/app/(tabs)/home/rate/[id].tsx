@@ -5,23 +5,31 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import Colors from "@/constants/Colors";
-
 import CustomButton from "@/components/teacherManagement/Button";
 import RatingCategories from "@/components/teacherManagement/RatingCategories";
 import { useColorScheme } from "@/components/useColorScheme";
-import { useSubmitRating, useTeacher } from "@/api/teachers";
-import { Tables } from "@/types";
+import {
+  useTeacher,
+  useUserRatingForTeacher,
+  useUpsertRating,
+} from "@/api/teachers";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { useQueryClient } from "@tanstack/react-query";
 
 const RateTeacher = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: teacher, error: errorTeacher, isLoading } = useTeacher(id);
   const [error, setError] = useState<string>("");
-  const { mutate: insertRating } = useSubmitRating();
-  const { profile} = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data: teacher, error: errorTeacher, isLoading } = useTeacher(id);
+  const { profile } = useAuth();
+  const { mutate: upsertRating } = useUpsertRating();
+
+  const { data: existingRating, isLoading: isLoadingRating } =
+    useUserRatingForTeacher(id, profile?.id);
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -35,17 +43,33 @@ const RateTeacher = () => {
     internalAssessment: 0,
   });
 
+  useEffect(() => {
+    if (existingRating) {
+      setRatings({
+        teachingQuality: existingRating.teaching ?? 0,
+        evaluationMethods: existingRating.evaluation ?? 0,
+        behaviorAttitude: existingRating.behaviour ?? 0,
+        internalAssessment: existingRating.internals ?? 0,
+      });
+      setClassAverage(existingRating.class_average ?? "");
+    }
+  }, [existingRating]);
+
+  if (isLoading || isLoadingRating) {
+    return <ActivityIndicator style={{ marginTop: 50 }} />;
+  }
+
   const handleRating = (category: keyof typeof ratings, rating: number) => {
     setRatings((prev) => ({ ...prev, [category]: rating }));
   };
 
-  if (errorTeacher || !teacher) {
+  if (errorTeacher) {
     return <Text>Failed to fetch teachers</Text>;
   }
 
   const onSubmitRating = () => {
     setError("");
-    // Validation
+
     if (
       ratings.teachingQuality === 0 ||
       ratings.evaluationMethods === 0 ||
@@ -57,38 +81,32 @@ const RateTeacher = () => {
       return;
     }
 
-    // if (!teacher?.id) {
-    //   setError("Missing teacher ID info.");
-    //   return;
-    // }
-
-    if (!profile?.id) {
-      setError("Missing user profile info.");
+    if (!teacher?.id || !profile?.id) {
+      setError("Missing teacher or user info.");
       return;
     }
 
-    // Submit Rating Logic
-    insertRating(
+    // Submit: if user has already rated, update, else insert
+    upsertRating(
       {
-        teacher_id: teacher?.id,
-        user_id: profile?.id,
+        teacher_id: teacher.id,
+        user_id: profile.id,
         teaching: ratings.teachingQuality,
         evaluation: ratings.evaluationMethods,
         behaviour: ratings.behaviorAttitude,
         internals: ratings.internalAssessment,
         class_average: classAverage,
+        existingRatingId: existingRating?.id, // only set if exists
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await queryClient.invalidateQueries({ queryKey: ["teachers"] });
+          await queryClient.refetchQueries({ queryKey: ["teachers"] });
           router.back();
         },
       }
     );
-
-    router.back();
   };
-
-  
 
   return (
     <ScrollView

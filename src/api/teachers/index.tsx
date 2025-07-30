@@ -1,5 +1,8 @@
 import { supabase } from "@/libs/supabase";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Tables } from "@/types";
+
+type Rating = Tables<"ratings">;
 
 //Fetch all teachers list
 export const useTeacherList = () =>
@@ -10,7 +13,10 @@ export const useTeacherList = () =>
       if (error) throw new Error(error.message);
       return data ?? [];
     },
+    staleTime: 0, // always fetch fresh when invalidated
+    refetchOnWindowFocus: true,
   });
+
 
 // fetching teacher details
 export const useTeacher = (id: string) =>
@@ -46,13 +52,40 @@ export const useTeacherRating = (id: string) =>
     },
   });
 
+// fetch existing rating by the current user for this teacher
+export const useUserRatingForTeacher = (teacherId?: string, userId?: string) =>
+  useQuery({
+    queryKey: ["userRating", teacherId, userId],
+    enabled: !!teacherId && !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ratings")
+        .select("*")
+        .eq("teacher_id", teacherId!)
+        .eq("user_id", userId!)
+        .single();
+
+      // If no rating found, just return undefined (do NOT throw error)
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  });
 
 // Insert teacher rating
-export const useSubmitRating = () => {
+export const useUpsertRating = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    async mutationFn(data: {
+    async mutationFn({
+      teacher_id,
+      user_id,
+      teaching,
+      evaluation,
+      behaviour,
+      internals,
+      class_average,
+      existingRatingId, // NEW: optional param
+    }: {
       teacher_id: string;
       user_id: string;
       teaching: number;
@@ -60,31 +93,55 @@ export const useSubmitRating = () => {
       behaviour: number;
       internals: number;
       class_average: string;
+      existingRatingId?: string; // if exists, perform update
     }) {
-      const { data: newRating, error } = await supabase
-        .from("ratings")
-        .insert({
-          teacher_id: data.teacher_id,
-          user_id: data.user_id,
-          teaching: data.teaching,
-          evaluation: data.evaluation,
-          behaviour: data.behaviour,
-          internals: data.internals,
-          class_average: data.class_average,
-        })
-        .single(); // assuming you want a single inserted row
-
-      if (error) {
-        throw new Error(error.message);
+      let result;
+      if (existingRatingId) {
+        result = await supabase
+          .from("ratings")
+          .update({
+            teaching,
+            evaluation,
+            behaviour,
+            internals,
+            class_average,
+          })
+          .eq("id", existingRatingId)
+          .single();
+      } else {
+        result = await supabase
+          .from("ratings")
+          .insert({
+            teacher_id,
+            user_id,
+            teaching,
+            evaluation,
+            behaviour,
+            internals,
+            class_average,
+          })
+          .single();
       }
 
-      return newRating;
+      const { data: updatedRating, error } = result;
+      if (error) throw new Error(error.message);
+      return updatedRating as Rating;
     },
 
-    // Optional: Refetch any relevant queries or handle caching
-    // onSuccess: () => {
-    //   queryClient.invalidateQueries({ queryKey: ["ratings"] });
-    // },
+    onSuccess: (newRating) => {
+      if (!newRating) return;
+
+      queryClient.setQueryData(
+        ["userRating", newRating.teacher_id, newRating.user_id],
+        newRating
+      );
+      queryClient.setQueryData(
+        ["ratings", newRating.teacher_id],
+        newRating
+      );
+
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    },
   });
 };
 
@@ -92,7 +149,7 @@ export const useSubmitRating = () => {
 // Fetch user favorite marked teachers
 export const useFavoriteTeacherIds = (userId?: string) =>
   useQuery({
-    queryKey: ["favoriteIds", userId],
+    queryKey: ["favoriteTeachers", userId],
     enabled: !!userId,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -141,7 +198,7 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
 
     // 2️⃣ Before the mutation fires, optimistically update the cache
     onMutate: async ({ teacherId, isFavorite }) => {
-      const key = ["favoriteIds", userId];
+      const key = ["favoriteTeachers", userId];
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({ queryKey: key });
 
@@ -161,14 +218,14 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
     },
     // 3️⃣ On error, rollback to the snapshot
     onError: (_err, _variables, context: any) => {
-      const key = ["favoriteIds", userId];
+      const key = ["favoriteTeachers", userId];
       if (context?.previous) {
         queryClient.setQueryData(key, context.previous);
       }
     },
     // 4️⃣ In any case, refetch so we're in sync with the server
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["favoriteIds", userId] });
+      queryClient.invalidateQueries({ queryKey: ["favoriteTeachers", userId] });
     },
   });
 };
