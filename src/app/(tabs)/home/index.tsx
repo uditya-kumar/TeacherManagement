@@ -23,7 +23,6 @@ import {
 import { useRef, useCallback } from "react";
 import { Tables } from "@/types";
 
-
 const index = () => {
   const [search, setSearch] = useState("");
   const { favorites, favoriteIds, toggleFavorite } = useFavorite();
@@ -43,13 +42,12 @@ const index = () => {
   }, [search, teachers]);
 
   const clearSearch = () => {
-  setSearch("");
-  // Reset scroll to top after state update
-  setTimeout(() => {
-    listRef.current?.scrollToOffset?.({ offset: 0, animated: false });
-  }, 0);
-};
-
+    setSearch("");
+    // Reset scroll to top after state update
+    setTimeout(() => {
+      listRef.current?.scrollToOffset?.({ offset: 0, animated: false });
+    }, 0);
+  };
 
   const handleRateTeacher = (teacherId: string) => {
     router.push(`/home/rate/${teacherId}`);
@@ -65,42 +63,6 @@ const index = () => {
   const onAddTeacher = () => {
     router.push(`/home/addTeacher`);
   };
-
-  const renderHeader = useMemo(
-    () => (
-      <>
-        <View style={styles.searchContainer}>
-          <CustomTextInput
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search Teachers.."
-          />
-
-          {search.length > 0 && (
-            <Pressable onPress={clearSearch} style={styles.clearButton}>
-              <X size={22} color={colors.text} />
-            </Pressable>
-          )}
-        </View>
-
-        <View style={styles.headingContainer}>
-          {search.length > 0 ? (
-            <Text style={[styles.heading, { color: colors.text }]}>
-              Results for {truncate(search, 8)}
-            </Text>
-          ) : (
-            <Text style={[styles.heading, { color: colors.text }]}>
-              All Teachers
-            </Text>
-          )}
-          <Text style={{ color: colors.text }}>
-            {filteredTeachers.length} Teachers
-          </Text>
-        </View>
-      </>
-    ),
-    [search, colors, colorScheme]
-  );
 
   const renderEmptyComponent = () => (
     <View
@@ -142,17 +104,17 @@ const index = () => {
 
   // Memoized renderItem for performance
   const renderItem = useCallback(
-  ({ item }: LegendListRenderItemProps<Tables<'teachers'>>) => (
-    <TeacherCard
-      teacher={item}
-      isFavorite={favoriteIds.includes(item.id)}
-      onToggleFavorite={() => toggleFavorite(item)}
-      onRateTeacher={() => handleRateTeacher(item.id)}
-      onViewDetails={() => handleViewDetails(item.id)}
-    />
-  ),
-  [favoriteIds, toggleFavorite]
-);
+    ({ item }: LegendListRenderItemProps<Tables<"teachers">>) => (
+      <TeacherCard
+        teacher={item}
+        isFavorite={favoriteIds.includes(item.id)}
+        onToggleFavorite={() => toggleFavorite(item)}
+        onRateTeacher={() => handleRateTeacher(item.id)}
+        onViewDetails={() => handleViewDetails(item.id)}
+      />
+    ),
+    [favoriteIds, toggleFavorite]
+  );
 
   if (isLoading) {
     return <ActivityIndicator />;
@@ -163,13 +125,40 @@ const index = () => {
   }
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.searchContainer}>
+        <CustomTextInput
+          value={search}
+          onChangeText={setSearch}
+          placeholder="Search Teachers.."
+        />
+
+        {search.length > 0 && (
+          <Pressable onPress={clearSearch} style={styles.clearButton}>
+            <X size={22} color={colors.text} />
+          </Pressable>
+        )}
+      </View>
+
+      <View style={styles.headingContainer}>
+        {search.length > 0 ? (
+          <Text style={[styles.heading, { color: colors.text }]}>
+            Results for {truncate(search, 8)}
+          </Text>
+        ) : (
+          <Text style={[styles.heading, { color: colors.text }]}>
+            All Teachers
+          </Text>
+        )}
+        <Text style={{ color: colors.text }}>
+          {filteredTeachers.length} Teachers
+        </Text>
+      </View>
       <LegendList
         ref={listRef}
         data={filteredTeachers}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        extraData={favoriteIds}              
-        ListHeaderComponent={renderHeader}
+        extraData={favoriteIds}
         ListEmptyComponent={renderEmptyComponent}
         contentContainerStyle={[{ gap: 25, paddingBottom: 10 }]}
         keyboardShouldPersistTaps="handled"

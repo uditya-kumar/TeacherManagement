@@ -52,7 +52,6 @@ export const googleSignIn = async () => {
 
   if (error) throw error;
   if (!data?.url) throw new Error("No auth URL from Supabase");
-
   const res = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
 
   if (res.type === "success" && res.url) {

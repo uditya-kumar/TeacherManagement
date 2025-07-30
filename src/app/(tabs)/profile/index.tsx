@@ -12,11 +12,13 @@ import {
 } from "lucide-react-native";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
+import { useAuth } from "@/app/providers/AuthProvider";
 
 const ProfilePage = () => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const isDark = colorScheme === 'dark';
+  const {profile} = useAuth()
 
   // Theme-aware colors
   const iconColor = colors.text;
@@ -32,7 +34,7 @@ const ProfilePage = () => {
       ]}>
         <User color={profileCircleIconColor} size={37} />
       </View>
-      <Text style={[styles.username, { color: colors.text }]}>uditya.23bce10497</Text>
+      <Text style={[styles.username, { color: colors.text }]}>{profile?.full_name}</Text>
 
       <View style={[
         styles.card,

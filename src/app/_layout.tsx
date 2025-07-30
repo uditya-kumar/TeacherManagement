@@ -13,7 +13,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "@/components/useColorScheme";
 import FavoriteProvider from "./providers/FavoriteProvider";
-import AuthProvider from "./providers/AuthProvider";
+import AuthProvider, { useAuth } from "./providers/AuthProvider";
 import QueryProvider from "./providers/QueryProvider";
 
 export {
@@ -59,6 +59,8 @@ function RootLayoutNav() {
 
   // Ensure we have a consistent color scheme
   const isDark = colorScheme === "dark";
+  const { session, loading } = useAuth();
+  console.log("srcapp_layout.tsx:- " + session);
 
   return (
     <SafeAreaProvider>
