@@ -9,18 +9,20 @@ export default {
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
     borderColor: '#e5e7eb',
+    buttonBackground: '#0C1120',
     cardBackground : 'white',
     starColor: '#FFD700',
     error: "#ef4444"
   },
   dark: {
     text: '#fff',
-    background: '#000',
+    background: '#111111',
     tint: tintColorDark,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
     borderColor: '#374151',
-    cardBackground: '#1f1f1f',
+    buttonBackground: '#374151',
+    cardBackground: '#161616',
     starColor: '#FFD700',
     error: "#ef4444"
   },

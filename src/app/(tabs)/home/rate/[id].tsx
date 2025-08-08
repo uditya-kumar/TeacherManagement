@@ -11,19 +11,25 @@ import Colors from "@/constants/Colors";
 import CustomButton from "@/components/teacherManagement/Button";
 import RatingCategories from "@/components/teacherManagement/RatingCategories";
 import { useColorScheme } from "@/components/useColorScheme";
-import { useTeacherList } from "@/api/teachers";
+import { useTeacher } from "@/api/teachers";
 import {
   useUserRatingForTeacher,
   useUpsertRating,
 } from "@/api/teachers/rating";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { useQueryClient } from "@tanstack/react-query";
 
 const RateTeacher = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [error, setError] = useState<string>("");
 
-  const { data: teachers, isLoading: isLoadingTeachersList } = useTeacherList();
-  const teacher = teachers?.find((t: { id: string }) => t.id === id);
+  const queryClient = useQueryClient();
+  const { data: teacher, isLoading: isLoadingTeacher } = useTeacher(id!, {
+    placeholderData: () =>
+      (queryClient.getQueryData(["teachers"]) as Array<{ id: string }> | undefined)?.find(
+        (t) => t.id === id
+      ) as any,
+  });
   const { profile } = useAuth();
   const { mutate: upsertRating } = useUpsertRating();
 
@@ -54,9 +60,7 @@ const RateTeacher = () => {
     }
   }, [existingRating]);
 
-  if (isLoadingTeachersList || isLoadingRating) {
-    return <ActivityIndicator style={{ marginTop: 50 }} />;
-  }
+  const isLoadingPage = isLoadingTeacher || isLoadingRating || !teacher;
 
   const handleRating = (category: keyof typeof ratings, rating: number) => {
     setRatings((prev) => ({ ...prev, [category]: rating }));
@@ -109,41 +113,49 @@ const RateTeacher = () => {
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        isLoadingPage && styles.centerContent,
+      ]}
     >
       <Stack.Screen
         options={{
-          title: `Rate ${teacher?.full_name}`,
+          title: teacher ? `Rate ${teacher.full_name}` : "Rate",
           headerRight: undefined,
         }}
       />
 
-      {/* rating categories component rendering */}
-      <RatingCategories
-        ratings={ratings}
-        classAverage={classAverage}
-        onRatingChange={handleRating}
-        onClassAverageChange={setClassAverage}
-        colors={colors}
-        isDark={isDark}
-      />
+      {isLoadingPage ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <>
+          <RatingCategories
+            ratings={ratings}
+            classAverage={classAverage}
+            onRatingChange={handleRating}
+            onClassAverageChange={setClassAverage}
+            colors={colors}
+            isDark={isDark}
+          />
 
-      {/* Error Message */}
-      {error && (
-        <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
+          {error && (
+            <Text style={[styles.errorText, { color: colors.error }]}>
+              {error}
+            </Text>
+          )}
+
+          <View style={{ marginHorizontal: 15, marginTop: 15 }}>
+            <CustomButton
+              text="Submit Rating"
+              textColor="#FFFFFF"
+              backgroundColor={isDark ? "#374151" : "#0C1120"}
+              icon="SendHorizontal"
+              onPress={onSubmitRating}
+              paddingVertical={13}
+            />
+          </View>
+        </>
       )}
-
-      {/* Submit Button */}
-      <View style={{ marginHorizontal: 15, marginTop: 15 }}>
-        <CustomButton
-          text="Submit Rating"
-          textColor="#FFFFFF"
-          backgroundColor={isDark ? "#374151" : "#0C1120"}
-          icon="SendHorizontal"
-          onPress={onSubmitRating}
-          paddingVertical={13}
-        />
-      </View>
     </ScrollView>
   );
 };
@@ -155,6 +167,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 32,
+  },
+  centerContent: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   errorText: {
     textAlign: "center",

@@ -13,10 +13,11 @@ export const useTeacherList = () =>
       if (error) throw new Error(error.message);
       return data ?? [];
     },
-    staleTime: 0, // always fetch fresh when invalidated
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    refetchOnMount: true,
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: "always",
+    refetchOnMount: false,
   });
 
 // ✅ New hook to fetch all rated teacher IDs by current user
@@ -36,10 +37,15 @@ export const useUserRatedTeacherIds = (userId?: string) =>
   });
 
 // fetching teacher details
-export const useTeacher = (id: string) =>
+export const useTeacher = (
+  id: string,
+  options?: {
+    placeholderData?: Tables<"teachers"> | (() => Tables<"teachers"> | undefined);
+  }
+) =>
   useQuery({
     queryKey: ["teacher", id],
-    enabled: !!id, // only run when we actually have an ID
+    enabled: !!id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("teachers")
@@ -50,6 +56,12 @@ export const useTeacher = (id: string) =>
       if (error) throw new Error(error.message);
       return data;
     },
+    placeholderData:
+      typeof options?.placeholderData === "function"
+        ? (options?.placeholderData as () => Tables<"teachers"> | undefined)
+        : (options?.placeholderData as Tables<"teachers"> | undefined),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 
 // Fetch user favorite marked teachers
@@ -66,6 +78,9 @@ export const useFavoriteTeacherIds = (userId?: string) =>
       if (error) throw new Error(error.message);
       return data.map((r) => r.teacher_id as string);
     },
+    staleTime: Infinity,
+    gcTime: 10 * 60_000,
+    refetchOnWindowFocus: false,
   });
 
 // handling favorite toggle
@@ -73,6 +88,7 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["toggleFavoriteTeacher", userId],
     // 1️⃣ The actual server request
     mutationFn: async ({
       teacherId,

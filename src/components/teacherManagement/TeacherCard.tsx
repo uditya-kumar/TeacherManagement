@@ -119,7 +119,7 @@ const TeacherCard = ({
         <CustomButton
           text={isAlreadyRated ? "Update Rating" : "Rate Teacher"}
           textColor="#FFFFFF"
-          backgroundColor={isDark ? "#374151" : "#0C1120"}
+          backgroundColor={isDark ? colors.buttonBackground : colors.buttonBackground}
           icon="UserCheck"
           onPress={onRateTeacher}
           paddingVertical={11}

@@ -25,6 +25,8 @@ import { Tables } from "@/types";
 import { useRealtimeTeachers } from "@/hooks/useRealtimeTeachers";
 import { useUserRatedTeacherIds } from "@/api/teachers";
 import { useAuth } from "@/app/providers/AuthProvider"; // if not already imported
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/libs/supabase";
 
 const index = () => {
   const [search, setSearch] = useState("");
@@ -35,6 +37,7 @@ const index = () => {
   const { data: teachers, error, isLoading } = useTeacherList();
   const { profile } = useAuth();
   const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
+  const queryClient = useQueryClient();
 
   useRealtimeTeachers();
 
@@ -58,7 +61,44 @@ const index = () => {
   };
 
   const handleRateTeacher = (teacherId: string) => {
+    // Navigate immediately for snappy UX
     router.push(`/home/rate/${teacherId}`);
+
+    // Fire-and-forget prefetch to warm cache without blocking navigation
+    if (profile?.id) {
+      queryClient
+        .prefetchQuery({
+          queryKey: ["userRating", teacherId, profile.id],
+          queryFn: async () => {
+            const { data, error } = await supabase
+              .from("ratings")
+              .select("*")
+              .eq("teacher_id", teacherId)
+              .eq("user_id", profile.id)
+              .maybeSingle();
+            if (error && error.code !== "PGRST116") throw new Error(error.message);
+            return data ?? null;
+          },
+        })
+        .catch(() => {});
+
+      queryClient
+        .prefetchQuery({
+          queryKey: ["teacher", teacherId],
+          queryFn: async () => {
+            const { data, error } = await supabase
+              .from("teachers")
+              .select(
+                "id, full_name, average_rating, rating_count, created_at, updated_at, status, cabin_no, mobile_no, created_by"
+              )
+              .eq("id", teacherId)
+              .single();
+            if (error) throw new Error(error.message);
+            return data;
+          },
+        })
+        .catch(() => {});
+    }
   };
 
   const handleViewDetails = (teacherId: string) => {

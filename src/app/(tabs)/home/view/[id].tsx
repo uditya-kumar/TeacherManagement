@@ -12,7 +12,7 @@ import RatingBarChart from "@/components/teacherManagement/RatingBarChart";
 import Colors from "@/constants/Colors";
 import { useFavorite } from "@/app/providers/FavoriteProvider";
 import { useColorScheme } from "@/components/useColorScheme";
-import { useTeacher, useTeacherRating } from "@/api/teachers";
+import { useTeacher } from "@/api/teachers";
 
 const ViewTeacherDetails = () => {
   const { favorites, favoriteIds, toggleFavorite } = useFavorite();
@@ -26,7 +26,6 @@ const ViewTeacherDetails = () => {
   }
 
   const { data: teacher, error, isLoading } = useTeacher(id);
-  // const { data: teacherRatings, error: ratingError } = useTeacherRating(id);
 
   if (isLoading) {
     return <ActivityIndicator />;

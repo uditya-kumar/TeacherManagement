@@ -5,20 +5,21 @@ import { Tables } from "@/types";
 type Rating = Tables<"ratings">;
 
 // fetch teacher ratings
-export const useTeacherRating = (id: string) =>
+export const useTeacherRatings = (teacherId: string) =>
   useQuery({
-    queryKey: ["ratings", id],
-    enabled: !!id, // only run when we actually have an ID
+    queryKey: ["ratingsByTeacher", teacherId],
+    enabled: !!teacherId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("ratings")
         .select("*")
-        .eq("teacher_id", id) // id is now a UUID string
-        .single();
+        .eq("teacher_id", teacherId);
 
       if (error) throw new Error(error.message);
-      return data;
+      return (data ?? []) as Rating[];
     },
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 
 // fetch existing rating by the current user for this teacher
@@ -53,6 +54,7 @@ export const useUpsertRating = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["upsertRating"],
     async mutationFn({
       teacher_id,
       user_id,
@@ -142,27 +144,40 @@ export const useUpsertRating = () => {
     onSuccess: (newRating) => {
       if (!newRating) return;
 
+      // Update the per-user rating cache for this teacher
       queryClient.setQueryData(
         ["userRating", newRating.teacher_id, newRating.user_id],
         newRating
       );
-      queryClient.setQueryData(["ratings", newRating.teacher_id], newRating);
+
+      // Merge into ratings list cache for the teacher if present
+      queryClient.setQueryData(
+        ["ratingsByTeacher", newRating.teacher_id],
+        (old: Rating[] | undefined) => {
+          if (!old) return [newRating as Rating];
+          const index = old.findIndex((r) => r.id === newRating.id);
+          if (index === -1) return [...old, newRating as Rating];
+          const copy = [...old];
+          copy[index] = newRating as Rating;
+          return copy;
+        }
+      );
     },
 
     // Always invalidate/refetch for server sync (regardless of success/error)
-    onSettled: (newRating, error, variables) => {
-      if (newRating) {
-        queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    onSettled: (newRating, _error, variables) => {
+      const teacherId = newRating?.teacher_id ?? variables?.teacher_id;
+      const userId = newRating?.user_id ?? variables?.user_id;
+      if (teacherId) {
+        queryClient.invalidateQueries({ queryKey: ["teacher", teacherId] });
         queryClient.invalidateQueries({
-          queryKey: ["ratedTeachers", newRating.user_id],
-        });
-      } else if (variables) {
-        // Fallback if no newRating (e.g., on error)
-        queryClient.invalidateQueries({ queryKey: ["teachers"] });
-        queryClient.invalidateQueries({
-          queryKey: ["ratedTeachers", variables.user_id],
+          queryKey: ["ratingsByTeacher", teacherId],
         });
       }
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ["ratedTeachers", userId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
   });
 };
