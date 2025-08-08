@@ -8,6 +8,9 @@ import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { View } from 'react-native';
 import { useAuth } from "../providers/AuthProvider";
 import { ActivityIndicator } from 'react-native';
+import AppToast from '@/components/teacherManagement/Toast';
+import { useEffect, useState } from 'react';
+import { subscribeToast } from '@/libs/toastService';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -73,6 +76,31 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    <RootToastHost />
     </View>
+  );
+}
+
+function RootToastHost() {
+  const [visible, setVisible] = useState(false);
+  const [message, setMessage] = useState('');
+  const [duration, setDuration] = useState(1500);
+
+  useEffect(() => {
+    const unsub = subscribeToast((msg, duration) => {
+      setMessage(msg);
+      setDuration(duration ?? 1500);
+      setVisible(true);
+    });
+    return unsub;
+  }, []);
+
+  return (
+    <AppToast
+      visible={visible}
+      message={message}
+      durationMs={duration}
+      onHide={() => setVisible(false)}
+    />
   );
 }

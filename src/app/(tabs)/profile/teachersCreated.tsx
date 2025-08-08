@@ -2,7 +2,12 @@ import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import React, { useCallback } from "react";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { useTeachersCreatedByUser, useApprovalPending, useDeleteTeacher } from "@/api/teachers/profile";
+import { UserPlus } from 'lucide-react-native';
+import {
+  useTeachersCreatedByUser,
+  useApprovalPending,
+  useDeleteTeacher,
+} from "@/api/teachers/profile";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { router } from "expo-router";
@@ -10,10 +15,16 @@ import { router } from "expo-router";
 const TeachersCreated = () => {
   const { profile } = useAuth();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"]; 
+  const colors = Colors[colorScheme ?? "light"];
 
-  const { data: teachers, isLoading, error } = useTeachersCreatedByUser(profile?.id);
-  const { mutate: deletePending, isPending: deleting } = useDeleteTeacher(profile?.id);
+  const {
+    data: teachers,
+    isLoading,
+    error,
+  } = useTeachersCreatedByUser(profile?.id);
+  const { mutate: deletePending, isPending: deleting } = useDeleteTeacher(
+    profile?.id
+  );
 
   const handleRateTeacher = useCallback((teacherId: string) => {
     router.push(`/home/rate/${teacherId}`);
@@ -23,12 +34,17 @@ const TeachersCreated = () => {
     router.push(`/home/view/${teacherId}`);
   }, []);
 
-  const handleDeleteTeacher = useCallback((teacherId: string) => {
-    deletePending({ teacherId });
-  }, [deletePending]);
+  const handleDeleteTeacher = useCallback(
+    (teacherId: string) => {
+      deletePending({ teacherId });
+    },
+    [deletePending]
+  );
 
   if (!profile?.id) {
-    return <Text style={{ margin: 16 }}>Please sign in to view this page.</Text>;
+    return (
+      <Text style={{ margin: 16 }}>Please sign in to view this page.</Text>
+    );
   }
 
   if (isLoading) {
@@ -42,18 +58,31 @@ const TeachersCreated = () => {
   if (!teachers || teachers.length === 0) {
     const isDark = colorScheme === "dark";
     return (
-      <View style={[styles.emptyContainer, { backgroundColor: colors.background }]}> 
-        <Text style={[styles.headerText, { color: isDark ? "#9ca3af" : "#6B7280" }]}>0 teachers</Text>
+      <View
+        style={[styles.emptyContainer, { backgroundColor: colors.background }]}
+      >
+        <Text
+          style={[styles.headerText, { color: isDark ? "#9ca3af" : "#6B7280" }]}
+        >
+          0 teachers
+        </Text>
         <View style={styles.emptyStateContainer}>
-          <Text style={[styles.emptyStateIcon, { color: isDark ? "#4b5563" : colors.borderColor }]}>➕</Text>
-          <Text style={[styles.emptyStateText, { color: isDark ? "#9ca3af" : "#6B7280" }]}>You haven't created any teacher yet</Text>
+          <UserPlus size={44} color={isDark ? "#9ca3af" : "#6B7280"} />
+          <Text
+            style={[
+              styles.emptyStateText,
+              { color: isDark ? "#9ca3af" : "#6B7280" },
+            ]}
+          >
+            You haven't created any teacher yet
+          </Text>
         </View>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}> 
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {teachers.map((teacher) => (
         <View key={teacher.id} style={{ marginBottom: 16 }}>
           <TeacherCard
@@ -63,9 +92,9 @@ const TeachersCreated = () => {
             onRateTeacher={() => handleRateTeacher(teacher.id)}
             onViewDetails={() => handleViewDetails(teacher.id)}
             isAlreadyRated={false}
-            showViewDetailsButton={teacher.status === 'verified'}
+            showViewDetailsButton={teacher.status === "verified"}
             secondaryButtonOverride={
-              teacher.status === 'pending'
+              teacher.status === "pending"
                 ? {
                     text: "Delete Teacher",
                     textColor: "#FFFFFF",

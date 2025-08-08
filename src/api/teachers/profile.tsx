@@ -12,7 +12,7 @@ export const useTeachersReviewedByUser = (userId?: string) =>
       const { data: ratings, error: ratingsError } = await supabase
         .from("ratings")
         .select("teacher_id")
-        .eq("user_id", userId);
+        .eq("user_id", userId)
       if (ratingsError) throw new Error(ratingsError.message);
       const teacherIds = (ratings ?? []).map((r) => r.teacher_id as string);
       if (teacherIds.length === 0) return [] as Tables<"teachers">[];
@@ -23,7 +23,8 @@ export const useTeachersReviewedByUser = (userId?: string) =>
         .select(
           "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status, created_by"
         )
-        .in("id", teacherIds);
+        .in("id", teacherIds)
+        .eq("status", "verified");
       if (teachersError) throw new Error(teachersError.message);
       return (teachers ?? []) as Tables<"teachers">[];
     },

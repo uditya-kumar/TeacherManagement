@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TextInput } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TextInput, InteractionManager } from "react-native";
 import React, { useState } from "react";
 import RatingCategories from "@/components/teacherManagement/RatingCategories";
 import Colors from "@/constants/Colors";
@@ -8,6 +8,7 @@ import { router } from "expo-router";
 import CustomTextInput from "@/components/teacherManagement/CustomTextInput";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useCreateTeacher } from "@/api/teachers";
+import { showToast } from "@/libs/toastService";
 
 const addTeacher = () => {
   const [classAverage, setClassAverage] = useState<string>("");
@@ -69,6 +70,12 @@ const addTeacher = () => {
       {
         onSuccess: () => {
           router.replace("/home");
+          setTimeout(() => {
+            showToast(
+              "Teacher Added Successfully, waiting for Admin to Approve",
+              3000
+            );
+          }, 200);
         },
         onError: (e) => setError(e instanceof Error ? e.message : "Failed"),
       }
