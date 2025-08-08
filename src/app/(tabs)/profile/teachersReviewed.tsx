@@ -19,10 +19,6 @@ const TeachersReviewed = () => {
     router.push(`/home/rate/${teacherId}`);
   }, []);
 
-  const handleViewDetails = useCallback((teacherId: string) => {
-    router.push(`/home/view/${teacherId}`);
-  }, []);
-
   const handleDeleteRating = useCallback(
     (teacherId: string) => {
       deleteRating({ teacherId });
@@ -73,6 +69,8 @@ const TeachersReviewed = () => {
               borderColor: "#B91C1C",
               icon: "Trash2",
               onPress: () => handleDeleteRating(teacher.id),
+              loading: deleting,
+              hideIconOnLoading: true,
             }}
           />
         </View>

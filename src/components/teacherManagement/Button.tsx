@@ -13,6 +13,7 @@ interface ButtonProps {
   onPress?: () => void;
   paddingVertical?: number;
   loading?: boolean;
+  hideIconOnLoading?: boolean;
 }
 
 const CustomButton: React.FC<ButtonProps> = ({
@@ -24,6 +25,7 @@ const CustomButton: React.FC<ButtonProps> = ({
   onPress,
   paddingVertical = 11,
   loading = false,
+  hideIconOnLoading = false,
 }) => {
   const IconComponent = LucideIcons[icon] as LucideIcon;
 
@@ -41,7 +43,9 @@ const CustomButton: React.FC<ButtonProps> = ({
       ]}
       onPress={!loading ? onPress : undefined}
     >
-      <IconComponent color={textColor} size={18} style={styles.icon} />
+      {!(loading && hideIconOnLoading) && (
+        <IconComponent color={textColor} size={18} style={styles.icon} />
+      )}
       <Text style={[styles.text, { color: textColor }]}>{text}</Text>
 
       {loading && (

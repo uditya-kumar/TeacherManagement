@@ -22,6 +22,8 @@ type TeacherCard = {
     borderColor?: string;
     icon: keyof typeof LucideIcons;
     onPress: () => void;
+    loading?: boolean;
+    hideIconOnLoading?: boolean;
   };
 };
 const TeacherCard = ({
@@ -144,6 +146,8 @@ const TeacherCard = ({
               icon={secondaryButtonOverride.icon}
               onPress={secondaryButtonOverride.onPress}
               paddingVertical={11}
+              loading={secondaryButtonOverride.loading}
+              hideIconOnLoading={secondaryButtonOverride.hideIconOnLoading}
             />
           </View>
         ) : (
