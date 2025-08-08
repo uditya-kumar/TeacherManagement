@@ -57,7 +57,7 @@ export const useTeacher = (
       const { data, error } = await supabase
         .from("teachers")
         .select(
-          "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status"
+          "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status, created_by"
         )
         .eq("id", id) // id is now a UUID string
         .single();

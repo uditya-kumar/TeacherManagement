@@ -5,14 +5,17 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useCallback } from "react";
 import { router, useLocalSearchParams } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import RatingBarChart from "@/components/teacherManagement/RatingBarChart";
 import Colors from "@/constants/Colors";
 import { useFavorite } from "@/app/providers/FavoriteProvider";
 import { useColorScheme } from "@/components/useColorScheme";
-import { useTeacher } from "@/api/teachers";
+import { useTeacher, useUserRatedTeacherIds } from "@/api/teachers";
+import { useTeacherRatingsBreakdown } from "@/api/teachers/rating";
+import { useAuth } from "@/app/providers/AuthProvider";
 
 const ViewTeacherDetails = () => {
   const { favorites, favoriteIds, toggleFavorite } = useFavorite();
@@ -26,13 +29,22 @@ const ViewTeacherDetails = () => {
   }
 
   const { data: teacher, error, isLoading } = useTeacher(id);
+  const { data: breakdown, isLoading: isLoadingBreakdown, refetch: refetchBreakdown } = useTeacherRatingsBreakdown(id);
+  const { profile } = useAuth();
+  const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Refetch breakdown whenever this screen gains focus to ensure freshness after rating updates
+      refetchBreakdown();
+    }, [refetchBreakdown])
+  );
 
   if (isLoading) {
     return <ActivityIndicator />;
   }
 
-  console.log(error?.message);
-  console.log("teacher is:- " + teacher);
+  
 
   if (error) {
     return <Text>Failed to Fetch teachers</Text>;
@@ -72,29 +84,23 @@ const ViewTeacherDetails = () => {
           isFavorite={favoriteIds.includes(teacher.id)}
           onToggleFavorite={() => toggleFavorite(teacher)}
           onRateTeacher={() => handleRateTeacher(teacher.id)}
+          isAlreadyRated={ratedTeacherIds.includes(teacher.id)}
+          showViewDetailsButton={false}
         />
       </View>
 
-      <Text style={[styles.heading, { color: colors.text }]}>
-        Rating Breakdown
-      </Text>
+      <Text style={[styles.heading, { color: colors.text }]}>Rating Breakdown</Text>
 
-      {/* <RatingBarChart title="Teaching Quality" data={teacherRatings?.teaching} />
-
-      <RatingBarChart
-        title="Evaluation Fairness"
-        data={teacher.evaluationFairness}
-      />
-
-      <RatingBarChart
-        title="Behavior & Attitude"
-        data={teacher.behaviorAttitude}
-      />
-
-      <RatingBarChart
-        title="Internal Assessment"
-        data={teacher.internalAssessment}
-      /> */}
+      {isLoadingBreakdown ? (
+        <ActivityIndicator style={{ marginTop: 12 }} />
+      ) : (
+        <>
+          <RatingBarChart title="Teaching Quality" data={breakdown?.teaching ?? []} />
+          <RatingBarChart title="Evaluation Fairness" data={breakdown?.evaluation ?? []} />
+          <RatingBarChart title="Behavior & Attitude" data={breakdown?.behaviour ?? []} />
+          <RatingBarChart title="Internal Assessment" data={breakdown?.internals ?? []} />
+        </>
+      )}
     </ScrollView>
   );
 };

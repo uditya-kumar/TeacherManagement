@@ -1,26 +1,76 @@
 import { supabase } from "@/libs/supabase";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tables } from "@/types";
+import type { RatingBreakdown } from "@/types";
 
 type Rating = Tables<"ratings">;
 
 // fetch teacher ratings
+export const teacherRatingsQueryOptions = (teacherId: string) => ({
+  queryKey: ["ratingsByTeacher", teacherId] as const,
+  queryFn: async (): Promise<Rating[]> => {
+    const { data, error } = await supabase
+      .from("ratings")
+      .select("*")
+      .eq("teacher_id", teacherId);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Rating[];
+  },
+  staleTime: 0,
+  refetchOnWindowFocus: false,
+});
+
 export const useTeacherRatings = (teacherId: string) =>
-  useQuery({
-    queryKey: ["ratingsByTeacher", teacherId],
+  useQuery(teacherRatingsQueryOptions(teacherId));
+
+// Derived breakdown per category for a teacher's ratings
+export const useTeacherRatingsBreakdown = (teacherId?: string) => {
+  const queryClient = useQueryClient();
+  return useQuery({
+    queryKey: ["ratingsBreakdown", teacherId],
     enabled: !!teacherId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("ratings")
-        .select("*")
-        .eq("teacher_id", teacherId);
+      // Fetch fresh ratings so breakdown reflects latest changes after invalidation
+      const ratings = await queryClient.fetchQuery(
+        teacherRatingsQueryOptions(teacherId as string)
+      );
 
-      if (error) throw new Error(error.message);
-      return (data ?? []) as Rating[];
+      const buildBreakdown = (values: number[]): RatingBreakdown[] => {
+        const total = values.length;
+        const counts: Record<number, number> = {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        };
+        for (const v of values) {
+          if (v >= 1 && v <= 5) counts[v] += 1;
+        }
+        return [5, 4, 3, 2, 1].map((stars) => ({
+          stars,
+          count: counts[stars],
+          percentage: total > 0 ? Math.round((counts[stars] / total) * 100) : 0,
+        }));
+      };
+
+      return {
+        teaching: buildBreakdown(ratings.map((r) => r.teaching)),
+        evaluation: buildBreakdown(ratings.map((r) => r.evaluation)),
+        behaviour: buildBreakdown(ratings.map((r) => r.behaviour)),
+        internals: buildBreakdown(ratings.map((r) => r.internals)),
+      } as {
+        teaching: RatingBreakdown[];
+        evaluation: RatingBreakdown[];
+        behaviour: RatingBreakdown[];
+        internals: RatingBreakdown[];
+      };
     },
     staleTime: 60_000,
+    gcTime: 5 * 60_000,
     refetchOnWindowFocus: false,
   });
+};
 
 // fetch existing rating by the current user for this teacher
 export const useUserRatingForTeacher = (teacherId?: string, userId?: string) =>
@@ -167,6 +217,54 @@ export const useUpsertRating = () => {
           return copy;
         }
       );
+
+      // Proactively recompute and update the cached breakdown to avoid a stale chart
+      queryClient.setQueryData(
+        ["ratingsBreakdown", newRating.teacher_id],
+        (prev: {
+          teaching: RatingBreakdown[];
+          evaluation: RatingBreakdown[];
+          behaviour: RatingBreakdown[];
+          internals: RatingBreakdown[];
+        } | undefined) => {
+          const recompute = (list: Rating[]) => {
+            const build = (values: number[]) => {
+              const total = values.length;
+              const counts: Record<number, number> = {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+              };
+              for (const v of values) if (v >= 1 && v <= 5) counts[v] += 1;
+              return [5, 4, 3, 2, 1].map((stars) => ({
+                stars,
+                count: counts[stars],
+                percentage:
+                  total > 0 ? Math.round((counts[stars] / total) * 100) : 0,
+              }));
+            };
+            return {
+              teaching: build(list.map((r) => r.teaching)),
+              evaluation: build(list.map((r) => r.evaluation)),
+              behaviour: build(list.map((r) => r.behaviour)),
+              internals: build(list.map((r) => r.internals)),
+            };
+          };
+
+          const currentList = queryClient.getQueryData<Rating[]>([
+            "ratingsByTeacher",
+            newRating.teacher_id,
+          ]) || [];
+          // Merge or insert newRating into currentList
+          const idx = currentList.findIndex((r) => r.id === newRating.id);
+          const merged = idx === -1
+            ? [...currentList, newRating as Rating]
+            : currentList.map((r) => (r.id === newRating.id ? (newRating as Rating) : r));
+          return recompute(merged);
+        }
+      );
     },
 
     // Always invalidate/refetch for server sync (regardless of success/error)
@@ -177,6 +275,9 @@ export const useUpsertRating = () => {
         queryClient.invalidateQueries({ queryKey: ["teacher", teacherId] });
         queryClient.invalidateQueries({
           queryKey: ["ratingsByTeacher", teacherId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["ratingsBreakdown", teacherId],
         });
       }
       if (userId) {
