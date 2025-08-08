@@ -31,7 +31,7 @@ const RateTeacher = () => {
       ),
   });
   const { profile } = useAuth();
-  const { mutate: upsertRating } = useUpsertRating();
+  const { mutate: upsertRating, isPending: isSubmitting } = useUpsertRating();
 
   const { data: existingRating, isLoading: isLoadingRating } =
     useUserRatingForTeacher(id, profile?.id);
@@ -161,6 +161,7 @@ const RateTeacher = () => {
               icon="SendHorizontal"
               onPress={onSubmitRating}
               paddingVertical={13}
+              loading={isSubmitting}
             />
           </View>
         </>

@@ -16,6 +16,7 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { useTeacher, useUserRatedTeacherIds } from "@/api/teachers";
 import { useTeacherRatingsBreakdown } from "@/api/teachers/rating";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ViewTeacherDetails = () => {
   const { favorites, favoriteIds, toggleFavorite } = useFavorite();
@@ -32,6 +33,7 @@ const ViewTeacherDetails = () => {
   const { data: breakdown, isLoading: isLoadingBreakdown, refetch: refetchBreakdown } = useTeacherRatingsBreakdown(id);
   const { profile } = useAuth();
   const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
+  const queryClient = useQueryClient();
 
   useFocusEffect(
     useCallback(() => {
@@ -71,6 +73,12 @@ const ViewTeacherDetails = () => {
   }
 
   const handleRateTeacher = (teacherId: string) => {
+    // Clear potentially stale per-user rating and aggregates to avoid flicker
+    if (profile?.id) {
+      queryClient.removeQueries({ queryKey: ["userRating", teacherId, profile.id], exact: true });
+      queryClient.removeQueries({ queryKey: ["ratingsByTeacher", teacherId], exact: true });
+      queryClient.removeQueries({ queryKey: ["ratingsBreakdown", teacherId], exact: true });
+    }
     router.push(`/home/rate/${teacherId}`);
   };
 
