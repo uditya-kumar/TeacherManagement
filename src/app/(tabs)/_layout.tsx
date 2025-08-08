@@ -38,6 +38,7 @@ export default function TabLayout() {
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
     <Tabs
       screenOptions={{
+        popToTopOnBlur: true,
         tabBarActiveTintColor: colors.text,
          tabBarStyle: {
           height: 60 + insets.bottom,
