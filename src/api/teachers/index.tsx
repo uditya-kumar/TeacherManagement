@@ -2,8 +2,6 @@ import { supabase } from "@/libs/supabase";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tables } from "@/types";
 
-type Rating = Tables<"ratings">;
-
 //Fetch all teachers list
 export const useTeacherList = () =>
   useQuery({
@@ -13,7 +11,8 @@ export const useTeacherList = () =>
         .from("teachers")
         .select(
           "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status"
-        );
+        )
+        .eq("status", "verified");
       if (error) throw new Error(error.message);
       return data ?? [];
     },
@@ -157,6 +156,70 @@ export const useToggleFavoriteTeacher = (userId?: string) => {
     // 4️⃣ In any case, refetch so we're in sync with the server
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["favoriteTeachers", userId] });
+    },
+  });
+};
+
+// Create teacher (pending) and optionally the creator's initial rating
+export const useCreateTeacher = (userId?: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["createTeacher", userId],
+    mutationFn: async ({
+      full_name,
+      cabin_no,
+      mobile_no,
+      initialRating,
+      class_average,
+    }: {
+      full_name: string;
+      cabin_no?: string;
+      mobile_no?: string;
+      initialRating?: {
+        teaching: number;
+        evaluation: number;
+        behaviour: number;
+        internals: number;
+      };
+      class_average?: string;
+    }) => {
+      if (!userId) throw new Error("No auth user");
+      // 1) Insert teacher with pending status
+      const { data: teacher, error: tErr } = await supabase
+        .from("teachers")
+        .insert({
+          full_name,
+          cabin_no: cabin_no ?? null,
+          mobile_no: mobile_no ?? null,
+          status: "pending",
+          created_by: userId,
+        })
+        .select("*")
+        .single();
+      if (tErr) throw new Error(tErr.message);
+
+      // 2) Optionally insert initial rating by creator
+      if (initialRating && class_average) {
+        const { error: rErr } = await supabase
+          .from("ratings")
+          .insert({
+            teacher_id: teacher.id,
+            user_id: userId,
+            teaching: initialRating.teaching,
+            evaluation: initialRating.evaluation,
+            behaviour: initialRating.behaviour,
+            internals: initialRating.internals,
+            class_average,
+          })
+          .single();
+        if (rErr) throw new Error(rErr.message);
+      }
+
+      return teacher as Tables<"teachers">;
+    },
+    onSuccess: () => {
+      // refresh related lists
+      queryClient.invalidateQueries({ queryKey: ["teachersCreated"] });
     },
   });
 };

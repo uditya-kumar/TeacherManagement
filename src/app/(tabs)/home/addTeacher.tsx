@@ -6,11 +6,15 @@ import { useColorScheme } from "@/components/useColorScheme";
 import CustomButton from "@/components/teacherManagement/Button";
 import { router } from "expo-router";
 import CustomTextInput from "@/components/teacherManagement/CustomTextInput";
+import { useAuth } from "@/app/providers/AuthProvider";
+import { useCreateTeacher } from "@/api/teachers";
 
 const addTeacher = () => {
   const [classAverage, setClassAverage] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [teacherName, setTeacherName] = useState<string>("");
+  const [mobileNumber, setMobileNumber] = useState<string>("");
+  const [cabinNumber, setCabinNumber] = useState<string>("");
   const [ratings, setRatings] = useState({
     teachingQuality: 0,
     evaluationMethods: 0,
@@ -21,6 +25,8 @@ const addTeacher = () => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
+  const { profile } = useAuth();
+  const { mutate: createTeacher, isPending } = useCreateTeacher(profile?.id);
 
   const handleRating = (category: keyof typeof ratings, rating: number) => {
     setRatings((prev) => ({ ...prev, [category]: rating }));
@@ -30,6 +36,10 @@ const addTeacher = () => {
     setError("");
     if (!teacherName) {
       setError("Enter Teacher Name");
+      return;
+    }
+    if (mobileNumber && !/^[0-9]{10}$/.test(mobileNumber)) {
+      setError("Invalid mobile number");
       return;
     }
     if (
@@ -43,10 +53,26 @@ const addTeacher = () => {
       return;
     }
 
-    // Add teacher Logic
-    console.log("Adding teacher...");
-
-    router.replace("/home");
+    createTeacher(
+      {
+        full_name: teacherName,
+        mobile_no: mobileNumber,
+        cabin_no: cabinNumber,
+        initialRating: {
+          teaching: ratings.teachingQuality,
+          evaluation: ratings.evaluationMethods,
+          behaviour: ratings.behaviorAttitude,
+          internals: ratings.internalAssessment,
+        },
+        class_average: classAverage,
+      },
+      {
+        onSuccess: () => {
+          router.replace("/home");
+        },
+        onError: (e) => setError(e instanceof Error ? e.message : "Failed"),
+      }
+    );
   };
 
   return (
@@ -61,6 +87,25 @@ const addTeacher = () => {
         value={teacherName}
         onChangeText={setTeacherName}
         placeholder="Enter Teacher's Full Name"
+      />
+
+      <Text style={[styles.label, { color: colors.text }]}>
+        Mobile Number (Optional)
+      </Text>
+
+      <CustomTextInput
+        value={mobileNumber}
+        onChangeText={setMobileNumber}
+        placeholder="Enter Mobile Number"
+      />
+
+      <Text style={[styles.label, { color: colors.text }]}>
+        Cabin Number (Optional)
+      </Text>
+      <CustomTextInput
+        value={cabinNumber}
+        onChangeText={setCabinNumber}
+        placeholder="Enter Cabin Number"
       />
 
       <Text style={[styles.label, { color: colors.text }]}>Rate Teacher *</Text>
@@ -81,12 +126,13 @@ const addTeacher = () => {
       {/* Submit Button */}
       <View style={{ marginHorizontal: 15, marginTop: 15 }}>
         <CustomButton
-          text="Submit Rating"
+          text="Create Teacher"
           textColor="#FFFFFF"
           backgroundColor={isDark ? "#374151" : "#0C1120"}
           icon="SendHorizontal"
           onPress={onAddTeacher}
           paddingVertical={13}
+          loading={isPending}
         />
       </View>
     </ScrollView>

@@ -60,4 +60,62 @@ export const useDeleteUserRatingForTeacher = (userId?: string) => {
   });
 };
 
+export const useTeachersCreatedByUser = (userId?: string) =>
+  useQuery({
+    queryKey: ["teachersCreated", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (!userId) return [] as Tables<"teachers">[];
+      const { data, error } = await supabase
+        .from("teachers")
+        .select("*")
+        .eq("created_by", userId)
+        .order("full_name");
+      if (error) throw new Error(error.message);
+      return (data ?? []) as Tables<"teachers">[];
+    },
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+  });
+
+// Read-only status checker for a teacher's approval status
+export const useApprovalPending = (teacherId?: string) =>
+  useQuery({
+    queryKey: ["approvalStatus", teacherId],
+    enabled: !!teacherId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("teachers")
+        .select("status")
+        .eq("id", teacherId as string)
+        .single();
+      if (error) throw new Error(error.message);
+      return (data?.status ?? null) as Tables<"teachers">["status"] | null;
+    },
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
+
+// Delete the teacher row (only works if row is pending enforced at DB level)
+export const useDeleteTeacher = (userId?: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["deleteTeacher", userId],
+    mutationFn: async ({ teacherId }: { teacherId: string }) => {
+      const { error } = await supabase
+        .from("teachers")
+        .delete()
+        .eq("id", teacherId)
+        .eq("status", "pending");
+      if (error) throw new Error(error.message);
+      return { teacherId };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachersCreated", userId] });
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    },
+  });
+};
+
 
