@@ -13,6 +13,7 @@ import {
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { supabase } from "@/libs/supabase";
 
 const ProfilePage = () => {
   const colorScheme = useColorScheme();
@@ -96,7 +97,13 @@ const ProfilePage = () => {
         </Pressable>
       </View>
 
-      <Pressable style={styles.signOutButton} onPress={() => console.log('signing out')}>
+      <Pressable
+        style={styles.signOutButton}
+        onPress={async () => {
+          await supabase.auth.signOut();
+          router.replace("/");
+        }}
+      >
         <View style={styles.rowLeft}>
           <LogOut size={20} color={colors.error} style={styles.icon} />
           <Text style={[styles.signOutText, { color: colors.error }]}>Sign Out</Text>
