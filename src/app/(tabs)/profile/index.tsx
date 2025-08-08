@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 import { Link, router } from "expo-router";
 import {
   User,
@@ -20,6 +20,7 @@ const ProfilePage = () => {
   const colors = Colors[colorScheme ?? 'light'];
   const isDark = colorScheme === 'dark';
   const {profile} = useAuth()
+  const [avatarError, setAvatarError] = useState(false);
 
   // Theme-aware colors
   const iconColor = colors.text;
@@ -29,11 +30,21 @@ const ProfilePage = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[
-        styles.profileCircle,
-        { backgroundColor: profileCircleBackground }
-      ]}>
-        <User color={profileCircleIconColor} size={37} />
+      <View
+        style={[
+          styles.profileCircle,
+          { backgroundColor: profileCircleBackground },
+        ]}
+      >
+        {profile?.avatar_url && !avatarError ? (
+          <Image
+            source={{ uri: profile.avatar_url }}
+            style={styles.avatar}
+            onError={() => setAvatarError(true)}
+          />
+        ) : (
+          <User color={profileCircleIconColor} size={37} />
+        )}
       </View>
       <Text style={[styles.username, { color: colors.text }]}>{profile?.full_name}</Text>
 
@@ -127,6 +138,12 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    resizeMode: 'cover',
   },
   username: {
     marginTop: 10,

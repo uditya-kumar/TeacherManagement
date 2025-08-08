@@ -5,6 +5,7 @@ import { Star, Phone, MapPin, Heart } from "lucide-react-native";
 import CustomButton from "./Button";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Tables } from "@/types";
+import * as LucideIcons from "lucide-react-native";
 
 type TeacherCard = {
   teacher: Tables<'teachers'>;
@@ -14,6 +15,14 @@ type TeacherCard = {
   onViewDetails?: () => void;
   showViewDetailsButton?: boolean;
   isAlreadyRated?: boolean;
+  secondaryButtonOverride?: {
+    text: string;
+    textColor: string;
+    backgroundColor: string;
+    borderColor?: string;
+    icon: keyof typeof LucideIcons;
+    onPress: () => void;
+  };
 };
 const TeacherCard = ({
   teacher,
@@ -23,6 +32,7 @@ const TeacherCard = ({
   onViewDetails,
   showViewDetailsButton = true,
   isAlreadyRated,
+  secondaryButtonOverride,
 }: TeacherCard) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -124,16 +134,32 @@ const TeacherCard = ({
           onPress={onRateTeacher}
           paddingVertical={11}
         />
-        {showViewDetailsButton && (
-          <CustomButton
-            text="View Details"
-            textColor={isDark ? colors.text : "#0C1120"}
-            backgroundColor={isDark ? "transparent" : "#FFFFFF"}
-            borderColor={colors.borderColor}
-            icon="Eye"
-            onPress={onViewDetails}
-            paddingVertical={11}
-          />
+        {secondaryButtonOverride ? (
+          <View style={styles.secondaryButtonWrapper}>
+            <CustomButton
+              text={secondaryButtonOverride.text}
+              textColor={secondaryButtonOverride.textColor}
+              backgroundColor={secondaryButtonOverride.backgroundColor}
+              borderColor={secondaryButtonOverride.borderColor}
+              icon={secondaryButtonOverride.icon}
+              onPress={secondaryButtonOverride.onPress}
+              paddingVertical={11}
+            />
+          </View>
+        ) : (
+          showViewDetailsButton && (
+            <View style={styles.secondaryButtonWrapper}>
+              <CustomButton
+                text="View Details"
+                textColor={isDark ? colors.text : "#0C1120"}
+                backgroundColor={isDark ? "transparent" : "#FFFFFF"}
+                borderColor={colors.borderColor}
+                icon="Eye"
+                onPress={onViewDetails}
+                paddingVertical={11}
+              />
+            </View>
+          )
         )}
       </View>
     </View>
@@ -184,7 +210,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
+  },
+  secondaryButtonWrapper: {
+    marginLeft: 10,
   },
   details: {
     // Color will be set dynamically

@@ -282,6 +282,7 @@ export const useUpsertRating = () => {
       }
       if (userId) {
         queryClient.invalidateQueries({ queryKey: ["ratedTeachers", userId] });
+        queryClient.invalidateQueries({ queryKey: ["teachersReviewed", userId] });
       }
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
