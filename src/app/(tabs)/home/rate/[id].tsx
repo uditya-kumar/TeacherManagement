@@ -11,20 +11,19 @@ import Colors from "@/constants/Colors";
 import CustomButton from "@/components/teacherManagement/Button";
 import RatingCategories from "@/components/teacherManagement/RatingCategories";
 import { useColorScheme } from "@/components/useColorScheme";
+import { useTeacherList } from "@/api/teachers";
 import {
-  useTeacher,
   useUserRatingForTeacher,
   useUpsertRating,
-} from "@/api/teachers";
+} from "@/api/teachers/rating";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { useQueryClient } from "@tanstack/react-query";
 
 const RateTeacher = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [error, setError] = useState<string>("");
-  const queryClient = useQueryClient();
 
-  const { data: teacher, error: errorTeacher, isLoading } = useTeacher(id);
+  const { data: teachers, isLoading: isLoadingTeachersList } = useTeacherList();
+  const teacher = teachers?.find((t: { id: string }) => t.id === id);
   const { profile } = useAuth();
   const { mutate: upsertRating } = useUpsertRating();
 
@@ -55,23 +54,13 @@ const RateTeacher = () => {
     }
   }, [existingRating]);
 
-  if (isLoading) {
-    console.log("home\rate[id].tsx:- Fetching teacher from id");
-    return <ActivityIndicator style={{ marginTop: 50 }} />;
-  }
-
-  if (isLoadingRating) {
-    console.log("home\rate[id].tsx:- Fetching Rating of the teacher");
+  if (isLoadingTeachersList || isLoadingRating) {
     return <ActivityIndicator style={{ marginTop: 50 }} />;
   }
 
   const handleRating = (category: keyof typeof ratings, rating: number) => {
     setRatings((prev) => ({ ...prev, [category]: rating }));
   };
-
-  if (errorTeacher) {
-    return <Text>Failed to fetch teachers</Text>;
-  }
 
   const onSubmitRating = () => {
     setError("");
@@ -87,8 +76,12 @@ const RateTeacher = () => {
       return;
     }
 
-    if (!teacher?.id || !profile?.id) {
-      setError("Missing teacher or user info.");
+    if (!teacher?.id) {
+      setError("Missing teacher info.");
+      return;
+    }
+    if (!profile?.id) {
+      setError("Missing user info.");
       return;
     }
 
