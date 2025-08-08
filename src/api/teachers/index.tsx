@@ -9,7 +9,11 @@ export const useTeacherList = () =>
   useQuery({
     queryKey: ["teachers"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("teachers").select("*");
+      const { data, error } = await supabase
+        .from("teachers")
+        .select(
+          "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status"
+        );
       if (error) throw new Error(error.message);
       return data ?? [];
     },
@@ -34,6 +38,9 @@ export const useUserRatedTeacherIds = (userId?: string) =>
       if (error) throw new Error(error.message);
       return data.map((r) => r.teacher_id as string);
     },
+    staleTime: Infinity,
+    gcTime: 10 * 60_000,
+    refetchOnWindowFocus: false,
   });
 
 // fetching teacher details
@@ -49,7 +56,9 @@ export const useTeacher = (
     queryFn: async () => {
       const { data, error } = await supabase
         .from("teachers")
-        .select("*")
+        .select(
+          "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status"
+        )
         .eq("id", id) // id is now a UUID string
         .single();
 

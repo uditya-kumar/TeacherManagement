@@ -42,18 +42,19 @@ const index = () => {
   useRealtimeTeachers();
 
   const filteredTeachers = useMemo(() => {
-  return (teachers ?? [])
-    .filter(
-      (teacher) =>
-        typeof teacher.full_name === "string" &&
-        teacher.full_name.toLowerCase().includes(search.toLowerCase())
-    )
-    .sort((a, b) => {
-      const nameA = a.full_name?.toLowerCase() ?? "";
-      const nameB = b.full_name?.toLowerCase() ?? "";
-      return nameA.localeCompare(nameB);
-    }); // ✅ Sorted alphabetically by full_name
-}, [search, teachers]);
+    const list = (teachers ?? []) as Tables<"teachers">[];
+    if (!search) return list;
+    const s = search.toLowerCase();
+    return list
+      .filter((teacher: Tables<"teachers">) =>
+        (teacher.full_name ?? "").toLowerCase().includes(s)
+      )
+      .sort((a: Tables<"teachers">, b: Tables<"teachers">) => {
+        const nameA = a.full_name?.toLowerCase() ?? "";
+        const nameB = b.full_name?.toLowerCase() ?? "";
+        return nameA.localeCompare(nameB);
+      });
+  }, [search, teachers]);
 
 
   const clearSearch = () => {
@@ -165,7 +166,7 @@ const index = () => {
     [favoriteIds, toggleFavorite, ratedTeacherIds]
   );
 
-  if (isLoading) {
+  if (isLoading && (!teachers || (teachers as Tables<"teachers">[]).length === 0)) {
     return <ActivityIndicator />;
   }
 

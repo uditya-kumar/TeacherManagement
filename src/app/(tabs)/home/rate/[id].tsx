@@ -26,9 +26,9 @@ const RateTeacher = () => {
   const queryClient = useQueryClient();
   const { data: teacher, isLoading: isLoadingTeacher } = useTeacher(id!, {
     placeholderData: () =>
-      (queryClient.getQueryData(["teachers"]) as Array<{ id: string }> | undefined)?.find(
+      (queryClient.getQueryData(["teachers"]) as Array<any> | undefined)?.find(
         (t) => t.id === id
-      ) as any,
+      ),
   });
   const { profile } = useAuth();
   const { mutate: upsertRating } = useUpsertRating();
