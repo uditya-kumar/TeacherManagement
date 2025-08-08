@@ -27,7 +27,7 @@ const TeachersCreated = () => {
   );
 
   const handleRateTeacher = useCallback((teacherId: string) => {
-    router.push(`/home/rate/${teacherId}`);
+    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: "/profile/teachersCreated" } });
   }, []);
 
   const handleViewDetails = useCallback((teacherId: string) => {

@@ -79,7 +79,7 @@ const ViewTeacherDetails = () => {
       queryClient.removeQueries({ queryKey: ["ratingsByTeacher", teacherId], exact: true });
       queryClient.removeQueries({ queryKey: ["ratingsBreakdown", teacherId], exact: true });
     }
-    router.push(`/home/rate/${teacherId}`);
+    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: `/home/view/${teacherId}` } });
   };
 
   return (

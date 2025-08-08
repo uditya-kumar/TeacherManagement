@@ -25,7 +25,7 @@ const favorites = () => {
   };
 
   const handleRateTeacher = (teacherId: string) => {
-    router.push(`/home/rate/${teacherId}`);
+    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: "/home/favorites" } });
   };
 
   const handleViewDetails = (teacherId: string) => {

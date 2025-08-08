@@ -73,8 +73,8 @@ const index = () => {
       queryClient.removeQueries({ queryKey: ["ratingsByTeacher", teacherId], exact: true });
     }
 
-    // Navigate immediately for snappy UX
-    router.push(`/home/rate/${teacherId}`);
+    // Navigate immediately for snappy UX, include `from` so we can return correctly
+    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: "/home" } });
 
     // Fire-and-forget prefetch to warm cache without blocking navigation
     if (profile?.id) {

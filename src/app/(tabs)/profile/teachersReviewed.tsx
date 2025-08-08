@@ -16,7 +16,7 @@ const TeachersReviewed = () => {
   const { mutate: deleteRating, isPending: deleting } = useDeleteUserRatingForTeacher(profile?.id);
 
   const handleRateTeacher = useCallback((teacherId: string) => {
-    router.push(`/home/rate/${teacherId}`);
+    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: "/profile/teachersReviewed" } });
   }, []);
 
   const handleDeleteRating = useCallback(

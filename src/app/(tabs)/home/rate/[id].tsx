@@ -20,7 +20,7 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
 const RateTeacher = () => {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const [error, setError] = useState<string>("");
 
   const queryClient = useQueryClient();
@@ -112,6 +112,27 @@ const RateTeacher = () => {
       },
       {
         onSuccess: async () => {
+          if (typeof from === "string") {
+            if (from.startsWith("/home/view/")) {
+              const backId = from.split("/").pop();
+              if (backId) {
+                router.replace({ pathname: "/home/view/[id]", params: { id: backId } });
+                return;
+              }
+            } else if (from === "/home/favorites") {
+              router.replace("/home/favorites");
+              return;
+            } else if (from === "/home") {
+              router.replace("/home");
+              return;
+            } else if (from === "/profile/teachersReviewed") {
+              router.replace("/profile/teachersReviewed");
+              return;
+            } else if (from === "/profile/teachersCreated") {
+              router.replace("/profile/teachersCreated");
+              return;
+            }
+          }
           router.back();
         },
       }
