@@ -62,6 +62,14 @@ const index = () => {
   };
 
   const handleRateTeacher = (teacherId: string) => {
+    // Clear potentially stale per-user rating to avoid brief flicker of old value
+    if (profile?.id) {
+      queryClient.removeQueries({
+        queryKey: ["userRating", teacherId, profile.id],
+        exact: true,
+      });
+    }
+
     // Navigate immediately for snappy UX
     router.push(`/home/rate/${teacherId}`);
 

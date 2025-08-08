@@ -49,7 +49,16 @@ const RateTeacher = () => {
   });
 
   useEffect(() => {
-    if (existingRating) {
+    // Only set when we have a definitive value (null = no rating, object = data)
+    if (existingRating === null) {
+      setRatings({
+        teachingQuality: 0,
+        evaluationMethods: 0,
+        behaviorAttitude: 0,
+        internalAssessment: 0,
+      });
+      setClassAverage("");
+    } else if (existingRating) {
       setRatings({
         teachingQuality: existingRating.teaching ?? 0,
         evaluationMethods: existingRating.evaluation ?? 0,

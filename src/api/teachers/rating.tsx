@@ -47,6 +47,11 @@ export const useUserRatingForTeacher = (teacherId?: string, userId?: string) =>
 
       return data;
     },
+    // Prevent using stale cached user rating to avoid flicker
+    staleTime: 0,
+    gcTime: 5 * 60_000,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: false,
   });
 
 // Insert teacher rating
