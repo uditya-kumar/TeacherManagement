@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  useColorScheme,
   StyleSheet,
   Pressable,
   Image,
@@ -10,25 +9,14 @@ import React from "react";
 import Colors from "@/constants/Colors";
 
 const GoogleButton = ({ onPress }: { onPress: () => void }) => {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"];
   return (
-    <Pressable
-      style={[
-        styles.button,
-        {
-          borderColor: colors.borderColor,
-          backgroundColor: colors.cardBackground,
-        },
-      ]}
-      onPress={onPress}
-    >
+    <Pressable style={styles.button} onPress={onPress}>
       <View style={styles.content}>
         <Image
           source={require("@assets/images/googleLogo.png")}
           style={styles.icon}
         />
-        <Text style={[styles.text, { color: colors.text }]}>
+        <Text style={[styles.text, { color: Colors.light.text }]}>
           Continue with Google
         </Text>
       </View>
@@ -44,6 +32,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     alignItems: "center",
     justifyContent: "center",
+    borderColor: Colors.light.borderColor,
+    backgroundColor: Colors.light.cardBackground,
   },
   content: {
     flexDirection: "row",
