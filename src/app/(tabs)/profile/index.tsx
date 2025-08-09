@@ -18,9 +18,9 @@ import { supabase } from "@/libs/supabase";
 
 const ProfilePage = () => {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-  const isDark = colorScheme === 'dark';
-  const {profile} = useAuth()
+  const colors = Colors[colorScheme ?? "light"];
+  const isDark = colorScheme === "dark";
+  const { profile } = useAuth();
   const [avatarError, setAvatarError] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
 
@@ -31,17 +31,20 @@ const ProfilePage = () => {
     }, [])
   );
 
-  const navigateOnce = useCallback((path: Parameters<typeof router.push>[0]) => {
-    if (isNavigating) return;
-    setIsNavigating(true);
-    router.push(path);
-  }, [isNavigating]);
+  const navigateOnce = useCallback(
+    (path: Parameters<typeof router.push>[0]) => {
+      if (isNavigating) return;
+      setIsNavigating(true);
+      router.push(path);
+    },
+    [isNavigating]
+  );
 
   // Theme-aware colors
   const iconColor = colors.text;
-  const chevronColor = isDark ? '#9ca3af' : '#6b7280';
-  const profileCircleBackground = isDark ? '#374151' : '#000000';
-  const profileCircleIconColor = isDark ? '#e5e7eb' : '#ffffff';
+  const chevronColor = isDark ? "#9ca3af" : "#6b7280";
+  const profileCircleBackground = isDark ? "#374151" : "#000000";
+  const profileCircleIconColor = isDark ? "#e5e7eb" : "#ffffff";
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -61,63 +64,75 @@ const ProfilePage = () => {
           <User color={profileCircleIconColor} size={37} />
         )}
       </View>
-      <Text style={[styles.username, { color: colors.text }]}>{profile?.full_name}</Text>
+      <Text style={[styles.username, { color: colors.text }]}>
+        {profile?.full_name}
+      </Text>
 
-      <View style={[
-        styles.card,
-        {
-          backgroundColor: colors.cardBackground,
-          borderColor: colors.borderColor,
-        }
-      ]}>
-
-        {/* Teachers Reviewed */}
-        <Pressable disabled={isNavigating} style={[
-          styles.row,
-          { borderBottomColor: colors.borderColor }
+      <View
+        style={[
+          styles.card,
+          {
+            backgroundColor: colors.cardBackground,
+            borderColor: colors.borderColor,
+          },
         ]}
-        onPress={() => navigateOnce('/profile/teachersReviewed')}
+      >
+        {/* Teachers Reviewed */}
+        <Pressable
+          disabled={isNavigating}
+          style={[styles.row, { borderBottomColor: colors.borderColor }]}
+          onPress={() => navigateOnce("/profile/teachersReviewed")}
         >
           <View style={styles.rowLeft}>
             <BookOpen size={20} color={iconColor} style={styles.icon} />
-            <Text style={[styles.rowText, { color: colors.text }]}>Teachers Reviewed</Text>
+            <Text style={[styles.rowText, { color: colors.text }]}>
+              Teachers Reviewed
+            </Text>
           </View>
           <ChevronRight size={20} color={chevronColor} />
         </Pressable>
-        
+
         {/* Teachers Created */}
-        <Pressable disabled={isNavigating} style={[
-          styles.row,
-          { borderBottomColor: colors.borderColor }
-        ]}
-        onPress={() => navigateOnce('/profile/teachersCreated')}
+        <Pressable
+          disabled={isNavigating}
+          style={[styles.row, { borderBottomColor: colors.borderColor }]}
+          onPress={() => navigateOnce("/profile/teachersCreated")}
         >
           <View style={styles.rowLeft}>
             <Plus size={20} color={iconColor} style={styles.icon} />
-            <Text style={[styles.rowText, { color: colors.text }]}>Teachers Created</Text>
+            <Text style={[styles.rowText, { color: colors.text }]}>
+              Teachers Created
+            </Text>
           </View>
           <ChevronRight size={20} color={chevronColor} />
         </Pressable>
-        
+
         {/* Report Bug */}
-        <Pressable disabled={isNavigating} style={[
-          styles.row,
-          { borderBottomColor: colors.borderColor }
-        ]}
-        onPress={() => navigateOnce('/profile/reportBug')}
+        <Pressable
+          disabled={isNavigating}
+          style={[styles.row, { borderBottomColor: colors.borderColor }]}
+          onPress={() => navigateOnce("/profile/reportBug")}
         >
           <View style={styles.rowLeft}>
             <Bug size={20} color={iconColor} style={styles.icon} />
-            <Text style={[styles.rowText, { color: colors.text }]}>Report a Bug</Text>
+            <Text style={[styles.rowText, { color: colors.text }]}>
+              Report a Bug
+            </Text>
           </View>
           <ChevronRight size={20} color={chevronColor} />
         </Pressable>
 
         {/* About Dev */}
-        <Pressable style={[styles.row, styles.lastRow]}>
+        <Pressable
+          disabled={isNavigating}
+          style={[styles.row, styles.lastRow]}
+          onPress={() => navigateOnce("/profile/aboutDev")}
+        >
           <View style={styles.rowLeft}>
             <Info size={20} color={iconColor} style={styles.icon} />
-            <Text style={[styles.rowText, { color: colors.text }]}>About DEV</Text>
+            <Text style={[styles.rowText, { color: colors.text }]}>
+              About DEV
+            </Text>
           </View>
           <ChevronRight size={20} color={chevronColor} />
         </Pressable>
@@ -132,7 +147,9 @@ const ProfilePage = () => {
       >
         <View style={styles.rowLeft}>
           <LogOut size={20} color={colors.error} style={styles.icon} />
-          <Text style={[styles.signOutText, { color: colors.error }]}>Sign Out</Text>
+          <Text style={[styles.signOutText, { color: colors.error }]}>
+            Sign Out
+          </Text>
         </View>
       </Pressable>
     </View>
@@ -158,7 +175,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   username: {
     marginTop: 10,

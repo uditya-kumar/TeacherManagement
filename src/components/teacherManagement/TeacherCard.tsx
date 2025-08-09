@@ -214,7 +214,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "flex-start",
   },
   secondaryButtonWrapper: {
     marginLeft: 10,
