@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     marginLeft: 10, // ← push spinner to right of text
   },
   icon: {
-    marginRight: 10,
+    marginRight: 6,
   },
   text: {
     fontWeight: "600",
