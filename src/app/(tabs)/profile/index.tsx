@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import {
@@ -126,7 +127,7 @@ const ProfilePage = () => {
         <Pressable
           disabled={isNavigating}
           style={[styles.row, styles.lastRow]}
-          onPress={() => navigateOnce("/profile/aboutDev")}
+          onPress={() => WebBrowser.openBrowserAsync("https://github.com/uditya2004")}
         >
           <View style={styles.rowLeft}>
             <Info size={20} color={iconColor} style={styles.icon} />
