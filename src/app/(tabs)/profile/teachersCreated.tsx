@@ -48,7 +48,11 @@ const TeachersCreated = () => {
   }
 
   if (isLoading) {
-    return <ActivityIndicator style={{ marginTop: 30 }} />;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large"/>
+      </View>
+    );
   }
 
   if (error) {

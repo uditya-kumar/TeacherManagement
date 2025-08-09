@@ -26,7 +26,11 @@ const ViewTeacherDetails = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   if (!id) {
-    return <ActivityIndicator />;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large"/>
+      </View>
+    );
   }
 
   const { data: teacher, error, isLoading } = useTeacher(id);
@@ -43,7 +47,11 @@ const ViewTeacherDetails = () => {
   );
 
   if (isLoading) {
-    return <ActivityIndicator />;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large"/>
+      </View>
+    );
   }
 
   

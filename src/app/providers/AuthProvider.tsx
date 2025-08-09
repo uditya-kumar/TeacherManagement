@@ -28,47 +28,79 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    let isMounted = true;
 
-      setSession(session);
-
-      if (session) {
-        // fetch profile
+    const fetchUserProfile = async (userId: string) => {
+      try {
         const { data } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", session.user.id)
+          .eq("id", userId)
           .single();
-
-        // updating Profile in state
+        if (!isMounted) return;
         setProfile(data || null);
+      } catch (_err) {
+        if (!isMounted) return;
+        setProfile(null);
       }
-
-      setLoading(false);
     };
 
-    fetchSession();
+    const init = async () => {
+      try {
+        const {
+          data: { session: currentSession },
+        } = await supabase.auth.getSession();
+        if (!isMounted) return;
+        setSession(currentSession);
+        // Do not block initial render on profile fetch
+        if (currentSession?.user?.id) {
+          void fetchUserProfile(currentSession.user.id);
+        } else {
+          setProfile(null);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
 
-    // ✅ Subscribe to auth changes
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        if (session) {
-          const { data } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .single();
-          setProfile(data || null);
+    void init();
+
+    // ✅ Subscribe to auth changes (handles INITIAL_SESSION, SIGNED_IN, TOKEN_REFRESHED, SIGNED_OUT)
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      async (event, newSession) => {
+        if (!isMounted) return;
+        switch (event) {
+          case "INITIAL_SESSION":
+          case "SIGNED_IN":
+          case "TOKEN_REFRESHED": {
+            setSession(newSession);
+            const userId = newSession?.user?.id;
+            if (userId) {
+              void fetchUserProfile(userId);
+            } else {
+              setProfile(null);
+            }
+            // Ensure we clear any loading state if still pending
+            setLoading(false);
+            break;
+          }
+          case "SIGNED_OUT": {
+            setSession(null);
+            setProfile(null);
+            setLoading(false);
+            break;
+          }
+          default: {
+            // No-op for other events
+            break;
+          }
         }
       }
     );
 
     return () => {
-      listener.subscription.unsubscribe(); // ✅ Cleanup
+      isMounted = false;
+      subscription.subscription.unsubscribe();
     };
   }, []);
 

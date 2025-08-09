@@ -11,10 +11,8 @@ const Signin = () => {
   const onSignin = async () => {
     try {
       await googleSignIn();
-      Alert.alert("Success", "You are now signed in!");
     } catch (err: any) {
       console.error("OAuth error:", err);
-      Alert.alert("Error", err.message);
     }
   };
 

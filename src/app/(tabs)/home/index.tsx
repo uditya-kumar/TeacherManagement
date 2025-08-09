@@ -178,7 +178,11 @@ const index = () => {
   );
 
   if (isLoading && (!teachers || (teachers as Tables<"teachers">[]).length === 0)) {
-    return <ActivityIndicator />;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large"/>
+      </View>
+    );
   }
 
   if (error || !teachers) {
