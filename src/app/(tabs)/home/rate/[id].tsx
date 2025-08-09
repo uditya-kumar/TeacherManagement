@@ -114,16 +114,14 @@ const RateTeacher = () => {
         onSuccess: async () => {
           if (typeof from === "string") {
             if (from.startsWith("/home/view/")) {
-              const backId = from.split("/").pop();
-              if (backId) {
-                router.replace({ pathname: "/home/view/[id]", params: { id: backId } });
-                return;
-              }
+              // Return to the existing view screen instead of stacking a duplicate
+              router.back();
+              return;
             } else if (from === "/home/favorites") {
-              router.replace("/home/favorites");
+              router.back();
               return;
             } else if (from === "/home") {
-              router.replace("/home");
+              router.back();
               return;
             } else if (from === "/profile/teachersReviewed") {
               router.replace("/profile/teachersReviewed");
