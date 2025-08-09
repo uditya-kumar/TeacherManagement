@@ -221,12 +221,7 @@ export const useUpsertRating = () => {
       // Proactively recompute and update the cached breakdown to avoid a stale chart
       queryClient.setQueryData(
         ["ratingsBreakdown", newRating.teacher_id],
-        (prev: {
-          teaching: RatingBreakdown[];
-          evaluation: RatingBreakdown[];
-          behaviour: RatingBreakdown[];
-          internals: RatingBreakdown[];
-        } | undefined) => {
+        () => {
           const recompute = (list: Rating[]) => {
             const build = (values: number[]) => {
               const total = values.length;

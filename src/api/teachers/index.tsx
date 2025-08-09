@@ -10,7 +10,7 @@ export const useTeacherList = () =>
       const { data, error } = await supabase
         .from("teachers")
         .select(
-          "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status"
+          "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status, created_by"
         )
         .eq("status", "verified");
       if (error) throw new Error(error.message);

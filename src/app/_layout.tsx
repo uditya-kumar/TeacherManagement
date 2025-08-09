@@ -13,7 +13,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "@/components/useColorScheme";
 import FavoriteProvider from "./providers/FavoriteProvider";
-import AuthProvider, { useAuth } from "./providers/AuthProvider";
+import AuthProvider from "./providers/AuthProvider";
 import QueryProvider from "./providers/QueryProvider";
 
 export {

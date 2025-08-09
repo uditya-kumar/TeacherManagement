@@ -1,7 +1,6 @@
 // src/libs/auth.ts
 import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import * as Linking from "expo-linking";
 import { supabase } from "./supabase";
 import { useEffect } from "react";
 import { useLinkingURL } from "expo-linking"; // ✅ New hook

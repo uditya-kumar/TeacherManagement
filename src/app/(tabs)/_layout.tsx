@@ -4,7 +4,6 @@ import { Tabs, Redirect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { View } from 'react-native';
 import { useAuth } from "../providers/AuthProvider";
 import { ActivityIndicator } from 'react-native';
@@ -58,10 +57,7 @@ export default function TabLayout() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-        },
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
+        }
       }}>
       <Tabs.Screen
         name="home"

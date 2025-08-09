@@ -1,4 +1,4 @@
-import { View, Text, useColorScheme, StyleSheet, Alert } from "react-native";
+import { View, Text, useColorScheme, StyleSheet } from "react-native";
 import React from "react";
 import Colors from "@/constants/Colors";
 import GoogleButton from "@/components/teacherManagement/GoogleButton";

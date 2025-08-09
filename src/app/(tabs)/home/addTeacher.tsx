@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TextInput, InteractionManager } from "react-native";
+import { View, Text, StyleSheet, ScrollView} from "react-native";
 import React, { useState } from "react";
 import RatingCategories from "@/components/teacherManagement/RatingCategories";
 import Colors from "@/constants/Colors";

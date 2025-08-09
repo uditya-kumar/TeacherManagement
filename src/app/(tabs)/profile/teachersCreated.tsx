@@ -5,7 +5,6 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { UserPlus } from 'lucide-react-native';
 import {
   useTeachersCreatedByUser,
-  useApprovalPending,
   useDeleteTeacher,
 } from "@/api/teachers/profile";
 import Colors from "@/constants/Colors";

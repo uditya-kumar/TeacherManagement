@@ -19,7 +19,7 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
 const ViewTeacherDetails = () => {
-  const { favorites, favoriteIds, toggleFavorite } = useFavorite();
+  const { favoriteIds, toggleFavorite } = useFavorite();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 

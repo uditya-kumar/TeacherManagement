@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable, Image } from "react-native";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import {
   User,
   BookOpen,
