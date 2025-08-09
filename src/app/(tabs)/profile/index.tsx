@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 import { router } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   User,
   BookOpen,
@@ -21,6 +22,20 @@ const ProfilePage = () => {
   const isDark = colorScheme === 'dark';
   const {profile} = useAuth()
   const [avatarError, setAvatarError] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  // Prevent stacking by resetting guard when this screen gains focus
+  useFocusEffect(
+    useCallback(() => {
+      setIsNavigating(false);
+    }, [])
+  );
+
+  const navigateOnce = useCallback((path: Parameters<typeof router.push>[0]) => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    router.push(path);
+  }, [isNavigating]);
 
   // Theme-aware colors
   const iconColor = colors.text;
@@ -57,11 +72,11 @@ const ProfilePage = () => {
       ]}>
 
         {/* Teachers Reviewed */}
-        <Pressable style={[
+        <Pressable disabled={isNavigating} style={[
           styles.row,
           { borderBottomColor: colors.borderColor }
         ]}
-        onPress={() => router.push('/profile/teachersReviewed')}
+        onPress={() => navigateOnce('/profile/teachersReviewed')}
         >
           <View style={styles.rowLeft}>
             <BookOpen size={20} color={iconColor} style={styles.icon} />
@@ -71,11 +86,11 @@ const ProfilePage = () => {
         </Pressable>
         
         {/* Teachers Created */}
-        <Pressable style={[
+        <Pressable disabled={isNavigating} style={[
           styles.row,
           { borderBottomColor: colors.borderColor }
         ]}
-        onPress={() => router.push('/profile/teachersCreated')}
+        onPress={() => navigateOnce('/profile/teachersCreated')}
         >
           <View style={styles.rowLeft}>
             <Plus size={20} color={iconColor} style={styles.icon} />
@@ -85,11 +100,11 @@ const ProfilePage = () => {
         </Pressable>
         
         {/* Report Bug */}
-        <Pressable style={[
+        <Pressable disabled={isNavigating} style={[
           styles.row,
           { borderBottomColor: colors.borderColor }
         ]}
-        onPress={() => router.push('/profile/reportBug')}
+        onPress={() => navigateOnce('/profile/reportBug')}
         >
           <View style={styles.rowLeft}>
             <Bug size={20} color={iconColor} style={styles.icon} />
