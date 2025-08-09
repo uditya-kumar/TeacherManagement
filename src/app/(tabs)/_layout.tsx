@@ -1,5 +1,5 @@
 import React from 'react';
-import Feather from '@expo/vector-icons/Feather';
+import { User, Home } from 'lucide-react-native';
 import { Tabs, Redirect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
@@ -12,12 +12,11 @@ import { useEffect, useState } from 'react';
 import { subscribeToast } from '@/libs/toastService';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof Feather>['name'];
-  color: string;
-}) {
-  return <Feather size={17} style={{ marginBottom: -3 }} {...props} />;
-}
+const TabBarIcon = ({ name, color }: { name: 'home' | 'user'; color: string }) => {
+  const size = 20;
+  if (name === 'home') return <Home color={color} size={size} />;
+  return <User color={color} size={size} />;
+};
 
 
 export default function TabLayout() {
