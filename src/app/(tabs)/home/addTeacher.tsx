@@ -11,6 +11,11 @@ import { useCreateTeacher } from "@/api/teachers";
 import { showToast } from "@/libs/toastService";
 
 const addTeacher = () => {
+  const NAME_MIN_LEN = 3;
+  const NAME_MAX_LEN = 60;
+  const NAME_REGEX = /^[A-Za-z. ]+$/; // alphabets, dot and space only
+  const CABIN_REGEX = /^[A-Za-z0-9- ]+$/; // letters, numbers, hyphen and space only
+  const CABIN_MAX_LEN = 15;
   const [classAverage, setClassAverage] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [teacherName, setTeacherName] = useState<string>("");
@@ -35,12 +40,42 @@ const addTeacher = () => {
 
   const onAddTeacher = () => {
     setError("");
-    if (!teacherName) {
+    const nameForValidation = teacherName.trim();
+    const nameForSubmit = teacherName.trimEnd(); // remove trailing spaces only before saving
+    const cabinForValidation = cabinNumber.trim();
+    const cabinForSubmit = cabinNumber.toUpperCase(); // auto-capitalize before saving
+
+    if (!nameForValidation) {
       setError("Enter Teacher Name");
       return;
     }
-    if (mobileNumber && !/^[0-9]{10}$/.test(mobileNumber)) {
-      setError("Invalid mobile number");
+    if (!NAME_REGEX.test(nameForValidation)) {
+      setError("Name can contain only letters, spaces and dots");
+      return;
+    }
+    if (
+      nameForValidation.length < NAME_MIN_LEN ||
+      nameForValidation.length > NAME_MAX_LEN
+    ) {
+      setError(`Name must be ${NAME_MIN_LEN}-${NAME_MAX_LEN} characters long`);
+      return;
+    }
+    if (mobileNumber) {
+      if (!/^[0-9]+$/.test(mobileNumber)) {
+        setError("Mobile number can only be numbers");
+        return;
+      }
+      if (mobileNumber.length !== 10) {
+        setError("Mobile number must be 10 digits");
+        return;
+      }
+    }
+    if (cabinForValidation && !CABIN_REGEX.test(cabinForValidation)) {
+      setError("Cabin number can contain only letters, numbers, hyphen and spaces");
+      return;
+    }
+    if (cabinForValidation && cabinForValidation.length > CABIN_MAX_LEN) {
+      setError(`Cabin number can't be more than ${CABIN_MAX_LEN} characters`);
       return;
     }
     if (
@@ -56,9 +91,9 @@ const addTeacher = () => {
 
     createTeacher(
       {
-        full_name: teacherName,
+        full_name: nameForSubmit,
         mobile_no: mobileNumber,
-        cabin_no: cabinNumber,
+        cabin_no: cabinForSubmit,
         initialRating: {
           teaching: ratings.teachingQuality,
           evaluation: ratings.evaluationMethods,
