@@ -24,10 +24,6 @@ export default function TabLayout() {
         name="teachersReviewed"
         options={{ title: "Teachers Reviewed" }}
       />
-      <Stack.Screen
-        name="aboutDev"
-        options={{ title: "About DEV" }}
-      />
     </Stack>
   );
 }

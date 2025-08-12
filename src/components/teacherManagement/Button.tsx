@@ -1,15 +1,16 @@
 // components/Button.tsx
 import React from "react";
 import { Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
-import * as LucideIcons from "lucide-react-native";
-import { LucideIcon } from "lucide-react-native";
+import { Plus, SendHorizontal, Eye, UserCheck, Trash2, type LucideProps } from "lucide-react-native";
+
+export type AllowedIconName = "Plus" | "SendHorizontal" | "Eye" | "UserCheck" | "Trash2";
 
 interface ButtonProps {
   text: string;
   textColor: string;
   backgroundColor: string;
   borderColor?: string;
-  icon: keyof typeof LucideIcons;
+  icon: AllowedIconName;
   onPress?: () => void;
   paddingVertical?: number;
   loading?: boolean;
@@ -27,7 +28,15 @@ const CustomButton: React.FC<ButtonProps> = ({
   loading = false,
   hideIconOnLoading = false,
 }) => {
-  const IconComponent = LucideIcons[icon] as LucideIcon;
+  const ICONS: Record<AllowedIconName, React.ComponentType<LucideProps>> = {
+    Plus,
+    SendHorizontal,
+    Eye,
+    UserCheck,
+    Trash2,
+  } as const;
+
+  const IconComponent = ICONS[icon];
 
   return (
     <Pressable

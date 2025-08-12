@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
 import React, { useCallback } from "react";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import { useAuth } from "@/app/providers/AuthProvider";
@@ -85,7 +85,10 @@ const TeachersCreated = () => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      contentContainerStyle={[styles.container, { paddingBottom: 10 }]}
+    > 
       {teachers.map((teacher) => (
         <View key={teacher.id} style={{ marginBottom: 16 }}>
           <TeacherCard
@@ -113,13 +116,12 @@ const TeachersCreated = () => {
           />
         </View>
       ))}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
   },
