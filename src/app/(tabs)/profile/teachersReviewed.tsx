@@ -5,7 +5,7 @@ import {
   StyleSheet,
   FlatList,
 } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import { useAuth } from "@/app/providers/AuthProvider";
 import {
@@ -46,7 +46,8 @@ const TeachersReviewed = () => {
       deleteRating(
         { teacherId },
         {
-          onSettled: () =>
+          // Keep spinner until item disappears; only clear early on error
+          onError: () =>
             setDeletingIds((prev) => {
               const next = new Set(prev);
               next.delete(teacherId);
@@ -57,6 +58,21 @@ const TeachersReviewed = () => {
     },
     [deleteRating]
   );
+
+  // Clear deleting flag when the item is actually removed from the list
+  useEffect(() => {
+    if (!teachers) return;
+    setDeletingIds((prev) => {
+      if (prev.size === 0) return prev;
+      const next = new Set(prev);
+      prev.forEach((id) => {
+        if (!teachers.some((t) => t.id === id)) {
+          next.delete(id);
+        }
+      });
+      return next;
+    });
+  }, [teachers]);
 
   if (!profile?.id) {
     return (
