@@ -1,8 +1,14 @@
-import { View, Text, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
-import React, { useCallback } from "react";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  FlatList,
+} from "react-native";
+import React, { useCallback, useState } from "react";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { UserPlus } from 'lucide-react-native';
+import { UserPlus } from "lucide-react-native";
 import {
   useTeachersCreatedByUser,
   useDeleteTeacher,
@@ -10,6 +16,9 @@ import {
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { router } from "expo-router";
+import { Tables } from "@/types";
+
+
 
 const TeachersCreated = () => {
   const { profile } = useAuth();
@@ -21,12 +30,15 @@ const TeachersCreated = () => {
     isLoading,
     error,
   } = useTeachersCreatedByUser(profile?.id);
-  const { mutate: deletePending, isPending: deleting } = useDeleteTeacher(
-    profile?.id
-  );
+  const { mutate: deletePending } = useDeleteTeacher(profile?.id);
+
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
   const handleRateTeacher = useCallback((teacherId: string) => {
-    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: "/profile/teachersCreated" } });
+    router.push({
+      pathname: "/home/rate/[id]",
+      params: { id: teacherId, from: "/profile/teachersCreated" },
+    });
   }, []);
 
   const handleViewDetails = useCallback((teacherId: string) => {
@@ -35,7 +47,22 @@ const TeachersCreated = () => {
 
   const handleDeleteTeacher = useCallback(
     (teacherId: string) => {
-      deletePending({ teacherId });
+      setDeletingIds((prev) => {
+        const next = new Set(prev);
+        next.add(teacherId);
+        return next;
+      });
+      deletePending(
+        { teacherId },
+        {
+          onSettled: () =>
+            setDeletingIds((prev) => {
+              const next = new Set(prev);
+              next.delete(teacherId);
+              return next;
+            }),
+        }
+      );
     },
     [deletePending]
   );
@@ -48,8 +75,8 @@ const TeachersCreated = () => {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large"/>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -85,38 +112,42 @@ const TeachersCreated = () => {
   }
 
   return (
-    <ScrollView
+    <FlatList
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={[styles.container, { paddingBottom: 10 }]}
-    > 
-      {teachers.map((teacher) => (
-        <View key={teacher.id} style={{ marginBottom: 16 }}>
-          <TeacherCard
-            teacher={teacher}
-            isFavorite={false}
-            onToggleFavorite={() => {}}
-            onRateTeacher={() => handleRateTeacher(teacher.id)}
-            onViewDetails={() => handleViewDetails(teacher.id)}
-            isAlreadyRated={true}
-            showViewDetailsButton={teacher.status === "verified"}
-            secondaryButtonOverride={
-              teacher.status === "pending"
-                ? {
-                    text: "Delete Teacher",
-                    textColor: "#FFFFFF",
-                    backgroundColor: deleting ? "#EF4444" : "#DC2626",
-                    borderColor: "#B91C1C",
-                    icon: "Trash2",
-                    onPress: () => handleDeleteTeacher(teacher.id),
-                    loading: deleting,
-                    hideIconOnLoading: true,
-                  }
-                : undefined
-            }
-          />
-        </View>
-      ))}
-    </ScrollView>
+      data={teachers as Tables<"teachers">[]}
+      keyExtractor={(t) => t.id}
+      renderItem={({ item }) => {
+        const isDeletingThis = deletingIds.has(item.id);
+        return (
+          <View style={{ marginBottom: 16 }}>
+            <TeacherCard
+              teacher={item}
+              isFavorite={false}
+              onToggleFavorite={() => {}}
+              onRateTeacher={() => handleRateTeacher(item.id)}
+              onViewDetails={() => handleViewDetails(item.id)}
+              isAlreadyRated={true}
+              showViewDetailsButton={item.status === "verified"}
+              secondaryButtonOverride={
+                item.status === "pending"
+                  ? {
+                      text: "Delete Teacher",
+                      textColor: "#FFFFFF",
+                      backgroundColor: isDeletingThis ? "#EF4444" : "#DC2626",
+                      borderColor: "#B91C1C",
+                      icon: "Trash2",
+                      onPress: () => handleDeleteTeacher(item.id),
+                      loading: isDeletingThis,
+                      hideIconOnLoading: true,
+                    }
+                  : undefined
+              }
+            />
+          </View>
+        );
+      }}
+    />
   );
 };
 
