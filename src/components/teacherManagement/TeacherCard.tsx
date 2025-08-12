@@ -5,7 +5,7 @@ import { Star, Phone, MapPin, Heart } from "lucide-react-native";
 import CustomButton from "./Button";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Tables } from "@/types";
-import * as LucideIcons from "lucide-react-native";
+import type { AllowedIconName } from "./Button";
 
 type TeacherCard = {
   teacher: Tables<'teachers'>;
@@ -20,7 +20,7 @@ type TeacherCard = {
     textColor: string;
     backgroundColor: string;
     borderColor?: string;
-    icon: keyof typeof LucideIcons;
+    icon: AllowedIconName;
     onPress: () => void;
     loading?: boolean;
     hideIconOnLoading?: boolean;
@@ -74,7 +74,7 @@ const TeacherCard = ({
             animateHeart();
             onToggleFavorite();
           }}
-          style={({ pressed }) => [
+          style={({ pressed }: { pressed: boolean }) => [
             styles.heartButton,
             { opacity: pressed ? 0.7 : 1 },
           ]}
