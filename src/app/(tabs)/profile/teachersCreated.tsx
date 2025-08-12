@@ -7,7 +7,6 @@ import {
   useTeachersCreatedByUser,
   useDeleteTeacher,
 } from "@/api/teachers/profile";
-import { useUserRatedTeacherIds } from "@/api/teachers";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { router } from "expo-router";
@@ -22,7 +21,6 @@ const TeachersCreated = () => {
     isLoading,
     error,
   } = useTeachersCreatedByUser(profile?.id);
-  const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
   const { mutate: deletePending, isPending: deleting } = useDeleteTeacher(
     profile?.id
   );
