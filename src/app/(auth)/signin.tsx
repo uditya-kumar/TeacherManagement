@@ -1,15 +1,31 @@
 import { View, Text, StyleSheet, Image } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import Colors from "@/constants/Colors";
 import GoogleButton from "@/components/teacherManagement/GoogleButton";
 import { googleSignIn } from "@/libs/auth";
+import Toast from "@/components/teacherManagement/Toast";
+import { subscribeToast } from "@/libs/toastService";
 
 const Signin = () => {
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastDuration, setToastDuration] = useState(1500);
+
+  React.useEffect(() => {
+    const unsubscribe = subscribeToast((message, duration = 1500) => {
+      setToastMessage(message);
+      setToastDuration(duration);
+      setToastVisible(true);
+    });
+    return unsubscribe;
+  }, []);
+
   const onSignin = async () => {
     try {
       await googleSignIn();
     } catch (err: any) {
-      console.error("OAuth error:", err);
+      // Error messages are already shown via toast in auth.ts
+      // Silent catch - no need to log or show anything
     }
   };
 
@@ -30,6 +46,13 @@ const Signin = () => {
       <View style={styles.bottomButton}>
         <GoogleButton onPress={onSignin} />
       </View>
+
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        durationMs={toastDuration}
+        onHide={() => setToastVisible(false)}
+      />
     </View>
   );
 };
