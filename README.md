@@ -166,10 +166,9 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 👨‍💻 Author
 
-**Uditya Agrawal**
+**Uditya Kumar**
 
 - GitHub: [@uditya2004](https://github.com/uditya2004)
-- Expo: [@uditya204](https://expo.dev/@uditya204)
 
 ---
 
