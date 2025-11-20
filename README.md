@@ -13,7 +13,7 @@
 
 ## 🌟 Overview
 
-**Vitsify** is a comprehensive teacher management and rating system built with React Native and Expo. The application enables students to discover, rate, and manage their favorite teachers while providing a seamless authentication flow and real-time data synchronization.
+**Vitsify** is a comprehensive teacher management and rating system (for VITBPL Students) built with React Native and Expo. The application enables students to discover, rate, and manage their favorite teachers while providing a seamless authentication flow and real-time data synchronization.
 
 ### Key Highlights
 
