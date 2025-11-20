@@ -26,6 +26,26 @@
   
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+
+### Application Interface
+
+<table>
+  <tr>
+    <td><img src="./public/Screenshot1.jpg" alt="Screenshot 1" width="250"/></td>
+    <td><img src="./public/Screenshot2.jpg" alt="Screenshot 2" width="250"/></td>
+    <td><img src="./public/Screenshot3.jpg" alt="Screenshot 3" width="250"/></td>
+  </tr>
+</table>
+
+*Experience the clean and intuitive user interface of Vitsify*
+
+</div>
+
+---
+
 ## 🛠 Tech Stack
 
 ### Frontend
