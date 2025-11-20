@@ -15,7 +15,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.Vitsify",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -40,7 +44,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "fc010752-7350-4b10-804b-ab042a2850ac"
+        "projectId": "2e5c8c16-b91f-4246-9933-ae6d738a9224"
       }
     }
   }
