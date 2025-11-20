@@ -13,10 +13,13 @@
 
 ## 🌟 Overview
 
-**Vitsify** is a comprehensive teacher management and rating system (for VITBPL Students) built with React Native and Expo. The application enables students to discover, rate, and manage their favorite teachers while providing a seamless authentication flow and real-time data synchronization.
+**Vitsify** is a comprehensive teacher management and rating system built with React Native and Expo, specifically designed for **VIT Bhopal University** students. The application enables students to discover, rate, and manage their favorite teachers while providing a seamless authentication flow and real-time data synchronization.
+
+> **📍 Institution:** Currently supports VIT Bhopal University only. The database contains faculty information specific to VIT Bhopal.
 
 ### Key Highlights
 
+- 🎓 **VIT Bhopal Exclusive** - Tailored for VIT Bhopal University students and faculty
 - 🔐 **Secure Authentication** - OAuth integration with session persistence
 - ⭐ **Teacher Ratings** - Multi-dimensional rating system (Teaching, Evaluation, Behavior, Internals)
 - 💝 **Favorites Management** - Bookmark and track favorite teachers
