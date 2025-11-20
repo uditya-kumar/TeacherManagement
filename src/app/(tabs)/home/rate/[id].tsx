@@ -36,7 +36,7 @@ const RateTeacher = () => {
   const { data: existingRating, isLoading: isLoadingRating } =
     useUserRatingForTeacher(id, profile?.id);
 
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
 

@@ -28,7 +28,7 @@ const addTeacher = () => {
     internalAssessment: 0,
   });
 
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
   const { profile } = useAuth();

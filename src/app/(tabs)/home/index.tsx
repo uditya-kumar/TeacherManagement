@@ -31,7 +31,7 @@ import { supabase } from "@/libs/supabase";
 const index = () => {
   const [search, setSearch] = useState("");
   const { favoriteIds, toggleFavorite } = useFavorite();
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const listRef = useRef<LegendListRef | null>(null); // For scroll control (optional)
   const { data: teachers, error, isLoading } = useTeacherList();

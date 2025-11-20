@@ -10,7 +10,7 @@ type RatingBarChartProps = {
 }
 
 const RatingBarChart = ({ title, data }: RatingBarChartProps) => {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const isDark = colorScheme === 'dark';
 

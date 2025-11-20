@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, Image, Switch } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
@@ -11,14 +11,16 @@ import {
   Info,
   LogOut,
   ChevronRight,
+  Moon,
+  Sun,
 } from "lucide-react-native";
 import Colors from "@/constants/Colors";
-import { useColorScheme } from "@/components/useColorScheme";
+import { useTheme } from "@/app/providers/ThemeProvider";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { supabase } from "@/libs/supabase";
 
 const ProfilePage = () => {
-  const colorScheme = useColorScheme();
+  const { colorScheme, toggleTheme } = useTheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
   const { profile } = useAuth();
@@ -107,6 +109,33 @@ const ProfilePage = () => {
           </View>
           <ChevronRight size={20} color={chevronColor} />
         </Pressable>
+
+        {/* Theme Toggle */}
+        <View
+          style={[styles.row, { borderBottomColor: colors.borderColor }]}
+        >
+          <View style={styles.rowLeft}>
+            {isDark ? (
+              <Moon size={20} color={iconColor} style={styles.icon} />
+            ) : (
+              <Sun size={20} color={iconColor} style={styles.icon} />
+            )}
+            <Text style={[styles.rowText, { color: colors.text }]}>
+              Theme
+            </Text>
+          </View>
+          <View style={styles.themeToggleRight}>
+            <Text style={[styles.themeLabel, { color: isDark ? "#9ca3af" : "#6b7280" }]}>
+              {isDark ? "Dark" : "Light"}
+            </Text>
+            <Switch
+              value={isDark}
+              onValueChange={toggleTheme}
+              trackColor={{ false: "#767577", true: "#009dffff" }}
+              thumbColor={isDark ? "#ffffffff" : "#f4f3f4"}
+            />
+          </View>
+        </View>
 
         {/* Report Bug */}
         <Pressable
@@ -209,6 +238,15 @@ const styles = StyleSheet.create({
   },
   rowText: {
     fontSize: 16,
+  },
+  themeToggleRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  themeLabel: {
+    fontSize: 14,
+    fontWeight: "500",
   },
   rowRightText: {
     fontSize: 16,

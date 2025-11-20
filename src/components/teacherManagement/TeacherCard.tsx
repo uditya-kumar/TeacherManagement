@@ -36,7 +36,7 @@ const TeacherCard = ({
   isAlreadyRated,
   secondaryButtonOverride,
 }: TeacherCard) => {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
   const scaleAnim = useRef(new Animated.Value(1)).current;

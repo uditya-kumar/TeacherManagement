@@ -1,6 +1,7 @@
-import { StyleSheet, useColorScheme, TextInput } from "react-native";
+import { StyleSheet, TextInput } from "react-native";
 import React from "react";
 import Colors from "@/constants/Colors";
+import { useColorScheme } from "@/components/useColorScheme";
 
 type CustomTextInputProps = {
   value: string,
@@ -11,7 +12,7 @@ type CustomTextInputProps = {
 }
 
 const CustomTextInput = ({value, onChangeText, placeholder, style}: CustomTextInputProps) => {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   return (
     <TextInput

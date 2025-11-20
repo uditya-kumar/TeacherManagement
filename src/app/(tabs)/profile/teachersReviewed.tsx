@@ -20,7 +20,7 @@ import { router } from "expo-router";
 
 const TeachersReviewed = () => {
   const { profile } = useAuth();
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
   const {

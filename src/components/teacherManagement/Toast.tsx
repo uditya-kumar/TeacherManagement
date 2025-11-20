@@ -13,7 +13,7 @@ type ToastProps = {
 const Toast: React.FC<ToastProps> = ({ visible, message, durationMs = 1800, onHide }) => {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
 
   useEffect(() => {

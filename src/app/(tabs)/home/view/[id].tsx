@@ -20,7 +20,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const ViewTeacherDetails = () => {
   const { favoriteIds, toggleFavorite } = useFavorite();
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
   const { id } = useLocalSearchParams<{ id: string }>();

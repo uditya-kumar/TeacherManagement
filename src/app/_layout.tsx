@@ -1,7 +1,7 @@
 import {
   DarkTheme,
   DefaultTheme,
-  ThemeProvider,
+  ThemeProvider as NavigationThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "@/components/useColorScheme";
+import { ThemeProvider, useTheme } from "./providers/ThemeProvider";
 import FavoriteProvider from "./providers/FavoriteProvider";
 import AuthProvider from "./providers/AuthProvider";
 import QueryProvider from "./providers/QueryProvider";
@@ -51,15 +51,23 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <ThemedApp />
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
+}
 
-  // Ensure we have a consistent color scheme
+function ThemedApp() {
+  const { colorScheme } = useTheme();
   const isDark = colorScheme === "dark";
 
   return (
-    <SafeAreaProvider>
+    <>
       <StatusBar style={isDark ? "light" : "dark"} />
-      <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
+      <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
         <AuthProvider>
           <QueryProvider>
             <FavoriteProvider>
@@ -71,7 +79,7 @@ function RootLayoutNav() {
             </FavoriteProvider>
           </QueryProvider>
         </AuthProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+      </NavigationThemeProvider>
+    </>
   );
 }

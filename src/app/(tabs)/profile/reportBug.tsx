@@ -17,7 +17,7 @@ import { router } from 'expo-router'
 import { showToast } from '@/libs/toastService'
 
 const ReportBug = () => {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const isDark = colorScheme === 'dark';
   const { profile } = useAuth();

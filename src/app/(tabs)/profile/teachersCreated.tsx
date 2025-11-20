@@ -22,7 +22,7 @@ import { Tables } from "@/types";
 
 const TeachersCreated = () => {
   const { profile } = useAuth();
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
   const {

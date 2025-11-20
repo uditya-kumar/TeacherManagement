@@ -9,7 +9,7 @@ import { useColorScheme } from "@/components/useColorScheme";
 
 const favorites = () => {
   const { favorites, toggleFavorite } = useFavorite();
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
 

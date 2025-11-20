@@ -20,7 +20,7 @@ const TabBarIcon = ({ name, color }: { name: 'home' | 'user'; color: string }) =
 
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
 
   const insets = useSafeAreaInsets();
