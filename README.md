@@ -1,9 +1,5 @@
 # Vitsify - Teacher Management System
 
-<div align="center">
-
-![Vitsify](./assets/images/icon.png)
-
 **A modern React Native application for managing and rating teachers**
 
 [![Expo](https://img.shields.io/badge/Expo-~53.0.23-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
