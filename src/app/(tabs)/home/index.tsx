@@ -47,7 +47,7 @@ const index = () => {
     const s = search.toLowerCase();
     return list
       .filter((teacher: Tables<"teachers">) =>
-        (teacher.full_name ?? "").toLowerCase().includes(s)
+        (teacher.full_name ?? "").toLowerCase().includes(s),
       )
       .sort((a: Tables<"teachers">, b: Tables<"teachers">) => {
         const nameA = a.full_name?.toLowerCase() ?? "";
@@ -56,62 +56,74 @@ const index = () => {
       });
   }, [search, teachers]);
 
-
   const clearSearch = () => {
     setSearch("");
   };
 
-  const handleRateTeacher = useCallback((teacherId: string) => {
-    // Clear potentially stale per-user rating to avoid brief flicker of old value
-    if (profile?.id) {
-      queryClient.removeQueries({
-        queryKey: ["userRating", teacherId, profile.id],
-        exact: true,
-      });
-      // Also clear ratings breakdown and list so view page recomputes freshly
-      queryClient.removeQueries({ queryKey: ["ratingsBreakdown", teacherId], exact: true });
-      queryClient.removeQueries({ queryKey: ["ratingsByTeacher", teacherId], exact: true });
-    }
-
-    // Navigate immediately for snappy UX, include `from` so we can return correctly
-    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: "/home" } });
-
-    // Fire-and-forget prefetch to warm cache without blocking navigation
-    if (profile?.id) {
-      queryClient
-        .prefetchQuery({
+  const handleRateTeacher = useCallback(
+    (teacherId: string) => {
+      // Clear potentially stale per-user rating to avoid brief flicker of old value
+      if (profile?.id) {
+        queryClient.removeQueries({
           queryKey: ["userRating", teacherId, profile.id],
-          queryFn: async () => {
-            const { data, error } = await supabase
-              .from("ratings")
-              .select("*")
-              .eq("teacher_id", teacherId)
-              .eq("user_id", profile.id)
-              .maybeSingle();
-            if (error && error.code !== "PGRST116") throw new Error(error.message);
-            return data ?? null;
-          },
-        })
-        .catch(() => {});
+          exact: true,
+        });
+        // Also clear ratings breakdown and list so view page recomputes freshly
+        queryClient.removeQueries({
+          queryKey: ["ratingsBreakdown", teacherId],
+          exact: true,
+        });
+        queryClient.removeQueries({
+          queryKey: ["ratingsByTeacher", teacherId],
+          exact: true,
+        });
+      }
 
-      queryClient
-        .prefetchQuery({
-          queryKey: ["teacher", teacherId],
-          queryFn: async () => {
-            const { data, error } = await supabase
-              .from("teachers")
-              .select(
-                "id, full_name, average_rating, rating_count, created_at, updated_at, status, cabin_no, mobile_no, created_by"
-              )
-              .eq("id", teacherId)
-              .single();
-            if (error) throw new Error(error.message);
-            return data;
-          },
-        })
-        .catch(() => {});
-    }
-  }, [profile?.id, queryClient]);
+      // Navigate immediately for snappy UX, include `from` so we can return correctly
+      router.push({
+        pathname: "/home/rate/[id]",
+        params: { id: teacherId, from: "/home" },
+      });
+
+      // Fire-and-forget prefetch to warm cache without blocking navigation
+      if (profile?.id) {
+        queryClient
+          .prefetchQuery({
+            queryKey: ["userRating", teacherId, profile.id],
+            queryFn: async () => {
+              const { data, error } = await supabase
+                .from("ratings")
+                .select("*")
+                .eq("teacher_id", teacherId)
+                .eq("user_id", profile.id)
+                .maybeSingle();
+              if (error && error.code !== "PGRST116")
+                throw new Error(error.message);
+              return data ?? null;
+            },
+          })
+          .catch(() => {});
+
+        queryClient
+          .prefetchQuery({
+            queryKey: ["teacher", teacherId],
+            queryFn: async () => {
+              const { data, error } = await supabase
+                .from("teachers")
+                .select(
+                  "id, full_name, average_rating, rating_count, created_at, updated_at, status, cabin_no, mobile_no, created_by",
+                )
+                .eq("id", teacherId)
+                .single();
+              if (error) throw new Error(error.message);
+              return data;
+            },
+          })
+          .catch(() => {});
+      }
+    },
+    [profile?.id, queryClient],
+  );
 
   const handleViewDetails = useCallback((teacherId: string) => {
     router.push(`/home/view/${teacherId}`);
@@ -163,9 +175,12 @@ const index = () => {
   );
 
   // Stable callback for toggleFavorite that receives the teacher
-  const handleToggleFavorite = useCallback((teacher: Tables<"teachers">) => {
-    toggleFavorite(teacher);
-  }, [toggleFavorite]);
+  const handleToggleFavorite = useCallback(
+    (teacher: Tables<"teachers">) => {
+      toggleFavorite(teacher);
+    },
+    [toggleFavorite],
+  );
 
   // Memoized renderItem for performance
   const renderItem = useCallback(
@@ -179,13 +194,22 @@ const index = () => {
         onViewDetails={handleViewDetails}
       />
     ),
-    [favoriteIds, ratedTeacherIds, handleToggleFavorite, handleRateTeacher, handleViewDetails]
+    [
+      favoriteIds,
+      ratedTeacherIds,
+      handleToggleFavorite,
+      handleRateTeacher,
+      handleViewDetails,
+    ],
   );
 
-  if (isLoading && (!teachers || (teachers as Tables<"teachers">[]).length === 0)) {
+  if (
+    isLoading &&
+    (!teachers || (teachers as Tables<"teachers">[]).length === 0)
+  ) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large"/>
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -231,7 +255,7 @@ const index = () => {
             </Text>
           </View>
         }
-        contentContainerStyle={[{ gap: 25, paddingBottom: 10 }]}
+        contentContainerStyle={styles.listContent}
         keyboardShouldPersistTaps="handled"
         recycleItems={true}
       />
@@ -243,6 +267,15 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     flex: 1,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  listContent: {
+    gap: 25,
+    paddingBottom: 10,
   },
   noTeacherContainer: {
     flex: 1,

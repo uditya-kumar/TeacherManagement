@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, StyleSheet, Pressable, Image, Switch } from "react-native";
+import { Image } from "expo-image";
+import { View, Text, StyleSheet, Pressable, Switch } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";

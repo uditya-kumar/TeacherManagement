@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import React, { useState } from "react";
 import Colors from "@/constants/Colors";
 import GoogleButton from "@/components/teacherManagement/GoogleButton";
