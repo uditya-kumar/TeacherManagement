@@ -61,7 +61,7 @@ const index = () => {
     setSearch("");
   };
 
-  const handleRateTeacher = (teacherId: string) => {
+  const handleRateTeacher = useCallback((teacherId: string) => {
     // Clear potentially stale per-user rating to avoid brief flicker of old value
     if (profile?.id) {
       queryClient.removeQueries({
@@ -111,11 +111,11 @@ const index = () => {
         })
         .catch(() => {});
     }
-  };
+  }, [profile?.id, queryClient]);
 
-  const handleViewDetails = (teacherId: string) => {
+  const handleViewDetails = useCallback((teacherId: string) => {
     router.push(`/home/view/${teacherId}`);
-  };
+  }, []);
 
   const truncate = (str: string, n: number) =>
     str.length > n ? str.slice(0, n) + "..." : str;
@@ -162,6 +162,11 @@ const index = () => {
     </View>
   );
 
+  // Stable callback for toggleFavorite that receives the teacher
+  const handleToggleFavorite = useCallback((teacher: Tables<"teachers">) => {
+    toggleFavorite(teacher);
+  }, [toggleFavorite]);
+
   // Memoized renderItem for performance
   const renderItem = useCallback(
     ({ item }: LegendListRenderItemProps<Tables<"teachers">>) => (
@@ -169,12 +174,12 @@ const index = () => {
         teacher={item}
         isFavorite={favoriteIds.includes(item.id)}
         isAlreadyRated={ratedTeacherIds.includes(item.id)}
-        onToggleFavorite={() => toggleFavorite(item)}
-        onRateTeacher={() => handleRateTeacher(item.id)}
-        onViewDetails={() => handleViewDetails(item.id)}
+        onToggleFavorite={handleToggleFavorite}
+        onRateTeacher={handleRateTeacher}
+        onViewDetails={handleViewDetails}
       />
     ),
-    [favoriteIds, toggleFavorite, ratedTeacherIds]
+    [favoriteIds, ratedTeacherIds, handleToggleFavorite, handleRateTeacher, handleViewDetails]
   );
 
   if (isLoading && (!teachers || (teachers as Tables<"teachers">[]).length === 0)) {

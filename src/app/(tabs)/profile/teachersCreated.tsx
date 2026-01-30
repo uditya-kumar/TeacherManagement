@@ -34,6 +34,9 @@ const TeachersCreated = () => {
 
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
+  // No-op callback for toggleFavorite since favorites aren't used here
+  const handleToggleFavorite = useCallback((_teacher: Tables<"teachers">) => {}, []);
+
   const handleRateTeacher = useCallback((teacherId: string) => {
     router.push({
       pathname: "/home/rate/[id]",
@@ -139,9 +142,9 @@ const TeachersCreated = () => {
             <TeacherCard
               teacher={item}
               isFavorite={false}
-              onToggleFavorite={() => {}}
-              onRateTeacher={() => handleRateTeacher(item.id)}
-              onViewDetails={() => handleViewDetails(item.id)}
+              onToggleFavorite={handleToggleFavorite}
+              onRateTeacher={handleRateTeacher}
+              onViewDetails={handleViewDetails}
               isAlreadyRated={true}
               showViewDetailsButton={item.status === "verified"}
               secondaryButtonOverride={

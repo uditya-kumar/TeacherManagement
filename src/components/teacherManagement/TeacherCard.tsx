@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Pressable, Animated } from "react-native";
-import React, { useRef } from "react";
+import React, { useRef, useCallback } from "react";
 import Colors from "@/constants/Colors";
 import { Star, Phone, MapPin, Heart } from "lucide-react-native";
 import CustomButton from "./Button";
@@ -7,12 +7,12 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { Tables } from "@/types";
 import type { AllowedIconName } from "./Button";
 
-type TeacherCard = {
+type TeacherCardProps = {
   teacher: Tables<'teachers'>;
   isFavorite: boolean;
-  onToggleFavorite: () => void;
-  onRateTeacher: () => void;
-  onViewDetails?: () => void;
+  onToggleFavorite: (teacher: Tables<'teachers'>) => void;
+  onRateTeacher: (teacherId: string) => void;
+  onViewDetails?: (teacherId: string) => void;
   showViewDetailsButton?: boolean;
   isAlreadyRated?: boolean;
   secondaryButtonOverride?: {
@@ -35,7 +35,7 @@ const TeacherCard = ({
   showViewDetailsButton = true,
   isAlreadyRated,
   secondaryButtonOverride,
-}: TeacherCard) => {
+}: TeacherCardProps) => {
   const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
@@ -44,6 +44,19 @@ const TeacherCard = ({
   // Theme-aware colors for better contrast
   const iconColor = isDark ? "#9ca3af" : "#6b7280";
   const detailsColor = isDark ? "#d1d5db" : "#6b7280";
+
+  // Stable callbacks that call parent handlers with teacher/id
+  const handleToggleFavorite = useCallback(() => {
+    onToggleFavorite(teacher);
+  }, [onToggleFavorite, teacher]);
+
+  const handleRateTeacher = useCallback(() => {
+    onRateTeacher(teacher.id);
+  }, [onRateTeacher, teacher.id]);
+
+  const handleViewDetails = useCallback(() => {
+    onViewDetails?.(teacher.id);
+  }, [onViewDetails, teacher.id]);
 
   const animateHeart = () => {
     scaleAnim.setValue(1.5);
@@ -72,7 +85,7 @@ const TeacherCard = ({
         <Pressable
           onPress={() => {
             animateHeart();
-            onToggleFavorite();
+            handleToggleFavorite();
           }}
           style={({ pressed }: { pressed: boolean }) => [
             styles.heartButton,
@@ -133,7 +146,7 @@ const TeacherCard = ({
           textColor="#FFFFFF"
           backgroundColor={isDark ? colors.buttonBackground : colors.buttonBackground}
           icon="UserCheck"
-          onPress={onRateTeacher}
+          onPress={handleRateTeacher}
           paddingVertical={11}
         />
         {secondaryButtonOverride ? (
@@ -159,7 +172,7 @@ const TeacherCard = ({
                 backgroundColor={isDark ? "transparent" : "#FFFFFF"}
                 borderColor={colors.borderColor}
                 icon="Eye"
-                onPress={onViewDetails}
+                onPress={handleViewDetails}
                 paddingVertical={11}
               />
             </View>

@@ -15,6 +15,7 @@ import {
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { router } from "expo-router";
+import { Tables } from "@/types";
 
 
 
@@ -32,6 +33,9 @@ const TeachersReviewed = () => {
     useDeleteUserRatingForTeacher(profile?.id);
 
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+
+  // No-op callback for toggleFavorite since favorites aren't used here
+  const handleToggleFavorite = useCallback((_teacher: Tables<"teachers">) => {}, []);
 
   const handleRateTeacher = useCallback((teacherId: string) => {
     router.push({
@@ -140,8 +144,8 @@ const TeachersReviewed = () => {
             <TeacherCard
               teacher={item}
               isFavorite={false}
-              onToggleFavorite={() => {}}
-              onRateTeacher={() => handleRateTeacher(item.id)}
+              onToggleFavorite={handleToggleFavorite}
+              onRateTeacher={handleRateTeacher}
               isAlreadyRated={true}
               showViewDetailsButton={false}
               secondaryButtonOverride={{

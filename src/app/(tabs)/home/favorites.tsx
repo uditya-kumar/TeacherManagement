@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import React from "react";
+import React, { useCallback } from "react";
 import { router} from "expo-router";
 import { useFavorite } from "../../../providers/FavoriteProvider";
 import Colors from "@/constants/Colors";
 import { Heart } from "lucide-react-native";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import { useColorScheme } from "@/components/useColorScheme";
+import { Tables } from "@/types";
 
 const favorites = () => {
   const { favorites, toggleFavorite } = useFavorite();
@@ -24,13 +25,17 @@ const favorites = () => {
     );
   };
 
-  const handleRateTeacher = (teacherId: string) => {
-    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: "/home/favorites" } });
-  };
+  const handleToggleFavorite = useCallback((teacher: Tables<"teachers">) => {
+    toggleFavorite(teacher);
+  }, [toggleFavorite]);
 
-  const handleViewDetails = (teacherId: string) => {
+  const handleRateTeacher = useCallback((teacherId: string) => {
+    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: "/home/favorites" } });
+  }, []);
+
+  const handleViewDetails = useCallback((teacherId: string) => {
     router.push(`/home/view/${teacherId}`);
-  };
+  }, []);
 
   if (favorites.length === 0) {
     return (
@@ -59,9 +64,9 @@ const favorites = () => {
             <TeacherCard
               teacher={item}
               isFavorite={true}
-              onToggleFavorite={() => toggleFavorite(item)}
-              onRateTeacher={() => handleRateTeacher(item.id)}
-              onViewDetails={() => handleViewDetails(item.id)}
+              onToggleFavorite={handleToggleFavorite}
+              onRateTeacher={handleRateTeacher}
+              onViewDetails={handleViewDetails}
             />
           )}
           contentContainerStyle={{ gap: 25, paddingBottom: 10 }}

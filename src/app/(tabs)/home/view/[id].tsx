@@ -17,14 +17,43 @@ import { useTeacher, useUserRatedTeacherIds } from "@/api/teachers";
 import { useTeacherRatingsBreakdown } from "@/api/teachers/rating";
 import { useAuth } from "@/providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import { Tables } from "@/types";
 
 const ViewTeacherDetails = () => {
   const { favoriteIds, toggleFavorite } = useFavorite();
   const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { profile } = useAuth();
+  const queryClient = useQueryClient();
 
+  // All hooks must be called before any conditional returns
+  const { data: teacher, error, isLoading } = useTeacher(id ?? "");
+  const { data: breakdown, isLoading: isLoadingBreakdown, refetch: refetchBreakdown } = useTeacherRatingsBreakdown(id ?? "");
+  const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
+
+  const handleToggleFavorite = useCallback((teacher: Tables<"teachers">) => {
+    toggleFavorite(teacher);
+  }, [toggleFavorite]);
+
+  const handleRateTeacher = useCallback((teacherId: string) => {
+    // Clear potentially stale per-user rating and aggregates to avoid flicker
+    if (profile?.id) {
+      queryClient.removeQueries({ queryKey: ["userRating", teacherId, profile.id], exact: true });
+      queryClient.removeQueries({ queryKey: ["ratingsByTeacher", teacherId], exact: true });
+      queryClient.removeQueries({ queryKey: ["ratingsBreakdown", teacherId], exact: true });
+    }
+    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: `/home/view/${teacherId}` } });
+  }, [profile?.id, queryClient]);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Refetch breakdown whenever this screen gains focus to ensure freshness after rating updates
+      if (id) refetchBreakdown();
+    }, [refetchBreakdown, id])
+  );
+
+  // Conditional returns AFTER all hooks
   if (!id) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -33,19 +62,6 @@ const ViewTeacherDetails = () => {
     );
   }
 
-  const { data: teacher, error, isLoading } = useTeacher(id);
-  const { data: breakdown, isLoading: isLoadingBreakdown, refetch: refetchBreakdown } = useTeacherRatingsBreakdown(id);
-  const { profile } = useAuth();
-  const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
-  const queryClient = useQueryClient();
-
-  useFocusEffect(
-    useCallback(() => {
-      // Refetch breakdown whenever this screen gains focus to ensure freshness after rating updates
-      refetchBreakdown();
-    }, [refetchBreakdown])
-  );
-
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -53,8 +69,6 @@ const ViewTeacherDetails = () => {
       </View>
     );
   }
-
-  
 
   if (error) {
     return <Text>Failed to Fetch teachers</Text>;
@@ -70,26 +84,6 @@ const ViewTeacherDetails = () => {
     );
   }
 
-  if (!teacher) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.errorText, { color: colors.text }]}>
-          Teacher Not Found
-        </Text>
-      </View>
-    );
-  }
-
-  const handleRateTeacher = (teacherId: string) => {
-    // Clear potentially stale per-user rating and aggregates to avoid flicker
-    if (profile?.id) {
-      queryClient.removeQueries({ queryKey: ["userRating", teacherId, profile.id], exact: true });
-      queryClient.removeQueries({ queryKey: ["ratingsByTeacher", teacherId], exact: true });
-      queryClient.removeQueries({ queryKey: ["ratingsBreakdown", teacherId], exact: true });
-    }
-    router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: `/home/view/${teacherId}` } });
-  };
-
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -98,8 +92,8 @@ const ViewTeacherDetails = () => {
         <TeacherCard
           teacher={teacher}
           isFavorite={favoriteIds.includes(teacher.id)}
-          onToggleFavorite={() => toggleFavorite(teacher)}
-          onRateTeacher={() => handleRateTeacher(teacher.id)}
+          onToggleFavorite={handleToggleFavorite}
+          onRateTeacher={handleRateTeacher}
           isAlreadyRated={ratedTeacherIds.includes(teacher.id)}
           showViewDetailsButton={false}
         />
