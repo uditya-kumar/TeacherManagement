@@ -1,5 +1,5 @@
 // Re-export the custom theme hook for web
-export { useTheme as useColorScheme } from '@/app/providers/ThemeProvider';
+export { useTheme as useColorScheme } from '@/providers/ThemeProvider';
 
 // Helper function to get just the color scheme value
 export const useColorSchemeValue = () => {

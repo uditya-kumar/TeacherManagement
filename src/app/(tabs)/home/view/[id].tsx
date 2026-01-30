@@ -11,11 +11,11 @@ import { useFocusEffect } from "@react-navigation/native";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import RatingBarChart from "@/components/teacherManagement/RatingBarChart";
 import Colors from "@/constants/Colors";
-import { useFavorite } from "@/app/providers/FavoriteProvider";
+import { useFavorite } from "@/providers/FavoriteProvider";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useTeacher, useUserRatedTeacherIds } from "@/api/teachers";
 import { useTeacherRatingsBreakdown } from "@/api/teachers/rating";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
 const ViewTeacherDetails = () => {

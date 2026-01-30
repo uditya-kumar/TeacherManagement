@@ -10,7 +10,7 @@ import { X, UserPlus } from "lucide-react-native";
 import Colors from "@/constants/Colors";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import { router } from "expo-router";
-import { useFavorite } from "@/app/providers/FavoriteProvider";
+import { useFavorite } from "@/providers/FavoriteProvider";
 import CustomButton from "@/components/teacherManagement/Button";
 import { useColorScheme } from "@/components/useColorScheme";
 import CustomTextInput from "@/components/teacherManagement/CustomTextInput";
@@ -24,7 +24,7 @@ import { useRef, useCallback } from "react";
 import { Tables } from "@/types";
 import { useRealtimeTeachers } from "@/hooks/useRealtimeTeachers";
 import { useUserRatedTeacherIds } from "@/api/teachers";
-import { useAuth } from "@/app/providers/AuthProvider"; // if not already imported
+import { useAuth } from "@/providers/AuthProvider"; // if not already imported
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/libs/supabase";
 

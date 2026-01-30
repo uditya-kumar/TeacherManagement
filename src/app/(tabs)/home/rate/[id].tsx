@@ -16,7 +16,7 @@ import {
   useUserRatingForTeacher,
   useUpsertRating,
 } from "@/api/teachers/rating";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
 const RateTeacher = () => {

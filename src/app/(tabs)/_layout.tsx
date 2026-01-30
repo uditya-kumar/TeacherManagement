@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { View } from 'react-native';
-import { useAuth } from "../providers/AuthProvider";
+import { useAuth } from "../../providers/AuthProvider";
 import { ActivityIndicator } from 'react-native';
 import AppToast from '@/components/teacherManagement/Toast';
 import { useEffect, useState } from 'react';

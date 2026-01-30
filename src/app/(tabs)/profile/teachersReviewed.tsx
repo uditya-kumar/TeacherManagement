@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import {
   useTeachersReviewedByUser,
   useDeleteUserRatingForTeacher,

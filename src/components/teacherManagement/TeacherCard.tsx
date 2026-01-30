@@ -226,4 +226,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TeacherCard;
+export default React.memo(TeacherCard);

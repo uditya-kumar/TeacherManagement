@@ -15,8 +15,8 @@ import {
   Sun,
 } from "lucide-react-native";
 import Colors from "@/constants/Colors";
-import { useTheme } from "@/app/providers/ThemeProvider";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useTheme } from "@/providers/ThemeProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/libs/supabase";
 
 const ProfilePage = () => {

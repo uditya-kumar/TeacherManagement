@@ -6,7 +6,7 @@ import { useColorScheme } from "@/components/useColorScheme";
 import CustomButton from "@/components/teacherManagement/Button";
 import { router } from "expo-router";
 import CustomTextInput from "@/components/teacherManagement/CustomTextInput";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useCreateTeacher } from "@/api/teachers";
 import { showToast } from "@/libs/toastService";
 

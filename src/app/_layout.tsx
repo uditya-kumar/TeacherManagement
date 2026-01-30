@@ -10,10 +10,10 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { ThemeProvider, useTheme } from "./providers/ThemeProvider";
-import FavoriteProvider from "./providers/FavoriteProvider";
-import AuthProvider from "./providers/AuthProvider";
-import QueryProvider from "./providers/QueryProvider";
+import { ThemeProvider, useTheme } from "../providers/ThemeProvider";
+import FavoriteProvider from "../providers/FavoriteProvider";
+import AuthProvider from "../providers/AuthProvider";
+import QueryProvider from "../providers/QueryProvider";
 
 export {
   // Catch any errors thrown by the Layout component.
