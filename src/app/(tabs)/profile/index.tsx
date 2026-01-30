@@ -44,6 +44,11 @@ const ProfilePage = () => {
     [isNavigating]
   );
 
+  const handleSignOut = useCallback(async () => {
+    await supabase.auth.signOut();
+    router.replace("/");
+  }, []);
+
   // Theme-aware colors
   const iconColor = colors.text;
   const chevronColor = isDark ? "#9ca3af" : "#6b7280";
@@ -171,10 +176,7 @@ const ProfilePage = () => {
 
       <Pressable
         style={styles.signOutButton}
-        onPress={async () => {
-          await supabase.auth.signOut();
-          router.replace("/");
-        }}
+        onPress={handleSignOut}
       >
         <View style={styles.rowLeft}>
           <LogOut size={20} color={colors.error} style={styles.icon} />

@@ -28,6 +28,10 @@ import { useAuth } from "@/providers/AuthProvider"; // if not already imported
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/libs/supabase";
 
+// Utility function moved outside component to avoid recreation on each render
+const truncate = (str: string, n: number) =>
+  str.length > n ? str.slice(0, n) + "..." : str;
+
 const index = () => {
   const [search, setSearch] = useState("");
   const { favoriteIds, toggleFavorite } = useFavorite();
@@ -56,9 +60,9 @@ const index = () => {
       });
   }, [search, teachers]);
 
-  const clearSearch = () => {
+  const clearSearch = useCallback(() => {
     setSearch("");
-  };
+  }, []);
 
   const handleRateTeacher = useCallback(
     (teacherId: string) => {
@@ -128,9 +132,6 @@ const index = () => {
   const handleViewDetails = useCallback((teacherId: string) => {
     router.push(`/home/view/${teacherId}`);
   }, []);
-
-  const truncate = (str: string, n: number) =>
-    str.length > n ? str.slice(0, n) + "..." : str;
 
   const onAddTeacher = () => {
     router.push(`/home/addTeacher`);
