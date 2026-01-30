@@ -67,6 +67,7 @@ const ProfilePage = () => {
           <Image
             source={{ uri: profile.avatar_url }}
             style={styles.avatar}
+            contentFit="cover"
             onError={() => setAvatarError(true)}
           />
         ) : (
@@ -208,7 +209,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    resizeMode: "cover",
   },
   username: {
     marginTop: 10,
