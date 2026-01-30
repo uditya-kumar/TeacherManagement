@@ -1,8 +1,23 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 import { RatingBreakdown } from '@/types';
 import { useColorScheme } from '@/components/useColorScheme';
+
+// Utility function moved outside component to avoid recreation on each render
+const formatCount = (count: number): string => {
+  if (count >= 1000000000) {
+    const value = count / 1000000000;
+    return (value % 1 === 0 ? value.toFixed(0) : value.toFixed(1)) + 'B';
+  } else if (count >= 1000000) {
+    const value = count / 1000000;
+    return (value % 1 === 0 ? value.toFixed(0) : value.toFixed(1)) + 'M';
+  } else if (count >= 1000) {
+    const value = count / 1000;
+    return (value % 1 === 0 ? value.toFixed(0) : value.toFixed(1)) + 'k';
+  }
+  return count.toString();
+};
 
 type RatingBarChartProps = {
   title: string;
@@ -20,19 +35,11 @@ const RatingBarChart = ({ title, data }: RatingBarChartProps) => {
   const inactiveBarColor = isDark ? '#4b5563' : '#E5E5E5';
   const secondaryTextColor = isDark ? '#9ca3af' : colors.tabIconDefault;
 
-  const formatCount = (count: number): string => {
-    if (count >= 1000000000) {
-      const value = count / 1000000000;
-      return (value % 1 === 0 ? value.toFixed(0) : value.toFixed(1)) + 'B';
-    } else if (count >= 1000000) {
-      const value = count / 1000000;
-      return (value % 1 === 0 ? value.toFixed(0) : value.toFixed(1)) + 'M';
-    } else if (count >= 1000) {
-      const value = count / 1000;
-      return (value % 1 === 0 ? value.toFixed(0) : value.toFixed(1)) + 'k';
-    }
-    return count.toString();
-  };
+  // Memoize sorted data to avoid recreation on each render
+  const sortedData = useMemo(
+    () => [...data].sort((a, b) => b.stars - a.stars),
+    [data]
+  );
   
   const renderStarRow = (breakdown: RatingBreakdown) => {
     return (
@@ -61,9 +68,6 @@ const RatingBarChart = ({ title, data }: RatingBarChartProps) => {
       </View>
     );
   };
-
-  // Sort data by stars in descending order (5, 4, 3, 2, 1)
-  const sortedData = [...data].sort((a, b) => b.stars - a.stars);
 
   return (
     <View style={[
@@ -142,4 +146,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RatingBarChart;
+export default React.memo(RatingBarChart);

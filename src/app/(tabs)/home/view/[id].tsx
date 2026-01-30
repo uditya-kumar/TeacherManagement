@@ -56,7 +56,7 @@ const ViewTeacherDetails = () => {
   // Conditional returns AFTER all hooks
   if (!id) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.centered}>
         <ActivityIndicator size="large"/>
       </View>
     );
@@ -64,7 +64,7 @@ const ViewTeacherDetails = () => {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.centered}>
         <ActivityIndicator size="large"/>
       </View>
     );
@@ -88,7 +88,7 @@ const ViewTeacherDetails = () => {
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <View style={{ marginTop: 10 }}>
+      <View style={styles.teacherCardWrapper}>
         <TeacherCard
           teacher={teacher}
           isFavorite={favoriteIds.includes(teacher.id)}
@@ -102,7 +102,7 @@ const ViewTeacherDetails = () => {
       <Text style={[styles.heading, { color: colors.text }]}>Rating Breakdown</Text>
 
       {isLoadingBreakdown ? (
-        <ActivityIndicator style={{ marginTop: 12 }} />
+        <ActivityIndicator style={styles.breakdownLoader} />
       ) : (
         <>
           <RatingBarChart title="Teaching Quality" data={breakdown?.teaching ?? []} />
@@ -119,6 +119,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  teacherCardWrapper: {
+    marginTop: 10,
+  },
+  breakdownLoader: {
+    marginTop: 12,
   },
   heading: {
     fontWeight: "600",
