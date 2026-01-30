@@ -5,7 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import Colors from "@/constants/Colors";
 import CustomButton from "@/components/teacherManagement/Button";
@@ -71,11 +71,11 @@ const RateTeacher = () => {
 
   const isLoadingPage = isLoadingTeacher || isLoadingRating || !teacher;
 
-  const handleRating = (category: keyof typeof ratings, rating: number) => {
+  const handleRating = useCallback((category: keyof typeof ratings, rating: number) => {
     setRatings((prev) => ({ ...prev, [category]: rating }));
-  };
+  }, []);
 
-  const onSubmitRating = () => {
+  const onSubmitRating = useCallback(() => {
     setError("");
 
     if (
@@ -135,7 +135,7 @@ const RateTeacher = () => {
         },
       }
     );
-  };
+  }, [ratings, classAverage, teacher?.id, profile?.id, existingRating?.id, upsertRating, from]);
 
   return (
     <ScrollView
@@ -172,7 +172,7 @@ const RateTeacher = () => {
             </Text>
           )}
 
-          <View style={{ marginHorizontal: 15, marginTop: 15 }}>
+          <View style={styles.submitButtonWrapper}>
             <CustomButton
               text="Submit Rating"
               textColor="#FFFFFF"
@@ -208,6 +208,10 @@ const styles = StyleSheet.create({
     marginBottom: -8,
     fontWeight: "500",
     fontSize: 14,
+  },
+  submitButtonWrapper: {
+    marginHorizontal: 15,
+    marginTop: 15,
   },
 });
 
