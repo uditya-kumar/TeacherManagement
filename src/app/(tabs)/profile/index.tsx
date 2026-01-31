@@ -19,12 +19,13 @@ import Colors from "@/constants/Colors";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/libs/supabase";
+import Skeleton from "@/components/teacherManagement/Skeleton";
 
 const ProfilePage = () => {
   const { colorScheme, toggleTheme } = useTheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
-  const { profile } = useAuth();
+  const { profile, loading: profileLoading } = useAuth();
   const [avatarError, setAvatarError] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
 
@@ -55,28 +56,42 @@ const ProfilePage = () => {
   const profileCircleBackground = isDark ? "#374151" : "#000000";
   const profileCircleIconColor = isDark ? "#e5e7eb" : "#ffffff";
 
+  // Check if profile data is still loading
+  const isProfileLoading = profileLoading || !profile;
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View
-        style={[
-          styles.profileCircle,
-          { backgroundColor: profileCircleBackground },
-        ]}
-      >
-        {profile?.avatar_url && !avatarError ? (
-          <Image
-            source={{ uri: profile.avatar_url }}
-            style={styles.avatar}
-            contentFit="cover"
-            onError={() => setAvatarError(true)}
-          />
-        ) : (
-          <User color={profileCircleIconColor} size={37} />
-        )}
-      </View>
-      <Text style={[styles.username, { color: colors.text }]}>
-        {profile?.full_name}
-      </Text>
+      {/* Avatar - Skeleton or actual content */}
+      {isProfileLoading ? (
+        <Skeleton width={100} height={100} borderRadius={50} />
+      ) : (
+        <View
+          style={[
+            styles.profileCircle,
+            { backgroundColor: profileCircleBackground },
+          ]}
+        >
+          {profile?.avatar_url && !avatarError ? (
+            <Image
+              source={{ uri: profile.avatar_url }}
+              style={styles.avatar}
+              contentFit="cover"
+              onError={() => setAvatarError(true)}
+            />
+          ) : (
+            <User color={profileCircleIconColor} size={37} />
+          )}
+        </View>
+      )}
+
+      {/* Username - Skeleton or actual content */}
+      {isProfileLoading ? (
+        <Skeleton width={120} height={20} borderRadius={6} style={{ marginTop: 10 }} />
+      ) : (
+        <Text style={[styles.username, { color: colors.text }]}>
+          {profile?.full_name}
+        </Text>
+      )}
 
       <View
         style={[
