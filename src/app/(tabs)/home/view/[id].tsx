@@ -3,13 +3,14 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
 } from "react-native";
 import React, { useCallback } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
+import TeacherCardSkeleton from "@/components/teacherManagement/TeacherCardSkeleton";
 import RatingBarChart from "@/components/teacherManagement/RatingBarChart";
+import RatingBarChartSkeleton from "@/components/teacherManagement/RatingBarChartSkeleton";
 import Colors from "@/constants/Colors";
 import { useFavorite } from "@/providers/FavoriteProvider";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -56,17 +57,31 @@ const ViewTeacherDetails = () => {
   // Conditional returns AFTER all hooks
   if (!id) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large"/>
-      </View>
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.teacherCardWrapper}>
+          <TeacherCardSkeleton />
+        </View>
+        <Text style={[styles.heading, { color: colors.text }]}>Rating Breakdown</Text>
+        <RatingBarChartSkeleton />
+        <RatingBarChartSkeleton />
+        <RatingBarChartSkeleton />
+        <RatingBarChartSkeleton />
+      </ScrollView>
     );
   }
 
   if (isLoading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large"/>
-      </View>
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.teacherCardWrapper}>
+          <TeacherCardSkeleton />
+        </View>
+        <Text style={[styles.heading, { color: colors.text }]}>Rating Breakdown</Text>
+        <RatingBarChartSkeleton />
+        <RatingBarChartSkeleton />
+        <RatingBarChartSkeleton />
+        <RatingBarChartSkeleton />
+      </ScrollView>
     );
   }
 
@@ -102,7 +117,12 @@ const ViewTeacherDetails = () => {
       <Text style={[styles.heading, { color: colors.text }]}>Rating Breakdown</Text>
 
       {isLoadingBreakdown ? (
-        <ActivityIndicator style={styles.breakdownLoader} />
+        <>
+          <RatingBarChartSkeleton />
+          <RatingBarChartSkeleton />
+          <RatingBarChartSkeleton />
+          <RatingBarChartSkeleton />
+        </>
       ) : (
         <>
           <RatingBarChart title="Teaching Quality" data={breakdown?.teaching ?? []} />
@@ -127,9 +147,6 @@ const styles = StyleSheet.create({
   },
   teacherCardWrapper: {
     marginTop: 10,
-  },
-  breakdownLoader: {
-    marginTop: 12,
   },
   heading: {
     fontWeight: "600",

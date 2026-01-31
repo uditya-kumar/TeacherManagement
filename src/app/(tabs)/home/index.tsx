@@ -3,12 +3,13 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import React, { useMemo, useState } from "react";
 import { X, UserPlus } from "lucide-react-native";
 import Colors from "@/constants/Colors";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
+import TeacherCardSkeleton from "@/components/teacherManagement/TeacherCardSkeleton";
 import { router } from "expo-router";
 import { useFavorite } from "@/providers/FavoriteProvider";
 import CustomButton from "@/components/teacherManagement/Button";
@@ -209,8 +210,27 @@ const index = () => {
     (!teachers || (teachers as Tables<"teachers">[]).length === 0)
   ) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" />
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.searchContainer}>
+          <CustomTextInput
+            value=""
+            onChangeText={() => {}}
+            placeholder="Search Teachers.."
+            editable={false}
+          />
+        </View>
+        <View style={styles.headingContainer}>
+          <Text style={[styles.heading, { color: colors.text }]}>All Teachers</Text>
+        </View>
+        <ScrollView
+          contentContainerStyle={styles.skeletonList}
+          showsVerticalScrollIndicator={false}
+        >
+          <TeacherCardSkeleton />
+          <TeacherCardSkeleton />
+          <TeacherCardSkeleton />
+          <TeacherCardSkeleton />
+        </ScrollView>
       </View>
     );
   }
@@ -320,6 +340,10 @@ const styles = StyleSheet.create({
     position: "relative",
     marginTop: 15,
     paddingBottom: 10,
+  },
+  skeletonList: {
+    gap: 25,
+    paddingBottom: 20,
   },
 });
 
