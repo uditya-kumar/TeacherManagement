@@ -62,6 +62,7 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Home',
+          animation: "shift",
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
@@ -70,6 +71,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
+          animation: "shift",
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
