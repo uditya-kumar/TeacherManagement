@@ -1,12 +1,13 @@
 import {
   View,
   Text,
-  ActivityIndicator,
   StyleSheet,
   FlatList,
+  ScrollView,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
+import TeacherCardSkeleton from "@/components/teacherManagement/TeacherCardSkeleton";
 import { useAuth } from "@/providers/AuthProvider";
 import {
   useTeachersReviewedByUser,
@@ -86,9 +87,14 @@ const TeachersReviewed = () => {
 
   if (isLoading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" />
-      </View>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: colors.background }}
+        contentContainerStyle={styles.skeletonContainer}
+      >
+        <TeacherCardSkeleton />
+        <TeacherCardSkeleton />
+        <TeacherCardSkeleton />
+      </ScrollView>
     );
   }
 
@@ -175,6 +181,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  skeletonContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    gap: 16,
   },
   emptyContainer: {
     flex: 1,
