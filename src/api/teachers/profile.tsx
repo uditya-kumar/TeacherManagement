@@ -53,8 +53,8 @@ export const useDeleteUserRatingForTeacher = (userId?: string) => {
       queryClient.invalidateQueries({ queryKey: ["userRating", teacherId, userId] });
       queryClient.invalidateQueries({ queryKey: ["ratedTeachers", userId] });
       queryClient.invalidateQueries({ queryKey: ["teachersReviewed", userId] });
+      // ratingsByTeacher invalidation also refreshes breakdown (derived via select)
       queryClient.invalidateQueries({ queryKey: ["ratingsByTeacher", teacherId] });
-      queryClient.invalidateQueries({ queryKey: ["ratingsBreakdown", teacherId] });
       queryClient.invalidateQueries({ queryKey: ["teacher", teacherId] });
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },

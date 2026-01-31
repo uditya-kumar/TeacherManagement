@@ -23,54 +23,36 @@ export const teacherRatingsQueryOptions = (teacherId: string) => ({
 export const useTeacherRatings = (teacherId: string) =>
   useQuery(teacherRatingsQueryOptions(teacherId));
 
+// Helper function to build breakdown from rating values
+const buildBreakdown = (values: number[]): RatingBreakdown[] => {
+  const total = values.length;
+  const counts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  for (const v of values) {
+    if (v >= 1 && v <= 5) counts[v] += 1;
+  }
+  return [5, 4, 3, 2, 1].map((stars) => ({
+    stars,
+    count: counts[stars],
+    percentage: total > 0 ? Math.round((counts[stars] / total) * 100) : 0,
+  }));
+};
+
 // Derived breakdown per category for a teacher's ratings
-export const useTeacherRatingsBreakdown = (teacherId?: string) => {
-  const queryClient = useQueryClient();
-  return useQuery({
-    queryKey: ["ratingsBreakdown", teacherId],
+// Uses `select` to transform raw ratings data - single query, shared cache
+export const useTeacherRatingsBreakdown = (teacherId?: string) =>
+  useQuery({
+    ...teacherRatingsQueryOptions(teacherId ?? ""),
+    queryKey: ["ratingsByTeacher", teacherId] as const,
     enabled: !!teacherId,
-    queryFn: async () => {
-      // Fetch fresh ratings so breakdown reflects latest changes after invalidation
-      const ratings = await queryClient.fetchQuery(
-        teacherRatingsQueryOptions(teacherId as string)
-      );
-
-      const buildBreakdown = (values: number[]): RatingBreakdown[] => {
-        const total = values.length;
-        const counts: Record<number, number> = {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0,
-        };
-        for (const v of values) {
-          if (v >= 1 && v <= 5) counts[v] += 1;
-        }
-        return [5, 4, 3, 2, 1].map((stars) => ({
-          stars,
-          count: counts[stars],
-          percentage: total > 0 ? Math.round((counts[stars] / total) * 100) : 0,
-        }));
-      };
-
-      return {
-        teaching: buildBreakdown(ratings.map((r) => r.teaching)),
-        evaluation: buildBreakdown(ratings.map((r) => r.evaluation)),
-        behaviour: buildBreakdown(ratings.map((r) => r.behaviour)),
-        internals: buildBreakdown(ratings.map((r) => r.internals)),
-      } as {
-        teaching: RatingBreakdown[];
-        evaluation: RatingBreakdown[];
-        behaviour: RatingBreakdown[];
-        internals: RatingBreakdown[];
-      };
-    },
+    select: (ratings) => ({
+      teaching: buildBreakdown(ratings.map((r) => r.teaching)),
+      evaluation: buildBreakdown(ratings.map((r) => r.evaluation)),
+      behaviour: buildBreakdown(ratings.map((r) => r.behaviour)),
+      internals: buildBreakdown(ratings.map((r) => r.internals)),
+    }),
     staleTime: 60_000,
     gcTime: 5 * 60_000,
-    refetchOnWindowFocus: false,
   });
-};
 
 // fetch existing rating by the current user for this teacher
 export const useUserRatingForTeacher = (teacherId?: string, userId?: string) =>
@@ -205,7 +187,9 @@ export const useUpsertRating = () => {
         newRating
       );
 
-      // Merge into ratings list cache for the teacher if present
+      // Merge into ratings list cache for the teacher
+      // The breakdown is now derived via `select`, so updating this cache
+      // automatically updates the breakdown too!
       queryClient.setQueryData(
         ["ratingsByTeacher", newRating.teacher_id],
         (old: Rating[] | undefined) => {
@@ -217,49 +201,6 @@ export const useUpsertRating = () => {
           return copy;
         }
       );
-
-      // Proactively recompute and update the cached breakdown to avoid a stale chart
-      queryClient.setQueryData(
-        ["ratingsBreakdown", newRating.teacher_id],
-        () => {
-          const recompute = (list: Rating[]) => {
-            const build = (values: number[]) => {
-              const total = values.length;
-              const counts: Record<number, number> = {
-                1: 0,
-                2: 0,
-                3: 0,
-                4: 0,
-                5: 0,
-              };
-              for (const v of values) if (v >= 1 && v <= 5) counts[v] += 1;
-              return [5, 4, 3, 2, 1].map((stars) => ({
-                stars,
-                count: counts[stars],
-                percentage:
-                  total > 0 ? Math.round((counts[stars] / total) * 100) : 0,
-              }));
-            };
-            return {
-              teaching: build(list.map((r) => r.teaching)),
-              evaluation: build(list.map((r) => r.evaluation)),
-              behaviour: build(list.map((r) => r.behaviour)),
-              internals: build(list.map((r) => r.internals)),
-            };
-          };
-
-          const currentList = queryClient.getQueryData<Rating[]>([
-            "ratingsByTeacher",
-            newRating.teacher_id,
-          ]) || [];
-          // Merge or insert newRating into currentList
-          const idx = currentList.findIndex((r) => r.id === newRating.id);
-          const merged = idx === -1
-            ? [...currentList, newRating as Rating]
-            : currentList.map((r) => (r.id === newRating.id ? (newRating as Rating) : r));
-          return recompute(merged);
-        }
-      );
     },
 
     // Always invalidate/refetch for server sync (regardless of success/error)
@@ -268,11 +209,9 @@ export const useUpsertRating = () => {
       const userId = newRating?.user_id ?? variables?.user_id;
       if (teacherId) {
         queryClient.invalidateQueries({ queryKey: ["teacher", teacherId] });
+        // Invalidating ratingsByTeacher also refreshes the breakdown (same query key with select)
         queryClient.invalidateQueries({
           queryKey: ["ratingsByTeacher", teacherId],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["ratingsBreakdown", teacherId],
         });
       }
       if (userId) {

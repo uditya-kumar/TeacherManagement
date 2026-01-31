@@ -73,11 +73,7 @@ const index = () => {
           queryKey: ["userRating", teacherId, profile.id],
           exact: true,
         });
-        // Also clear ratings breakdown and list so view page recomputes freshly
-        queryClient.removeQueries({
-          queryKey: ["ratingsBreakdown", teacherId],
-          exact: true,
-        });
+        // Clear ratings list (breakdown is derived from this via select)
         queryClient.removeQueries({
           queryKey: ["ratingsByTeacher", teacherId],
           exact: true,

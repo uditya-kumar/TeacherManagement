@@ -41,8 +41,8 @@ const ViewTeacherDetails = () => {
     // Clear potentially stale per-user rating and aggregates to avoid flicker
     if (profile?.id) {
       queryClient.removeQueries({ queryKey: ["userRating", teacherId, profile.id], exact: true });
+      // Clear ratings list (breakdown is derived from this via select)
       queryClient.removeQueries({ queryKey: ["ratingsByTeacher", teacherId], exact: true });
-      queryClient.removeQueries({ queryKey: ["ratingsBreakdown", teacherId], exact: true });
     }
     router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: `/home/view/${teacherId}` } });
   }, [profile?.id, queryClient]);
