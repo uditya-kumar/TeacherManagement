@@ -2,7 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   ScrollView,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
@@ -18,6 +17,8 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { router } from "expo-router";
 import { Tables } from "@/types";
+import { useFavorite } from "@/providers/FavoriteProvider";
+import { LegendList, LegendListRenderItemProps } from "@legendapp/list";
 
 
 
@@ -25,6 +26,7 @@ const TeachersCreated = () => {
   const { profile } = useAuth();
   const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const { favoriteIds, toggleFavorite } = useFavorite();
 
   const {
     data: teachers,
@@ -35,8 +37,9 @@ const TeachersCreated = () => {
 
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
-  // No-op callback for toggleFavorite since favorites aren't used here
-  const handleToggleFavorite = useCallback((_teacher: Tables<"teachers">) => {}, []);
+  const handleToggleFavorite = useCallback((teacher: Tables<"teachers">) => {
+    toggleFavorite(teacher);
+  }, [toggleFavorite]);
 
   const handleRateTeacher = useCallback((teacherId: string) => {
     router.push({
@@ -69,6 +72,40 @@ const TeachersCreated = () => {
       );
     },
     [deletePending]
+  );
+
+  // Memoized renderItem for performance
+  const renderItem = useCallback(
+    ({ item }: LegendListRenderItemProps<Tables<"teachers">>) => {
+      const isDeletingThis = deletingIds.has(item.id);
+      const isFav = favoriteIds.includes(item.id);
+      return (
+        <TeacherCard
+          teacher={item}
+          isFavorite={isFav}
+          onToggleFavorite={handleToggleFavorite}
+          onRateTeacher={handleRateTeacher}
+          onViewDetails={handleViewDetails}
+          isAlreadyRated={true}
+          showViewDetailsButton={item.status === "verified"}
+          secondaryButtonOverride={
+            item.status === "pending"
+              ? {
+                  text: "Delete Teacher",
+                  textColor: "#FFFFFF",
+                  backgroundColor: isDeletingThis ? "#EF4444" : "#DC2626",
+                  borderColor: "#B91C1C",
+                  icon: "Trash2",
+                  onPress: () => handleDeleteTeacher(item.id),
+                  loading: isDeletingThis,
+                  hideIconOnLoading: true,
+                }
+              : undefined
+          }
+        />
+      );
+    },
+    [deletingIds, favoriteIds, handleToggleFavorite, handleRateTeacher, handleViewDetails, handleDeleteTeacher]
   );
 
   // Clear deleting flag only when the item is actually removed from the list
@@ -136,41 +173,15 @@ const TeachersCreated = () => {
   }
 
   return (
-    <FlatList
+    <LegendList
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={[styles.container, { paddingBottom: 10 }]}
       data={teachers as Tables<"teachers">[]}
       keyExtractor={(t) => t.id}
-      renderItem={({ item }) => {
-        const isDeletingThis = deletingIds.has(item.id);
-        return (
-          <View style={{ marginBottom: 16 }}>
-            <TeacherCard
-              teacher={item}
-              isFavorite={false}
-              onToggleFavorite={handleToggleFavorite}
-              onRateTeacher={handleRateTeacher}
-              onViewDetails={handleViewDetails}
-              isAlreadyRated={true}
-              showViewDetailsButton={item.status === "verified"}
-              secondaryButtonOverride={
-                item.status === "pending"
-                  ? {
-                      text: "Delete Teacher",
-                      textColor: "#FFFFFF",
-                      backgroundColor: isDeletingThis ? "#EF4444" : "#DC2626",
-                      borderColor: "#B91C1C",
-                      icon: "Trash2",
-                      onPress: () => handleDeleteTeacher(item.id),
-                      loading: isDeletingThis,
-                      hideIconOnLoading: true,
-                    }
-                  : undefined
-              }
-            />
-          </View>
-        );
-      }}
+      renderItem={renderItem}
+      estimatedItemSize={180}
+      recycleItems={true}
+      extraData={favoriteIds}
     />
   );
 };

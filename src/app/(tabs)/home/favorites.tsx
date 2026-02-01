@@ -79,6 +79,7 @@ const favorites = () => {
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={renderHeader}
           recycleItems={true}
+          estimatedItemSize={180}
         />
       </View>
     );

@@ -19,7 +19,8 @@ export const teacherListQueryOptions = () =>
         .select(
           "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status, created_by"
         )
-        .eq("status", "verified");
+        .eq("status", "verified")
+        .order("full_name", { ascending: true });
       if (error) throw new Error(error.message);
       return data ?? [];
     },

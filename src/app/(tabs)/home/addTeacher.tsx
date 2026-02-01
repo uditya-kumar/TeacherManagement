@@ -78,14 +78,19 @@ const addTeacher = () => {
       setError(`Cabin number can't be more than ${CABIN_MAX_LEN} characters`);
       return;
     }
-    if (
-      ratings.teachingQuality === 0 ||
-      ratings.evaluationMethods === 0 ||
-      ratings.behaviorAttitude === 0 ||
-      ratings.internalAssessment === 0 ||
-      !classAverage
-    ) {
-      setError("Please provide all ratings");
+    // Ratings are now optional - but if any rating is provided, all must be provided
+    const ratingValues = [
+      ratings.teachingQuality,
+      ratings.evaluationMethods,
+      ratings.behaviorAttitude,
+      ratings.internalAssessment,
+    ];
+    const hasAnyRating = ratingValues.some((r) => r > 0) || classAverage;
+    const hasAllRatings =
+      ratingValues.every((r) => r > 0) && classAverage;
+
+    if (hasAnyRating && !hasAllRatings) {
+      setError("Please provide all the Ratings");
       return;
     }
 
@@ -94,13 +99,15 @@ const addTeacher = () => {
         full_name: nameForSubmit,
         mobile_no: mobileNumber,
         cabin_no: cabinForSubmit,
-        initialRating: {
-          teaching: ratings.teachingQuality,
-          evaluation: ratings.evaluationMethods,
-          behaviour: ratings.behaviorAttitude,
-          internals: ratings.internalAssessment,
-        },
-        class_average: classAverage,
+        initialRating: hasAllRatings
+          ? {
+              teaching: ratings.teachingQuality,
+              evaluation: ratings.evaluationMethods,
+              behaviour: ratings.behaviorAttitude,
+              internals: ratings.internalAssessment,
+            }
+          : undefined,
+        class_average: hasAllRatings ? classAverage : undefined,
       },
       {
         onSuccess: () => {
@@ -150,7 +157,7 @@ const addTeacher = () => {
         placeholder="Enter Cabin Number"
       />
 
-      <Text style={[styles.label, { color: colors.text }]}>Rate Teacher *</Text>
+      <Text style={[styles.label, { color: colors.text }]}>Rate Teacher (Optional)</Text>
       <RatingCategories
         ratings={ratings}
         classAverage={classAverage}
