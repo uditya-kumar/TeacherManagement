@@ -84,4 +84,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TeacherCardSkeleton;
+export default React.memo(TeacherCardSkeleton);
