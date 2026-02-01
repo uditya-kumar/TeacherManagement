@@ -4,7 +4,7 @@
 -- This file contains the complete SQL setup for the TeacherManagement app.
 -- Run these queries in order to replicate the database setup.
 -- Generated: February 2026
--- Project: Vitsify (ykcpcgwzwrgvohhvrbrz)
+-- Project: Vitsify
 -- ============================================================================
 
 -- ============================================================================
