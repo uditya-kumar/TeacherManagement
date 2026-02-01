@@ -1,12 +1,19 @@
 import { supabase } from "@/libs/supabase";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { Tables } from "@/types";
 
-//Fetch all teachers list
-export const useTeacherList = () =>
-  useQuery({
-    queryKey: ["teachers"],
-    queryFn: async () => {
+// ============================================================
+// Query Options Factories (Best Practice for TanStack Query v5)
+// ============================================================
+
+/**
+ * Query options for teacher list - reusable across components
+ * Uses QueryClient defaults for staleTime, gcTime, refetchOnWindowFocus
+ */
+export const teacherListQueryOptions = () =>
+  queryOptions({
+    queryKey: ["teachers"] as const,
+    queryFn: async (): Promise<Tables<"teachers">[]> => {
       const { data, error } = await supabase
         .from("teachers")
         .select(
@@ -16,19 +23,48 @@ export const useTeacherList = () =>
       if (error) throw new Error(error.message);
       return data ?? [];
     },
-    staleTime: 60_000,
-    gcTime: 5 * 60_000,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: "always",
-    refetchOnMount: false,
+    // Uses defaults: staleTime: 5min, gcTime: 1hr
   });
 
-// ✅ New hook to fetch all rated teacher IDs by current user
-export const useUserRatedTeacherIds = (userId?: string) =>
-  useQuery({
-    queryKey: ["ratedTeachers", userId],
+/**
+ * Query options for single teacher - supports placeholderData
+ */
+export const teacherQueryOptions = (
+  id: string,
+  placeholderData?: Tables<"teachers"> | (() => Tables<"teachers"> | undefined)
+) =>
+  queryOptions({
+    queryKey: ["teacher", id] as const,
+    enabled: !!id,
+    queryFn: async (): Promise<Tables<"teachers">> => {
+      const { data, error } = await supabase
+        .from("teachers")
+        .select(
+          "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status, created_by"
+        )
+        .eq("id", id)
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    placeholderData:
+      typeof placeholderData === "function"
+        ? (placeholderData as () => Tables<"teachers"> | undefined)
+        : (placeholderData as Tables<"teachers"> | undefined),
+    // Uses defaults: staleTime: 5min, gcTime: 1hr
+  });
+
+/**
+ * Query options for rated teacher IDs
+ * staleTime: Infinity - This data rarely changes (only when user rates)
+ * gcTime: Infinity - Keep in cache forever (small data)
+ */
+export const ratedTeacherIdsQueryOptions = (userId?: string) =>
+  queryOptions({
+    queryKey: ["ratedTeachers", userId] as const,
     enabled: !!userId,
-    queryFn: async () => {
+    queryFn: async (): Promise<string[]> => {
       const { data, error } = await supabase
         .from("ratings")
         .select("teacher_id")
@@ -37,47 +73,20 @@ export const useUserRatedTeacherIds = (userId?: string) =>
       if (error) throw new Error(error.message);
       return data.map((r) => r.teacher_id as string);
     },
-    staleTime: Infinity,
-    gcTime: 10 * 60_000,
-    refetchOnWindowFocus: false,
+    staleTime: Infinity, // Never stale - invalidated on rating
+    gcTime: Infinity,    // Keep forever (consistent with staleTime)
   });
 
-// fetching teacher details
-export const useTeacher = (
-  id: string,
-  options?: {
-    placeholderData?: Tables<"teachers"> | (() => Tables<"teachers"> | undefined);
-  }
-) =>
-  useQuery({
-    queryKey: ["teacher", id],
-    enabled: !!id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("teachers")
-        .select(
-          "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status, created_by"
-        )
-        .eq("id", id) // id is now a UUID string
-        .single();
-
-      if (error) throw new Error(error.message);
-      return data;
-    },
-    placeholderData:
-      typeof options?.placeholderData === "function"
-        ? (options?.placeholderData as () => Tables<"teachers"> | undefined)
-        : (options?.placeholderData as Tables<"teachers"> | undefined),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-  });
-
-// Fetch user favorite marked teachers
-export const useFavoriteTeacherIds = (userId?: string) =>
-  useQuery({
-    queryKey: ["favoriteTeachers", userId],
+/**
+ * Query options for favorite teacher IDs
+ * staleTime: Infinity - Invalidated on toggle
+ * gcTime: Infinity - Keep in cache forever (small data)
+ */
+export const favoriteTeacherIdsQueryOptions = (userId?: string) =>
+  queryOptions({
+    queryKey: ["favoriteTeachers", userId] as const,
     enabled: !!userId,
-    queryFn: async () => {
+    queryFn: async (): Promise<string[]> => {
       const { data, error } = await supabase
         .from("teacher_favorites")
         .select("teacher_id")
@@ -86,10 +95,32 @@ export const useFavoriteTeacherIds = (userId?: string) =>
       if (error) throw new Error(error.message);
       return data.map((r) => r.teacher_id as string);
     },
-    staleTime: Infinity,
-    gcTime: 10 * 60_000,
-    refetchOnWindowFocus: false,
+    staleTime: Infinity, // Never stale - invalidated on toggle
+    gcTime: Infinity,    // Keep forever (consistent with staleTime)
   });
+
+// ============================================================
+// Hooks (using query options factories)
+// ============================================================
+
+/** Fetch all verified teachers */
+export const useTeacherList = () => useQuery(teacherListQueryOptions());
+
+/** Fetch teacher IDs rated by current user */
+export const useUserRatedTeacherIds = (userId?: string) =>
+  useQuery(ratedTeacherIdsQueryOptions(userId));
+
+/** Fetch single teacher details */
+export const useTeacher = (
+  id: string,
+  options?: {
+    placeholderData?: Tables<"teachers"> | (() => Tables<"teachers"> | undefined);
+  }
+) => useQuery(teacherQueryOptions(id, options?.placeholderData));
+
+/** Fetch favorite teacher IDs for current user */
+export const useFavoriteTeacherIds = (userId?: string) =>
+  useQuery(favoriteTeacherIdsQueryOptions(userId));
 
 // handling favorite toggle
 export const useToggleFavoriteTeacher = (userId?: string) => {

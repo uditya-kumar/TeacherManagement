@@ -2,36 +2,38 @@ import { supabase } from "@/libs/supabase";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tables } from "@/types";
 
-export const useTeachersReviewedByUser = (userId?: string) =>
-  useQuery({
-    queryKey: ["teachersReviewed", userId],
-    enabled: !!userId,
-    queryFn: async () => {
-      if (!userId) return [] as Tables<"teachers">[];
-      // Get teacher_ids the user has rated
-      const { data: ratings, error: ratingsError } = await supabase
-        .from("ratings")
-        .select("teacher_id")
-        .eq("user_id", userId)
-      if (ratingsError) throw new Error(ratingsError.message);
-      const teacherIds = (ratings ?? []).map((r) => r.teacher_id as string);
-      if (teacherIds.length === 0) return [] as Tables<"teachers">[];
+// Query options factory for teachers reviewed by user
+export const teachersReviewedQueryOptions = (userId?: string) => ({
+  queryKey: ["teachersReviewed", userId] as const,
+  enabled: !!userId,
+  queryFn: async (): Promise<Tables<"teachers">[]> => {
+    if (!userId) return [];
 
-      // Fetch teachers by IDs
-      const { data: teachers, error: teachersError } = await supabase
-        .from("teachers")
-        .select(
-          "id, full_name, average_rating, rating_count, cabin_no, mobile_no, created_at, updated_at, status, created_by"
+    // Single query with join - eliminates request waterfall!
+    const { data, error } = await supabase
+      .from("ratings")
+      .select(
+        `
+        teacher_id,
+        teachers!inner (
+          id, full_name, average_rating, rating_count, 
+          cabin_no, mobile_no, created_at, updated_at, status, created_by
         )
-        .in("id", teacherIds)
-        .eq("status", "verified");
-      if (teachersError) throw new Error(teachersError.message);
-      return (teachers ?? []) as Tables<"teachers">[];
-    },
-    staleTime: 60_000,
-    gcTime: 5 * 60_000,
-    refetchOnWindowFocus: false,
-  });
+      `,
+      )
+      .eq("user_id", userId)
+      .eq("teachers.status", "verified");
+
+    if (error) throw new Error(error.message);
+
+    // Extract teacher objects from the joined result
+    return (data ?? []).map((r: any) => r.teachers as Tables<"teachers">);
+  },
+  // Uses default staleTime (5 min) and gcTime (1 hour)
+});
+
+export const useTeachersReviewedByUser = (userId?: string) =>
+  useQuery(teachersReviewedQueryOptions(userId));
 
 export const useDeleteUserRatingForTeacher = (userId?: string) => {
   const queryClient = useQueryClient();
@@ -50,52 +52,56 @@ export const useDeleteUserRatingForTeacher = (userId?: string) => {
     onSuccess: (_data, variables) => {
       const teacherId = variables.teacherId;
       // Invalidate caches impacted by rating removal
-      queryClient.invalidateQueries({ queryKey: ["userRating", teacherId, userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["userRating", teacherId, userId],
+      });
       queryClient.invalidateQueries({ queryKey: ["ratedTeachers", userId] });
       queryClient.invalidateQueries({ queryKey: ["teachersReviewed", userId] });
       // ratingsByTeacher invalidation also refreshes breakdown (derived via select)
-      queryClient.invalidateQueries({ queryKey: ["ratingsByTeacher", teacherId] });
+      queryClient.invalidateQueries({
+        queryKey: ["ratingsByTeacher", teacherId],
+      });
       queryClient.invalidateQueries({ queryKey: ["teacher", teacherId] });
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
   });
 };
 
+// Query options factory for teachers created by user
+export const teachersCreatedQueryOptions = (userId?: string) => ({
+  queryKey: ["teachersCreated", userId] as const,
+  enabled: !!userId,
+  queryFn: async (): Promise<Tables<"teachers">[]> => {
+    if (!userId) return [];
+    const { data, error } = await supabase
+      .from("teachers")
+      .select("*")
+      .eq("created_by", userId)
+      .order("full_name");
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  },
+  // Uses default staleTime (5 min) and gcTime (1 hour)
+});
+
 export const useTeachersCreatedByUser = (userId?: string) =>
-  useQuery({
-    queryKey: ["teachersCreated", userId],
-    enabled: !!userId,
-    queryFn: async () => {
-      if (!userId) return [] as Tables<"teachers">[];
-      const { data, error } = await supabase
-        .from("teachers")
-        .select("*")
-        .eq("created_by", userId)
-        .order("full_name");
-      if (error) throw new Error(error.message);
-      return (data ?? []) as Tables<"teachers">[];
-    },
-    staleTime: 60_000,
-    gcTime: 5 * 60_000,
-    refetchOnWindowFocus: false,
-  });
+  useQuery(teachersCreatedQueryOptions(userId));
 
 // Read-only status checker for a teacher's approval status
 export const useApprovalPending = (teacherId?: string) =>
   useQuery({
     queryKey: ["approvalStatus", teacherId],
     enabled: !!teacherId,
-    queryFn: async () => {
+    queryFn: async (): Promise<Tables<"teachers">["status"] | null> => {
       const { data, error } = await supabase
         .from("teachers")
         .select("status")
-        .eq("id", teacherId as string)
+        .eq("id", teacherId!)
         .single();
       if (error) throw new Error(error.message);
-      return (data?.status ?? null) as Tables<"teachers">["status"] | null;
+      return data?.status ?? null;
     },
-    staleTime: 30_000,
-    refetchOnWindowFocus: false,
+    staleTime: 30_000, // Check status more frequently
   });
 
 // Delete the teacher row (only works if row is pending enforced at DB level)
@@ -118,5 +124,3 @@ export const useDeleteTeacher = (userId?: string) => {
     },
   });
 };
-
-
