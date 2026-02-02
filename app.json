@@ -16,7 +16,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.Vitsify",
+      "bundleIdentifier": "com.fluxByte.Vitsify",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -27,7 +27,9 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.Vitsify"
+      "package": "com.fluxByte.Vitsify",
+      "versionCode": 0,
+      "permissions": []
     },
     "web": {
       "bundler": "metro",
