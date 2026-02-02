@@ -4,17 +4,7 @@ import { View, Text, StyleSheet, Pressable, Switch } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import {
-  User,
-  BookOpen,
-  Plus,
-  Bug,
-  Info,
-  LogOut,
-  ChevronRight,
-  Moon,
-  Sun,
-} from "lucide-react-native";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAuth } from "@/providers/AuthProvider";
@@ -79,7 +69,7 @@ const ProfilePage = () => {
               onError={() => setAvatarError(true)}
             />
           ) : (
-            <User color={profileCircleIconColor} size={37} />
+            <Feather name="user" color={profileCircleIconColor} size={37} />
           )}
         </View>
       )}
@@ -109,12 +99,12 @@ const ProfilePage = () => {
           onPress={() => navigateOnce("/profile/teachersReviewed")}
         >
           <View style={styles.rowLeft}>
-            <BookOpen size={20} color={iconColor} style={styles.icon} />
+            <Feather name="book-open" size={20} color={iconColor} style={styles.icon} />
             <Text style={[styles.rowText, { color: colors.text }]}>
               Teachers Reviewed
             </Text>
           </View>
-          <ChevronRight size={20} color={chevronColor} />
+          <Feather name="chevron-right" size={20} color={chevronColor} />
         </Pressable>
 
         {/* Teachers Created */}
@@ -124,12 +114,12 @@ const ProfilePage = () => {
           onPress={() => navigateOnce("/profile/teachersCreated")}
         >
           <View style={styles.rowLeft}>
-            <Plus size={20} color={iconColor} style={styles.icon} />
+            <Feather name="plus" size={20} color={iconColor} style={styles.icon} />
             <Text style={[styles.rowText, { color: colors.text }]}>
               Teachers Created
             </Text>
           </View>
-          <ChevronRight size={20} color={chevronColor} />
+          <Feather name="chevron-right" size={20} color={chevronColor} />
         </Pressable>
 
         {/* Theme Toggle */}
@@ -138,9 +128,9 @@ const ProfilePage = () => {
         >
           <View style={styles.rowLeft}>
             {isDark ? (
-              <Moon size={20} color={iconColor} style={styles.icon} />
+              <Feather name="moon" size={20} color={iconColor} style={styles.icon} />
             ) : (
-              <Sun size={20} color={iconColor} style={styles.icon} />
+              <Feather name="sun" size={20} color={iconColor} style={styles.icon} />
             )}
             <Text style={[styles.rowText, { color: colors.text }]}>
               Theme
@@ -166,12 +156,12 @@ const ProfilePage = () => {
           onPress={() => navigateOnce("/profile/reportBug")}
         >
           <View style={styles.rowLeft}>
-            <Bug size={20} color={iconColor} style={styles.icon} />
+            <MaterialIcons name="bug-report" size={20} color={iconColor} style={styles.icon} />
             <Text style={[styles.rowText, { color: colors.text }]}>
               Report a Bug
             </Text>
           </View>
-          <ChevronRight size={20} color={chevronColor} />
+          <Feather name="chevron-right" size={20} color={chevronColor} />
         </Pressable>
 
         {/* About Dev */}
@@ -181,12 +171,12 @@ const ProfilePage = () => {
           onPress={() => WebBrowser.openBrowserAsync("https://github.com/uditya2004")}
         >
           <View style={styles.rowLeft}>
-            <Info size={20} color={iconColor} style={styles.icon} />
+            <Feather name="info" size={20} color={iconColor} style={styles.icon} />
             <Text style={[styles.rowText, { color: colors.text }]}>
               About DEV
             </Text>
           </View>
-          <ChevronRight size={20} color={chevronColor} />
+          <Feather name="chevron-right" size={20} color={chevronColor} />
         </Pressable>
       </View>
 
@@ -195,7 +185,7 @@ const ProfilePage = () => {
         onPress={handleSignOut}
       >
         <View style={styles.rowLeft}>
-          <LogOut size={20} color={colors.error} style={styles.icon} />
+          <Feather name="log-out" size={20} color={colors.error} style={styles.icon} />
           <Text style={[styles.signOutText, { color: colors.error }]}>
             Sign Out
           </Text>

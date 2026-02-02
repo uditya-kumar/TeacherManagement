@@ -98,7 +98,6 @@ const ReportBug = () => {
           text="Submit Bug"
           textColor="#FFFFFF"
           backgroundColor={isDark ? '#374151' : '#0C1120'}
-          icon="SendHorizontal"
           onPress={onSubmit}
           paddingVertical={13}
           loading={isPending}

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, Stack } from "expo-router";
 import { Pressable } from "react-native";
-import { FolderHeart } from "lucide-react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 
@@ -21,8 +21,9 @@ export default function TabLayout() {
           <Link href="/home/favorites" asChild>
             <Pressable>
               {({ pressed }) => (
-                <FolderHeart
-                  size={25}
+                <MaterialCommunityIcons
+                  name="folder-heart-outline"
+                  size={27}
                   color={colors.text}
                   style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                 />

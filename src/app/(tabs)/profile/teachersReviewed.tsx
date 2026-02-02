@@ -90,7 +90,7 @@ const TeachersReviewed = () => {
             textColor: "#FFFFFF",
             backgroundColor: isDeletingThis ? "#EF4444" : "#DC2626",
             borderColor: "#B91C1C",
-            icon: "Trash2",
+            icon: "trash-2",
             onPress: () => handleDeleteRating(item.id),
             loading: isDeletingThis,
             hideIconOnLoading: true,

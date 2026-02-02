@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Pressable, Animated } from "react-native";
 import React, { useRef, useCallback } from "react";
 import Colors from "@/constants/Colors";
-import { Star, Phone, MapPin, Heart } from "lucide-react-native";
+import { AntDesign, Feather } from "@expo/vector-icons";
 import CustomButton from "./Button";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Tables } from "@/types";
@@ -93,16 +93,16 @@ const TeacherCard = ({
           ]}
         >
           <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-            <Heart
-              size={22}
-              color={isFavorite ? "#E91E63" : iconColor}
-              fill={isFavorite ? "#E91E63" : "transparent"}
-            />
+            {isFavorite ? (
+              <Feather name="heart" size={22} color="#E91E63" />
+            ) : (
+              <Feather name="heart" size={22} color={iconColor} />
+            )}
           </Animated.View>
         </Pressable>
       </View>
       <View style={styles.ratingContainer}>
-        <Star size={20} color={colors.starColor} fill={colors.starColor} />
+        <AntDesign name="star" size={20} color={colors.starColor} />
 
         {teacher.rating_count === 0 ? (
           <Text
@@ -126,14 +126,14 @@ const TeacherCard = ({
       </View>
       <View style={styles.detailsContainer}>
         <View style={styles.detailRow}>
-          <MapPin size={15} color={iconColor} style={styles.icon} />
+          <Feather name="map-pin" size={15} color={iconColor} style={styles.icon} />
           <Text style={[styles.details, { color: detailsColor }]}>
             {teacher.cabin_no?.trim() || "N/A"}
           </Text>
         </View>
 
         <View style={styles.detailRowWithMargin}>
-          <Phone size={15} color={iconColor} style={styles.icon} />
+          <Feather name="phone" size={15} color={iconColor} style={styles.icon} />
           <Text style={[styles.details, { color: detailsColor }]} selectable>
             {teacher.mobile_no?.trim() || "N/A"}
           </Text>
@@ -145,7 +145,7 @@ const TeacherCard = ({
           text={isAlreadyRated ? "Update Rating" : "Rate Teacher"}
           textColor="#FFFFFF"
           backgroundColor={isDark ? colors.buttonBackground : colors.buttonBackground}
-          icon="UserCheck"
+          icon="user-check"
           onPress={handleRateTeacher}
           paddingVertical={11}
         />
@@ -171,7 +171,7 @@ const TeacherCard = ({
                 textColor={isDark ? colors.text : "#0C1120"}
                 backgroundColor={isDark ? "transparent" : "#FFFFFF"}
                 borderColor={colors.borderColor}
-                icon="Eye"
+                icon="eye"
                 onPress={handleViewDetails}
                 paddingVertical={11}
               />

@@ -177,7 +177,6 @@ const RateTeacher = () => {
               text="Submit Rating"
               textColor="#FFFFFF"
               backgroundColor={isDark ? "#374151" : "#0C1120"}
-              icon="SendHorizontal"
               onPress={onSubmitRating}
               paddingVertical={13}
               loading={isSubmitting}

@@ -8,7 +8,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import TeacherCardSkeleton from "@/components/teacherManagement/TeacherCardSkeleton";
 import { useAuth } from "@/providers/AuthProvider";
-import { UserPlus } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
 import {
   useTeachersCreatedByUser,
   useDeleteTeacher,
@@ -95,7 +95,7 @@ const TeachersCreated = () => {
                   textColor: "#FFFFFF",
                   backgroundColor: isDeletingThis ? "#EF4444" : "#DC2626",
                   borderColor: "#B91C1C",
-                  icon: "Trash2",
+                  icon: "trash-2",
                   onPress: () => handleDeleteTeacher(item.id),
                   loading: isDeletingThis,
                   hideIconOnLoading: true,
@@ -158,7 +158,7 @@ const TeachersCreated = () => {
           0 teachers
         </Text>
         <View style={styles.emptyStateContainer}>
-          <UserPlus size={44} color={isDark ? "#9ca3af" : "#6B7280"} />
+          <Feather name="user-plus" size={44} color={isDark ? "#9ca3af" : "#6B7280"} />
           <Text
             style={[
               styles.emptyStateText,

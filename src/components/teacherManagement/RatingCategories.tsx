@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
-import { Star, Circle } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
 
 // Define the props interface for the component
 interface RatingCategoriesProps {
@@ -60,7 +60,8 @@ const RatingCategories: React.FC<RatingCategoriesProps> = ({
             onPress={() => onRatingChange(category, star)}
             style={styles.starButton}
           >
-            <Star
+            <Feather
+              name="star"
               size={32}
               color={
                 star <= ratings[category]
@@ -68,9 +69,6 @@ const RatingCategories: React.FC<RatingCategoriesProps> = ({
                   : isDark
                   ? "#4b5563"
                   : colors.borderColor
-              }
-              fill={
-                star <= ratings[category] ? colors.starColor : "transparent"
               }
             />
           </Pressable>
@@ -91,10 +89,10 @@ const RatingCategories: React.FC<RatingCategoriesProps> = ({
       style={styles.radioOption}
       onPress={() => onClassAverageChange(value)}
     >
-      <Circle
+      <Feather
+        name="circle"
         size={20}
-        color={isDark ? "#6b7280" : colors.borderColor}
-        fill={classAverage === value ? colors.text : "transparent"}
+        color={classAverage === value ? colors.text : (isDark ? "#6b7280" : colors.borderColor)}
       />
       <View style={styles.radioTextContainer}>
         <Text style={[styles.radioLabel, { color: colors.text }]}>{label}</Text>

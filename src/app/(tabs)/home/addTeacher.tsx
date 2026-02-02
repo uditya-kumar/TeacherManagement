@@ -178,7 +178,6 @@ const addTeacher = () => {
           text="Create Teacher"
           textColor="#FFFFFF"
           backgroundColor={isDark ? "#374151" : "#0C1120"}
-          icon="SendHorizontal"
           onPress={onAddTeacher}
           paddingVertical={13}
           loading={isPending}

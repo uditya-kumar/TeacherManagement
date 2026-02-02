@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import { router} from "expo-router";
 import { useFavorite } from "../../../providers/FavoriteProvider";
 import Colors from "@/constants/Colors";
-import { Heart } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Tables } from "@/types";
@@ -62,7 +62,7 @@ const favorites = () => {
         </Text>
 
         <View style={styles.emptyStateContainer}>
-          <Heart size={70} color={isDark ? "#4b5563" : colors.borderColor} />
+          <Feather name="heart" size={70} color={isDark ? "#4b5563" : colors.borderColor} />
           <Text style={[styles.emptyStateText, { color: secondaryTextColor }]}>
             Tap the heart icon on any teacher to add them to your favorites
           </Text>

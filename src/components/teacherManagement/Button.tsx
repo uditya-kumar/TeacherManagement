@@ -1,16 +1,18 @@
 // components/Button.tsx
 import React from "react";
 import { Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
-import { Plus, SendHorizontal, Eye, UserCheck, Trash2, type LucideProps } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
+import type { ComponentProps } from "react";
 
-export type AllowedIconName = "Plus" | "SendHorizontal" | "Eye" | "UserCheck" | "Trash2";
+type FeatherIconName = ComponentProps<typeof Feather>["name"];
+export type AllowedIconName = "plus" | "send" | "eye" | "user-check" | "trash-2";
 
 interface ButtonProps {
   text: string;
   textColor: string;
   backgroundColor: string;
   borderColor?: string;
-  icon: AllowedIconName;
+  icon?: AllowedIconName;
   onPress?: () => void;
   paddingVertical?: number;
   loading?: boolean;
@@ -28,16 +30,6 @@ const CustomButton: React.FC<ButtonProps> = ({
   loading = false,
   hideIconOnLoading = false,
 }) => {
-  const ICONS: Record<AllowedIconName, React.ComponentType<LucideProps>> = {
-    Plus,
-    SendHorizontal,
-    Eye,
-    UserCheck,
-    Trash2,
-  } as const;
-
-  const IconComponent = ICONS[icon];
-
   return (
     <Pressable
       style={({ pressed }) => [
@@ -53,7 +45,7 @@ const CustomButton: React.FC<ButtonProps> = ({
       onPress={!loading ? onPress : undefined}
     >
       {!(loading && hideIconOnLoading) && (
-        <IconComponent color={textColor} size={18} style={styles.icon} />
+        <Feather name={icon} color={textColor} size={18} style={styles.icon} />
       )}
       <Text style={[styles.text, { color: textColor }]}>{text}</Text>
 

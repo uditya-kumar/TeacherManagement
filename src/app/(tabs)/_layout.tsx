@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Home } from 'lucide-react-native';
+import { Feather } from '@expo/vector-icons';
 import { Tabs, Redirect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
@@ -14,8 +14,7 @@ import { subscribeToast } from '@/libs/toastService';
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 const TabBarIcon = ({ name, color }: { name: 'home' | 'user'; color: string }) => {
   const size = 20;
-  if (name === 'home') return <Home color={color} size={size} />;
-  return <User color={color} size={size} />;
+  return <Feather name={name} color={color} size={size} />;
 };
 
 

@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import React, { useMemo, useState } from "react";
-import { X, UserPlus } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import TeacherCardSkeleton from "@/components/teacherManagement/TeacherCardSkeleton";
@@ -147,7 +147,7 @@ const index = () => {
           { backgroundColor: colorScheme === "dark" ? "#374151" : "#f4f4f4ff" },
         ]}
       >
-        <UserPlus size={40} color="#9ca3af" />
+        <Feather name="user-plus" size={40} color="#9ca3af" />
       </View>
       <Text
         style={{
@@ -165,7 +165,7 @@ const index = () => {
         text="Add Teacher"
         textColor="#FFFFFF"
         backgroundColor={colorScheme === "dark" ? "#1f2937" : "#0C1120"}
-        icon="Plus"
+        icon="plus"
         onPress={onAddTeacher}
         paddingVertical={13}
       />
@@ -245,7 +245,7 @@ const index = () => {
 
         {search.length > 0 && (
           <Pressable onPress={clearSearch} style={styles.clearButton}>
-            <X size={22} color={colors.text} />
+            <Feather name="x" size={22} color={colors.text} />
           </Pressable>
         )}
       </View>
