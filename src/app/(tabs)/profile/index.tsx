@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable, Switch } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAuth } from "@/providers/AuthProvider";
@@ -156,7 +156,7 @@ const ProfilePage = () => {
           onPress={() => navigateOnce("/profile/reportBug")}
         >
           <View style={styles.rowLeft}>
-            <MaterialIcons name="bug-report" size={20} color={iconColor} style={styles.icon} />
+            <Ionicons name="bug-outline" size={20} color={iconColor} style={styles.icon} />
             <Text style={[styles.rowText, { color: colors.text }]}>
               Report a Bug
             </Text>
