@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Pressable, Animated } from "react-native";
 import React, { useRef, useCallback } from "react";
 import Colors from "@/constants/Colors";
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { AntDesign, Feather, FontAwesome } from "@expo/vector-icons";
 import CustomButton from "./Button";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Tables } from "@/types";
@@ -94,9 +94,9 @@ const TeacherCard = ({
         >
           <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
             {isFavorite ? (
-              <Feather name="heart" size={22} color="#E91E63" />
+              <FontAwesome name="heart" size={22} color="#E91E63" />
             ) : (
-              <Feather name="heart" size={22} color={iconColor} />
+              <FontAwesome name="heart-o" size={22} color={iconColor} />
             )}
           </Animated.View>
         </Pressable>

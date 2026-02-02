@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 
 // Define the props interface for the component
 interface RatingCategoriesProps {
@@ -60,8 +60,8 @@ const RatingCategories: React.FC<RatingCategoriesProps> = ({
             onPress={() => onRatingChange(category, star)}
             style={styles.starButton}
           >
-            <Feather
-              name="star"
+            <FontAwesome
+              name={star <= ratings[category] ? "star" : "star-o"}
               size={32}
               color={
                 star <= ratings[category]
@@ -89,10 +89,10 @@ const RatingCategories: React.FC<RatingCategoriesProps> = ({
       style={styles.radioOption}
       onPress={() => onClassAverageChange(value)}
     >
-      <Feather
+      <FontAwesome
         name="circle"
         size={20}
-        color={classAverage === value ? colors.text : (isDark ? "#6b7280" : colors.borderColor)}
+        color={classAverage === value ? colors.text : (isDark ? "#343639" : colors.borderColor)}
       />
       <View style={styles.radioTextContainer}>
         <Text style={[styles.radioLabel, { color: colors.text }]}>{label}</Text>
