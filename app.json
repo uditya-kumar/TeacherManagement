@@ -28,7 +28,6 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.fluxByte.Vitsify",
-      "versionCode": 0,
       "permissions": []
     },
     "web": {
