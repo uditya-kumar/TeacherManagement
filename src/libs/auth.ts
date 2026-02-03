@@ -3,7 +3,7 @@ import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { supabase } from "./supabase";
 import { useEffect } from "react";
-import { useLinkingURL } from "expo-linking"; // ✅ New hook
+import { useLinkingURL } from "expo-linking";
 import { showToast } from "./toastService";
 
 
@@ -17,6 +17,14 @@ const redirectTo = makeRedirectUri({
 });
 
 const ALLOWED_EMAIL_DOMAIN = "@vitbhopal.ac.in";
+const ADMIN_EMAIL = "growthcastle3@gmail.com";
+
+// Check if email is allowed (admin or VIT Bhopal domain)
+const isEmailAllowed = (email: string): boolean => {
+  const lowerEmail = email.toLowerCase();
+  if (lowerEmail === ADMIN_EMAIL.toLowerCase()) return true;
+  return lowerEmail.endsWith(ALLOWED_EMAIL_DOMAIN);
+};
 
 // Helper function to decode JWT and extract email
 const decodeJWT = (token: string): { email?: string; sub?: string } => {
@@ -71,7 +79,7 @@ const createSessionFromUrl = async (url: string) => {
       throw new Error("No email in token");
     }
 
-    if (!userEmail.endsWith(ALLOWED_EMAIL_DOMAIN)) {
+    if (!isEmailAllowed(userEmail)) {
       showToast("Use VIT BPL college email", 3000);
       throw new Error("Invalid email domain");
     }
