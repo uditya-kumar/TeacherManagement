@@ -49,14 +49,16 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     saveTheme(theme);
   };
 
-  const toggleTheme = () => {
-    const newTheme = themePreference === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-  };
-
   // Determine the actual color scheme to use
   const colorScheme: ColorSchemeName =
     themePreference === "system" ? deviceColorScheme : themePreference;
+
+  const toggleTheme = () => {
+    // Use the actual colorScheme (not themePreference) to determine the new theme
+    // This fixes the issue when themePreference is "system"
+    const newTheme = colorScheme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+  };
 
   if (!isLoaded) {
     return null;

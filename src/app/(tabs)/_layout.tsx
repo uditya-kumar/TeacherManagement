@@ -74,7 +74,7 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Home',
-          animation: "fade", // Lighter animation than "shift"
+          animation: "none",
           headerShown: false,
           tabBarIcon: renderHomeIcon,
         }}
@@ -83,7 +83,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          animation: "fade", // Lighter animation than "shift"
+          animation: "none",
           headerShown: false,
           tabBarIcon: renderProfileIcon,
         }}
