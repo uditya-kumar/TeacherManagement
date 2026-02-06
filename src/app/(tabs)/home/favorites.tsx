@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useCallback } from "react";
-import { router} from "expo-router";
+import React, { useCallback, useMemo } from "react";
+import { router } from "expo-router";
 import { useFavorite } from "../../../providers/FavoriteProvider";
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
@@ -9,7 +9,7 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { Tables } from "@/types";
 import { LegendList, LegendListRenderItemProps } from "@legendapp/list";
 
-const favorites = () => {
+const Favorites = () => {
   const { favorites, toggleFavorite } = useFavorite();
   const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -18,13 +18,19 @@ const favorites = () => {
   // Theme-aware colors
   const secondaryTextColor = isDark ? "#9ca3af" : "#6B7280";
 
-  const renderHeader = useCallback(() => {
-    return (
-      <Text style={[styles.headerText, { color: secondaryTextColor }]}>
-        {favorites.length} teachers
-      </Text>
-    );
-  }, [secondaryTextColor, favorites.length]);
+  // Memoize style objects
+  const containerStyle = useMemo(() => [styles.container, { backgroundColor: colors.background }], [colors.background]);
+  const emptyContainerStyle = useMemo(() => [styles.emptyContainer, { backgroundColor: colors.background }], [colors.background]);
+  const headerTextStyle = useMemo(() => [styles.headerText, { color: secondaryTextColor }], [secondaryTextColor]);
+  const emptyStateTextStyle = useMemo(() => [styles.emptyStateText, { color: secondaryTextColor }], [secondaryTextColor]);
+  const emptyIconColor = isDark ? "#4b5563" : colors.borderColor;
+
+  // Memoize ListHeaderComponent to prevent recreation
+  const ListHeaderComponent = useMemo(() => (
+    <Text style={headerTextStyle}>
+      {favorites.length} teachers
+    </Text>
+  ), [headerTextStyle, favorites.length]);
 
   const handleToggleFavorite = useCallback((teacher: Tables<"teachers">) => {
     toggleFavorite(teacher);
@@ -37,6 +43,9 @@ const favorites = () => {
   const handleViewDetails = useCallback((teacherId: string) => {
     router.push(`/home/view/${teacherId}`);
   }, []);
+
+  // Stable keyExtractor
+  const keyExtractor = useCallback((item: Tables<"teachers">) => item.id, []);
 
   // Memoized renderItem for performance
   const renderItem = useCallback(
@@ -52,38 +61,36 @@ const favorites = () => {
     [handleToggleFavorite, handleRateTeacher, handleViewDetails]
   );
 
-  if (favorites.length === 0) {
-    return (
-      <View
-        style={[styles.emptyContainer, { backgroundColor: colors.background }]}
-      >
-        <Text style={[styles.headerText, { color: secondaryTextColor }]}>
-          0 teachers
+  // Memoize empty state to prevent recreation
+  const EmptyState = useMemo(() => (
+    <View style={emptyContainerStyle}>
+      <Text style={headerTextStyle}>0 teachers</Text>
+      <View style={styles.emptyStateContainer}>
+        <Feather name="heart" size={70} color={emptyIconColor} />
+        <Text style={emptyStateTextStyle}>
+          Tap the heart icon on any teacher to add them to your favorites
         </Text>
+      </View>
+    </View>
+  ), [emptyContainerStyle, headerTextStyle, emptyIconColor, emptyStateTextStyle]);
 
-        <View style={styles.emptyStateContainer}>
-          <Feather name="heart" size={70} color={isDark ? "#4b5563" : colors.borderColor} />
-          <Text style={[styles.emptyStateText, { color: secondaryTextColor }]}>
-            Tap the heart icon on any teacher to add them to your favorites
-          </Text>
-        </View>
-      </View>
-    );
-  } else {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <LegendList
-          data={favorites}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
-          ListHeaderComponent={renderHeader}
-          recycleItems={true}
-          estimatedItemSize={180}
-        />
-      </View>
-    );
+  if (favorites.length === 0) {
+    return EmptyState;
   }
+
+  return (
+    <View style={containerStyle}>
+      <LegendList
+        data={favorites}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        ListHeaderComponent={ListHeaderComponent}
+        recycleItems={true}
+        estimatedItemSize={180}
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -116,4 +123,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default favorites;
+export default React.memo(Favorites);
