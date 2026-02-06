@@ -5,7 +5,7 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -27,6 +27,10 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+// Memoize static screen options to prevent new object references
+const rootScreenOptions = { animation: 'simple_push' as const };
+const hiddenHeaderOptions = { headerShown: false };
 
 export default function RootLayout() {
   useEffect(() => {
@@ -51,17 +55,23 @@ function ThemedApp() {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === "dark";
 
+  // Memoize the navigation theme to prevent re-renders
+  const navigationTheme = useMemo(
+    () => (isDark ? DarkTheme : DefaultTheme),
+    [isDark]
+  );
+
   return (
     <>
       <StatusBar style={isDark ? "light" : "dark"} />
-      <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
+      <NavigationThemeProvider value={navigationTheme}>
         <AuthProvider>
           <QueryProvider>
             <FavoriteProvider>
-              <Stack screenOptions={{ animation: 'simple_push' }}>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack screenOptions={rootScreenOptions}>
+                <Stack.Screen name="index" options={hiddenHeaderOptions} />
+                <Stack.Screen name="(auth)" options={hiddenHeaderOptions} />
+                <Stack.Screen name="(tabs)" options={hiddenHeaderOptions} />
               </Stack>
             </FavoriteProvider>
           </QueryProvider>
