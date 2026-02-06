@@ -134,46 +134,50 @@ const index = () => {
     router.push(`/home/view/${teacherId}`);
   }, []);
 
-  const onAddTeacher = () => {
+  const onAddTeacher = useCallback(() => {
     router.push(`/home/addTeacher`);
-  };
+  }, []);
 
-  const renderEmptyComponent = () => (
-    <View
-      style={[
-        styles.noTeacherContainer,
-        { backgroundColor: colors.background, marginTop: 25 },
-      ]}
-    >
+  // Memoized empty component to prevent recreation on each render
+  const renderEmptyComponent = useMemo(
+    () => (
       <View
         style={[
-          styles.icon,
-          { backgroundColor: colorScheme === "dark" ? "#374151" : "#f4f4f4ff" },
+          styles.noTeacherContainer,
+          { backgroundColor: colors.background, marginTop: 25 },
         ]}
       >
-        <Feather name="user-plus" size={40} color="#9ca3af" />
-      </View>
-      <Text
-        style={{
-          color: colorScheme === "dark" ? "#9ca3af" : "#6b7280",
-          fontSize: 17,
-          textAlign: "center",
-          paddingBottom: 15,
-        }}
-      >
-        We couldn't find any teacher matching "{search}"
-      </Text>
+        <View
+          style={[
+            styles.icon,
+            { backgroundColor: colorScheme === "dark" ? "#374151" : "#f4f4f4ff" },
+          ]}
+        >
+          <Feather name="user-plus" size={40} color="#9ca3af" />
+        </View>
+        <Text
+          style={{
+            color: colorScheme === "dark" ? "#9ca3af" : "#6b7280",
+            fontSize: 17,
+            textAlign: "center",
+            paddingBottom: 15,
+          }}
+        >
+          We couldn't find any teacher matching "{search}"
+        </Text>
 
-      {/* Add teacher Button */}
-      <CustomButton
-        text="Add Teacher"
-        textColor="#FFFFFF"
-        backgroundColor={colorScheme === "dark" ? "#1f2937" : "#0C1120"}
-        icon="plus"
-        onPress={onAddTeacher}
-        paddingVertical={13}
-      />
-    </View>
+        {/* Add teacher Button */}
+        <CustomButton
+          text="Add Teacher"
+          textColor="#FFFFFF"
+          backgroundColor={colorScheme === "dark" ? "#1f2937" : "#0C1120"}
+          icon="plus"
+          onPress={onAddTeacher}
+          paddingVertical={13}
+        />
+      </View>
+    ),
+    [colors.background, colorScheme, search, onAddTeacher]
   );
 
   // Stable callback for toggleFavorite that receives the teacher
@@ -205,6 +209,27 @@ const index = () => {
       handleRateTeacher,
       handleViewDetails,
     ],
+  );
+
+  // Memoized header component to prevent recreation on each render
+  const listHeaderComponent = useMemo(
+    () => (
+      <View style={styles.headingContainer}>
+        {search.length > 0 ? (
+          <Text style={[styles.heading, { color: colors.text }]}>
+            Results for {truncate(search, 8)}
+          </Text>
+        ) : (
+          <Text style={[styles.heading, { color: colors.text }]}>
+            All Teachers
+          </Text>
+        )}
+        <Text style={{ color: colors.text }}>
+          {filteredTeachers.length} Teachers
+        </Text>
+      </View>
+    ),
+    [search, colors.text, filteredTeachers.length]
   );
 
   if (
@@ -262,22 +287,7 @@ const index = () => {
         renderItem={renderItem}
         extraData={favoriteIdsSet}
         ListEmptyComponent={renderEmptyComponent}
-        ListHeaderComponent={
-          <View style={styles.headingContainer}>
-            {search.length > 0 ? (
-              <Text style={[styles.heading, { color: colors.text }]}>
-                Results for {truncate(search, 8)}
-              </Text>
-            ) : (
-              <Text style={[styles.heading, { color: colors.text }]}>
-                All Teachers
-              </Text>
-            )}
-            <Text style={{ color: colors.text }}>
-              {filteredTeachers.length} Teachers
-            </Text>
-          </View>
-        }
+        ListHeaderComponent={listHeaderComponent}
         contentContainerStyle={styles.listContent}
         keyboardShouldPersistTaps="handled"
         recycleItems={true}
