@@ -1,6 +1,6 @@
 // components/Button.tsx
-import React from "react";
-import { Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import React, { useMemo } from "react";
+import { Text, StyleSheet, Pressable, ActivityIndicator, ViewStyle } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import type { ComponentProps } from "react";
 
@@ -30,32 +30,47 @@ const CustomButton: React.FC<ButtonProps> = ({
   loading = false,
   hideIconOnLoading = false,
 }) => {
+  // Memoize the base style to avoid recreating object on every render
+  const baseStyle = useMemo<ViewStyle>(
+    () => ({
+      paddingVertical,
+      backgroundColor,
+      borderColor,
+      borderWidth: borderColor !== "transparent" ? 1 : 0,
+    }),
+    [paddingVertical, backgroundColor, borderColor]
+  );
+
+  // Memoize text style to avoid inline object
+  const textStyle = useMemo(
+    () => [styles.text, { color: textColor }],
+    [textColor]
+  );
+
+  // Show icon only when: icon is defined AND (not loading OR not hideIconOnLoading)
+  const showIcon = icon && !(loading && hideIconOnLoading);
+
   return (
     <Pressable
       style={({ pressed }) => [
         styles.button,
-        {
-          paddingVertical,
-          backgroundColor,
-          borderColor,
-          borderWidth: borderColor !== "transparent" ? 1 : 0,
-          opacity: pressed ? 0.9 : 1,
-        },
+        baseStyle,
+        pressed && styles.pressed,
       ]}
       onPress={!loading ? onPress : undefined}
     >
-      {!(loading && hideIconOnLoading) && (
+      {showIcon ? (
         <Feather name={icon} color={textColor} size={18} style={styles.icon} />
-      )}
-      <Text style={[styles.text, { color: textColor }]}>{text}</Text>
+      ) : null}
+      <Text style={textStyle}>{text}</Text>
 
-      {loading && (
+      {loading ? (
         <ActivityIndicator
           size="small"
           color={textColor}
           style={styles.spinner}
         />
-      )}
+      ) : null}
     </Pressable>
   );
 };
@@ -68,8 +83,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
   },
+  pressed: {
+    opacity: 0.9,
+  },
   spinner: {
-    marginLeft: 10, // ← push spinner to right of text
+    marginLeft: 10,
   },
   icon: {
     marginRight: 6,
@@ -80,4 +98,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomButton;
+export default React.memo(CustomButton);
