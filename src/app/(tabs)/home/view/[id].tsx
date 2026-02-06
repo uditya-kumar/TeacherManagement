@@ -4,7 +4,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
@@ -32,6 +32,10 @@ const ViewTeacherDetails = () => {
   const { data: teacher, error, isLoading } = useTeacher(id ?? "");
   const { data: breakdown, isLoading: isLoadingBreakdown, refetch: refetchBreakdown } = useTeacherRatingsBreakdown(id ?? "");
   const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
+
+  // Convert to Sets for O(1) lookup
+  const favoriteIdsSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
+  const ratedIdsSet = useMemo(() => new Set(ratedTeacherIds), [ratedTeacherIds]);
 
   const handleToggleFavorite = useCallback((teacher: Tables<"teachers">) => {
     toggleFavorite(teacher);
@@ -106,10 +110,10 @@ const ViewTeacherDetails = () => {
       <View style={styles.teacherCardWrapper}>
         <TeacherCard
           teacher={teacher}
-          isFavorite={favoriteIds.includes(teacher.id)}
+          favoriteIdsSet={favoriteIdsSet}
+          ratedIdsSet={ratedIdsSet}
           onToggleFavorite={handleToggleFavorite}
           onRateTeacher={handleRateTeacher}
-          isAlreadyRated={ratedTeacherIds.includes(teacher.id)}
           showViewDetailsButton={false}
         />
       </View>

@@ -4,7 +4,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
 import TeacherCardSkeleton from "@/components/teacherManagement/TeacherCardSkeleton";
 import { useAuth } from "@/providers/AuthProvider";
@@ -26,6 +26,9 @@ const TeachersReviewed = () => {
   const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const { favoriteIds, toggleFavorite } = useFavorite();
+
+  // Convert to Set for O(1) lookup - memoized for stable reference
+  const favoriteIdsSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
 
   const {
     data: teachers,
@@ -75,11 +78,10 @@ const TeachersReviewed = () => {
   const renderItem = useCallback(
     ({ item }: LegendListRenderItemProps<Tables<"teachers">>) => {
       const isDeletingThis = deletingIds.has(item.id);
-      const isFav = favoriteIds.includes(item.id);
       return (
         <TeacherCard
           teacher={item}
-          isFavorite={isFav}
+          favoriteIdsSet={favoriteIdsSet}
           onToggleFavorite={handleToggleFavorite}
           onRateTeacher={handleRateTeacher}
           onViewDetails={handleViewDetails}
@@ -98,7 +100,7 @@ const TeachersReviewed = () => {
         />
       );
     },
-    [deletingIds, favoriteIds, handleToggleFavorite, handleRateTeacher, handleViewDetails, handleDeleteRating]
+    [deletingIds, favoriteIdsSet, handleToggleFavorite, handleRateTeacher, handleViewDetails, handleDeleteRating]
   );
 
   // Clear deleting flag when the item is actually removed from the list

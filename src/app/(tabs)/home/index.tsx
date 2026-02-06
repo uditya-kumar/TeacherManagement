@@ -44,6 +44,10 @@ const index = () => {
   const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
   const queryClient = useQueryClient();
 
+  // Convert arrays to Sets for O(1) lookup - memoized to maintain stable references
+  const favoriteIdsSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
+  const ratedIdsSet = useMemo(() => new Set(ratedTeacherIds), [ratedTeacherIds]);
+
   useRealtimeTeachers();
 
   const filteredTeachers = useMemo(() => {
@@ -181,20 +185,22 @@ const index = () => {
   );
 
   // Memoized renderItem for performance
+  // By passing Sets instead of doing .includes() here, the renderItem callback stays stable
+  // The lookup happens inside TeacherCard, so only the affected card re-renders on favorite toggle
   const renderItem = useCallback(
     ({ item }: LegendListRenderItemProps<Tables<"teachers">>) => (
       <TeacherCard
         teacher={item}
-        isFavorite={favoriteIds.includes(item.id)}
-        isAlreadyRated={ratedTeacherIds.includes(item.id)}
+        favoriteIdsSet={favoriteIdsSet}
+        ratedIdsSet={ratedIdsSet}
         onToggleFavorite={handleToggleFavorite}
         onRateTeacher={handleRateTeacher}
         onViewDetails={handleViewDetails}
       />
     ),
     [
-      favoriteIds,
-      ratedTeacherIds,
+      favoriteIdsSet,
+      ratedIdsSet,
       handleToggleFavorite,
       handleRateTeacher,
       handleViewDetails,
@@ -254,7 +260,7 @@ const index = () => {
         data={filteredTeachers}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        extraData={[favoriteIds, ratedTeacherIds]}
+        extraData={favoriteIdsSet}
         ListEmptyComponent={renderEmptyComponent}
         ListHeaderComponent={
           <View style={styles.headingContainer}>

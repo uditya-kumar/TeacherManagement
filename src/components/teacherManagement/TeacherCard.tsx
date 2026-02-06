@@ -9,12 +9,16 @@ import type { AllowedIconName } from "./Button";
 
 type TeacherCardProps = {
   teacher: Tables<'teachers'>;
-  isFavorite: boolean;
+  // Option 1: Pass boolean directly (for simple cases like favorites screen)
+  isFavorite?: boolean;
+  isAlreadyRated?: boolean;
+  // Option 2: Pass Sets for O(1) lookup inside component (better for lists)
+  favoriteIdsSet?: Set<string>;
+  ratedIdsSet?: Set<string>;
   onToggleFavorite: (teacher: Tables<'teachers'>) => void;
   onRateTeacher: (teacherId: string) => void;
   onViewDetails?: (teacherId: string) => void;
   showViewDetailsButton?: boolean;
-  isAlreadyRated?: boolean;
   secondaryButtonOverride?: {
     text: string;
     textColor: string;
@@ -28,18 +32,25 @@ type TeacherCardProps = {
 };
 const TeacherCard = ({
   teacher,
-  isFavorite,
+  isFavorite: isFavoriteProp,
+  isAlreadyRated: isAlreadyRatedProp,
+  favoriteIdsSet,
+  ratedIdsSet,
   onToggleFavorite,
   onRateTeacher,
   onViewDetails,
   showViewDetailsButton = true,
-  isAlreadyRated,
   secondaryButtonOverride,
 }: TeacherCardProps) => {
   const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const isDark = colorScheme === "dark";
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  // Derive isFavorite/isAlreadyRated from Sets if provided, otherwise use boolean props
+  // This allows stable renderItem callbacks - the lookup happens inside the memoized component
+  const isFavorite = favoriteIdsSet ? favoriteIdsSet.has(teacher.id) : (isFavoriteProp ?? false);
+  const isAlreadyRated = ratedIdsSet ? ratedIdsSet.has(teacher.id) : (isAlreadyRatedProp ?? false);
 
   // Theme-aware colors for better contrast
   const iconColor = isDark ? "#9ca3af" : "#6b7280";
