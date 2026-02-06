@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { Image } from "expo-image";
 import { View, Text, StyleSheet, Pressable, Switch } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAuth } from "@/providers/AuthProvider";
@@ -17,22 +17,22 @@ const ProfilePage = () => {
   const isDark = colorScheme === "dark";
   const { profile, loading: profileLoading } = useAuth();
   const [avatarError, setAvatarError] = useState(false);
-  const [isNavigating, setIsNavigating] = useState(false);
+  const isNavigatingRef = useRef(false);
 
   // Prevent stacking by resetting guard when this screen gains focus
   useFocusEffect(
     useCallback(() => {
-      setIsNavigating(false);
+      isNavigatingRef.current = false;
     }, [])
   );
 
   const navigateOnce = useCallback(
     (path: Parameters<typeof router.push>[0]) => {
-      if (isNavigating) return;
-      setIsNavigating(true);
+      if (isNavigatingRef.current) return;
+      isNavigatingRef.current = true;
       router.push(path);
     },
-    [isNavigating]
+    []
   );
 
   const handleSignOut = useCallback(async () => {
@@ -94,7 +94,6 @@ const ProfilePage = () => {
       >
         {/* Teachers Reviewed */}
         <Pressable
-          disabled={isNavigating}
           style={[styles.row, { borderBottomColor: colors.borderColor }]}
           onPress={() => navigateOnce("/profile/teachersReviewed")}
         >
@@ -109,7 +108,6 @@ const ProfilePage = () => {
 
         {/* Teachers Created */}
         <Pressable
-          disabled={isNavigating}
           style={[styles.row, { borderBottomColor: colors.borderColor }]}
           onPress={() => navigateOnce("/profile/teachersCreated")}
         >
@@ -151,7 +149,6 @@ const ProfilePage = () => {
 
         {/* Report Bug */}
         <Pressable
-          disabled={isNavigating}
           style={[styles.row, { borderBottomColor: colors.borderColor }]}
           onPress={() => navigateOnce("/profile/reportBug")}
         >
@@ -166,7 +163,6 @@ const ProfilePage = () => {
 
         {/* About Dev */}
         <Pressable
-          disabled={isNavigating}
           style={[styles.row, styles.lastRow]}
           onPress={() => WebBrowser.openBrowserAsync("https://github.com/uditya2004")}
         >
@@ -269,4 +265,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfilePage;
+export default React.memo(ProfilePage);
