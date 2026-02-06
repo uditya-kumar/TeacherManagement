@@ -1,36 +1,46 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { Link, Stack } from "expo-router";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 
-
-
-export default function TabLayout() {
+export default function HomeLayout() {
   const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+
+  // Memoize header styles to prevent new object references
+  const headerStyle = useMemo(() => ({
+    backgroundColor: colors.background,
+  }), [colors.background]);
+
+  const headerTitleStyle = useMemo(() => ({
+    color: colors.text,
+  }), [colors.text]);
+
+  // Memoize headerRight to prevent re-renders
+  const headerRight = useCallback(() => (
+    <Link href="/home/favorites" asChild>
+      <Pressable>
+        {({ pressed }) => (
+          <MaterialCommunityIcons
+            name="folder-heart-outline"
+            size={27}
+            color={colors.text}
+            style={[styles.headerIcon, { opacity: pressed ? 0.5 : 1 }]}
+          />
+        )}
+      </Pressable>
+    </Link>
+  ), [colors.text]);
 
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerTitleStyle: { color: colors.text },
+        headerStyle,
+        headerTitleStyle,
         headerTintColor: colors.text,
-        headerRight: () => (
-          <Link href="/home/favorites" asChild>
-            <Pressable>
-              {({ pressed }) => (
-                <MaterialCommunityIcons
-                  name="folder-heart-outline"
-                  size={27}
-                  color={colors.text}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
-              )}
-            </Pressable>
-          </Link>
-        ),
+        headerRight,
       }}
     >
       <Stack.Screen name="index" options={{ title: "Teacher Directory" }} />
@@ -47,3 +57,9 @@ export default function TabLayout() {
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+  headerIcon: {
+    marginRight: 15,
+  },
+});

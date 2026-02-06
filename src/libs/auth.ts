@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import { useLinkingURL } from "expo-linking";
 import { showToast } from "./toastService";
 
-
 WebBrowser.maybeCompleteAuthSession();
 
 // Build ONE redirect URI that matches what you whitelisted in Supabase
@@ -29,13 +28,13 @@ const isEmailAllowed = (email: string): boolean => {
 // Helper function to decode JWT and extract email
 const decodeJWT = (token: string): { email?: string; sub?: string } => {
   try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join(""),
     );
     return JSON.parse(jsonPayload);
   } catch (e) {
@@ -59,8 +58,11 @@ const createSessionFromUrl = async (url: string) => {
       // Check if there's an error in the URL (from Supabase trigger rejection)
       const error_description = fragmentParams.get("error_description");
       const error_message = fragmentParams.get("error");
-      
-      if (error_description?.includes("vitbhopal.ac.in") || error_description?.includes("VIT Bhopal")) {
+
+      if (
+        error_description?.includes("vitbhopal.ac.in") ||
+        error_description?.includes("VIT Bhopal")
+      ) {
         showToast("🚨 Use VIT BPL college email to Login", 3000);
       } else if (error_message || error_description) {
         showToast("🚨 Use VIT BPL college email to Login", 3000);
@@ -117,13 +119,15 @@ export const googleSignIn = async () => {
     showToast("Unable to start sign in. Please try again", 3000);
     throw error;
   }
-  
+
   if (!data?.url) {
     showToast("Unable to start sign in. Please try again", 3000);
     throw new Error("No auth URL from Supabase");
   }
-  
-  const res = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+
+  const res = await WebBrowser.openAuthSessionAsync(data.url, redirectTo, {
+    createTask: false,
+  });
 
   if (res.type === "success" && res.url) {
     await createSessionFromUrl(res.url);
@@ -141,7 +145,7 @@ export const googleSignIn = async () => {
 };
 
 export const useInitialUrlHandler = () => {
-  const url = useLinkingURL(); 
+  const url = useLinkingURL();
 
   useEffect(() => {
     if (url?.startsWith("vitsify:///")) {
@@ -152,4 +156,3 @@ export const useInitialUrlHandler = () => {
     }
   }, [url]);
 };
-

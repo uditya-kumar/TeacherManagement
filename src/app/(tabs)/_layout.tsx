@@ -1,21 +1,20 @@
-import React from 'react';
+import React, { memo, useMemo, useEffect, useState, useCallback } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Tabs, Redirect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { View } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from "../../providers/AuthProvider";
-import { ActivityIndicator } from 'react-native';
 import AppToast from '@/components/teacherManagement/Toast';
-import { useEffect, useState } from 'react';
 import { subscribeToast } from '@/libs/toastService';
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-const TabBarIcon = ({ name, color }: { name: 'home' | 'user'; color: string }) => {
-  const size = 20;
-  return <Feather name={name} color={color} size={size} />;
-};
+// Memoized tab icon to prevent unnecessary re-renders
+const TAB_ICON_SIZE = 20;
+const TabBarIcon = memo(({ name, color }: { name: 'home' | 'user'; color: string }) => {
+  return <Feather name={name} color={color} size={TAB_ICON_SIZE} />;
+});
+TabBarIcon.displayName = 'TabBarIcon';
 
 
 export default function TabLayout() {
@@ -26,9 +25,31 @@ export default function TabLayout() {
 
   const { session, loading } = useAuth();
 
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  // Memoize tabBarStyle to prevent new object on every render
+  const tabBarStyle = useMemo(() => ({
+    height: 60 + insets.bottom,
+    paddingBottom: insets.bottom,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderTopWidth: 1,
+    borderColor: colorScheme === 'dark' ? Colors.dark.borderColor : Colors.light.borderColor,
+    backgroundColor: colors.background,
+  }), [insets.bottom, colorScheme, colors.background]);
+
+  // Memoize icon render functions to prevent new references
+  const renderHomeIcon = useCallback(({ color }: { color: string }) => (
+    <TabBarIcon name="home" color={color} />
+  ), []);
+
+  const renderProfileIcon = useCallback(({ color }: { color: string }) => (
+    <TabBarIcon name="user" color={color} />
+  ), []);
+
+  // Conditional returns AFTER all hooks
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large"/>
       </View>
     );
@@ -39,40 +60,32 @@ export default function TabLayout() {
   }
 
   return (
-    <View style={{ backgroundColor: colors.background, flex: 1 }}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
     <Tabs
       screenOptions={{
-        popToTopOnBlur: true,
+        // Removed popToTopOnBlur - it causes full re-renders on tab switch
         tabBarActiveTintColor: colors.text,
-         tabBarStyle: {
-          height: 60 + insets.bottom,
-          paddingBottom: insets.bottom,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          borderTopWidth: 1,
-          borderColor: colorScheme === 'dark' ? Colors.dark.borderColor : Colors.light.borderColor,
-          backgroundColor: colors.background, 
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-        }
+        tabBarStyle,
+        tabBarLabelStyle: styles.tabBarLabel,
+        // Lazy load screens - don't mount until first visit
+        lazy: true,
       }}>
       <Tabs.Screen
         name="home"
         options={{
           title: 'Home',
-          animation: "shift",
+          animation: "fade", // Lighter animation than "shift"
           headerShown: false,
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: renderHomeIcon,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          animation: "shift",
+          animation: "fade", // Lighter animation than "shift"
           headerShown: false,
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          tabBarIcon: renderProfileIcon,
         }}
       />
     </Tabs>
@@ -81,26 +94,45 @@ export default function TabLayout() {
   );
 }
 
-function RootToastHost() {
+// Memoized toast host to prevent re-renders from parent
+const RootToastHost = memo(function RootToastHost() {
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState('');
   const [duration, setDuration] = useState(1500);
 
   useEffect(() => {
-    const unsub = subscribeToast((msg, duration) => {
+    const unsub = subscribeToast((msg, dur) => {
       setMessage(msg);
-      setDuration(duration ?? 1500);
+      setDuration(dur ?? 1500);
       setVisible(true);
     });
     return unsub;
   }, []);
+
+  // Stable callback reference
+  const handleHide = useCallback(() => setVisible(false), []);
 
   return (
     <AppToast
       visible={visible}
       message={message}
       durationMs={duration}
-      onHide={() => setVisible(false)}
+      onHide={handleHide}
     />
   );
-}
+});
+
+// Hoisted static styles (per skills best practice)
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tabBarLabel: {
+    fontSize: 12,
+  },
+});
