@@ -5,7 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import Colors from "@/constants/Colors";
 import CustomButton from "@/components/teacherManagement/Button";
@@ -48,6 +48,18 @@ const RateTeacher = () => {
     internalAssessment: 0,
   });
 
+  // Use refs for values needed in submit callback to avoid dependency changes
+  const ratingsRef = useRef(ratings);
+  ratingsRef.current = ratings;
+  const classAverageRef = useRef(classAverage);
+  classAverageRef.current = classAverage;
+  const teacherIdRef = useRef(teacher?.id);
+  teacherIdRef.current = teacher?.id;
+  const profileIdRef = useRef(profile?.id);
+  profileIdRef.current = profile?.id;
+  const existingRatingIdRef = useRef(existingRating?.id);
+  existingRatingIdRef.current = existingRating?.id;
+
   useEffect(() => {
     // Only set when we have a definitive value (null = no rating, object = data)
     if (existingRating === null) {
@@ -71,6 +83,20 @@ const RateTeacher = () => {
 
   const isLoadingPage = isLoadingTeacher || isLoadingRating || !teacher;
 
+  // Memoize style objects
+  const containerStyle = useMemo(() => [styles.container, { backgroundColor: colors.background }], [colors.background]);
+  const scrollContentStyle = useMemo(() => [
+    styles.scrollContent,
+    isLoadingPage && styles.centerContent,
+  ], [isLoadingPage]);
+  const errorTextStyle = useMemo(() => [styles.errorText, { color: colors.error }], [colors.error]);
+
+  // Memoize Stack.Screen options
+  const screenOptions = useMemo(() => ({
+    title: teacher ? `Rate ${teacher.full_name}` : "Rate",
+    headerRight: undefined,
+  }), [teacher]);
+
   const handleRating = useCallback((category: keyof typeof ratings, rating: number) => {
     setRatings((prev) => ({ ...prev, [category]: rating }));
   }, []);
@@ -78,22 +104,28 @@ const RateTeacher = () => {
   const onSubmitRating = useCallback(() => {
     setError("");
 
+    const currentRatings = ratingsRef.current;
+    const currentClassAverage = classAverageRef.current;
+    const currentTeacherId = teacherIdRef.current;
+    const currentProfileId = profileIdRef.current;
+    const currentExistingRatingId = existingRatingIdRef.current;
+
     if (
-      ratings.teachingQuality === 0 ||
-      ratings.evaluationMethods === 0 ||
-      ratings.behaviorAttitude === 0 ||
-      ratings.internalAssessment === 0 ||
-      !classAverage
+      currentRatings.teachingQuality === 0 ||
+      currentRatings.evaluationMethods === 0 ||
+      currentRatings.behaviorAttitude === 0 ||
+      currentRatings.internalAssessment === 0 ||
+      !currentClassAverage
     ) {
       setError("Please provide all ratings");
       return;
     }
 
-    if (!teacher?.id) {
+    if (!currentTeacherId) {
       setError("Missing teacher info.");
       return;
     }
-    if (!profile?.id) {
+    if (!currentProfileId) {
       setError("Missing user info.");
       return;
     }
@@ -101,20 +133,19 @@ const RateTeacher = () => {
     // Submit: if user has already rated, update, else insert
     upsertRating(
       {
-        teacher_id: teacher.id,
-        user_id: profile.id,
-        teaching: ratings.teachingQuality,
-        evaluation: ratings.evaluationMethods,
-        behaviour: ratings.behaviorAttitude,
-        internals: ratings.internalAssessment,
-        class_average: classAverage,
-        existingRatingId: existingRating?.id, // only set if exists
+        teacher_id: currentTeacherId,
+        user_id: currentProfileId,
+        teaching: currentRatings.teachingQuality,
+        evaluation: currentRatings.evaluationMethods,
+        behaviour: currentRatings.behaviorAttitude,
+        internals: currentRatings.internalAssessment,
+        class_average: currentClassAverage,
+        existingRatingId: currentExistingRatingId,
       },
       {
         onSuccess: async () => {
           if (typeof from === "string") {
             if (from.startsWith("/home/view/")) {
-              // Return to the existing view screen instead of stacking a duplicate
               router.back();
               return;
             } else if (from === "/home/favorites") {
@@ -135,23 +166,15 @@ const RateTeacher = () => {
         },
       }
     );
-  }, [ratings, classAverage, teacher?.id, profile?.id, existingRating?.id, upsertRating, from]);
+  }, [upsertRating, from]);
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={containerStyle}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={[
-        styles.scrollContent,
-        isLoadingPage && styles.centerContent,
-      ]}
+      contentContainerStyle={scrollContentStyle}
     >
-      <Stack.Screen
-        options={{
-          title: teacher ? `Rate ${teacher.full_name}` : "Rate",
-          headerRight: undefined,
-        }}
-      />
+      <Stack.Screen options={screenOptions} />
 
       {isLoadingPage ? (
         <ActivityIndicator size="large" />
@@ -167,7 +190,7 @@ const RateTeacher = () => {
           />
 
           {error && (
-            <Text style={[styles.errorText, { color: colors.error }]}>
+            <Text style={errorTextStyle}>
               {error}
             </Text>
           )}
@@ -176,7 +199,7 @@ const RateTeacher = () => {
             <CustomButton
               text="Submit Rating"
               textColor="#FFFFFF"
-              backgroundColor={isDark ? "#374151" : "#0C1120"}
+              backgroundColor={colors.buttonBackground}
               onPress={onSubmitRating}
               paddingVertical={13}
               loading={isSubmitting}
@@ -214,4 +237,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RateTeacher;
+export default React.memo(RateTeacher);
