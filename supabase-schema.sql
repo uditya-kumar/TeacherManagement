@@ -80,6 +80,10 @@ CREATE INDEX idx_teachers_status ON public.teachers USING btree (status);
 -- Enable RLS
 ALTER TABLE public.teachers ENABLE ROW LEVEL SECURITY;
 
+-- Set REPLICA IDENTITY to FULL for realtime updates
+-- This ensures all columns are sent in UPDATE events (needed for rating updates)
+ALTER TABLE public.teachers REPLICA IDENTITY FULL;
+
 -- RLS Policies for teachers
 CREATE POLICY "Anyone can view teachers" 
     ON public.teachers FOR SELECT 
