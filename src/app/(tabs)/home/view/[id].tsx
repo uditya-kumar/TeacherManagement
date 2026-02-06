@@ -4,7 +4,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
@@ -20,6 +20,23 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { Tables } from "@/types";
 
+// Memoized skeleton loading component to avoid re-creating JSX
+const LoadingSkeleton = React.memo(({ containerStyle, headingStyle }: { 
+  containerStyle: object; 
+  headingStyle: object;
+}) => (
+  <ScrollView style={containerStyle}>
+    <View style={styles.teacherCardWrapper}>
+      <TeacherCardSkeleton />
+    </View>
+    <Text style={headingStyle}>Rating Breakdown</Text>
+    <RatingBarChartSkeleton />
+    <RatingBarChartSkeleton />
+    <RatingBarChartSkeleton />
+    <RatingBarChartSkeleton />
+  </ScrollView>
+));
+
 const ViewTeacherDetails = () => {
   const { favoriteIds, toggleFavorite } = useFavorite();
   const { colorScheme } = useColorScheme();
@@ -27,6 +44,10 @@ const ViewTeacherDetails = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile } = useAuth();
   const queryClient = useQueryClient();
+  
+  // Use ref for profile.id to avoid callback recreation
+  const profileIdRef = useRef(profile?.id);
+  profileIdRef.current = profile?.id;
 
   // All hooks must be called before any conditional returns
   const { data: teacher, error, isLoading } = useTeacher(id ?? "");
@@ -37,19 +58,24 @@ const ViewTeacherDetails = () => {
   const favoriteIdsSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const ratedIdsSet = useMemo(() => new Set(ratedTeacherIds), [ratedTeacherIds]);
 
+  // Memoize style objects to prevent recreation
+  const containerStyle = useMemo(() => [styles.container, { backgroundColor: colors.background }], [colors.background]);
+  const headingStyle = useMemo(() => [styles.heading, { color: colors.text }], [colors.text]);
+
   const handleToggleFavorite = useCallback((teacher: Tables<"teachers">) => {
     toggleFavorite(teacher);
   }, [toggleFavorite]);
 
   const handleRateTeacher = useCallback((teacherId: string) => {
     // Clear potentially stale per-user rating and aggregates to avoid flicker
-    if (profile?.id) {
-      queryClient.removeQueries({ queryKey: ["userRating", teacherId, profile.id], exact: true });
+    const currentProfileId = profileIdRef.current;
+    if (currentProfileId) {
+      queryClient.removeQueries({ queryKey: ["userRating", teacherId, currentProfileId], exact: true });
       // Clear ratings list (breakdown is derived from this via select)
       queryClient.removeQueries({ queryKey: ["ratingsByTeacher", teacherId], exact: true });
     }
     router.push({ pathname: "/home/rate/[id]", params: { id: teacherId, from: `/home/view/${teacherId}` } });
-  }, [profile?.id, queryClient]);
+  }, [queryClient]);
 
   useFocusEffect(
     useCallback(() => {
@@ -59,34 +85,8 @@ const ViewTeacherDetails = () => {
   );
 
   // Conditional returns AFTER all hooks
-  if (!id) {
-    return (
-      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.teacherCardWrapper}>
-          <TeacherCardSkeleton />
-        </View>
-        <Text style={[styles.heading, { color: colors.text }]}>Rating Breakdown</Text>
-        <RatingBarChartSkeleton />
-        <RatingBarChartSkeleton />
-        <RatingBarChartSkeleton />
-        <RatingBarChartSkeleton />
-      </ScrollView>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.teacherCardWrapper}>
-          <TeacherCardSkeleton />
-        </View>
-        <Text style={[styles.heading, { color: colors.text }]}>Rating Breakdown</Text>
-        <RatingBarChartSkeleton />
-        <RatingBarChartSkeleton />
-        <RatingBarChartSkeleton />
-        <RatingBarChartSkeleton />
-      </ScrollView>
-    );
+  if (!id || isLoading) {
+    return <LoadingSkeleton containerStyle={containerStyle} headingStyle={headingStyle} />;
   }
 
   if (error) {
@@ -95,7 +95,7 @@ const ViewTeacherDetails = () => {
 
   if (!teacher) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={containerStyle}>
         <Text style={[styles.errorText, { color: colors.text }]}>
           Teacher Not Found
         </Text>
@@ -104,9 +104,7 @@ const ViewTeacherDetails = () => {
   }
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    <ScrollView style={containerStyle}>
       <View style={styles.teacherCardWrapper}>
         <TeacherCard
           teacher={teacher}
@@ -118,7 +116,7 @@ const ViewTeacherDetails = () => {
         />
       </View>
 
-      <Text style={[styles.heading, { color: colors.text }]}>Rating Breakdown</Text>
+      <Text style={headingStyle}>Rating Breakdown</Text>
 
       {isLoadingBreakdown ? (
         <>
@@ -163,4 +161,5 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
 });
-export default ViewTeacherDetails;
+
+export default React.memo(ViewTeacherDetails);
