@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useMemo } from "react";
-import { Tables} from "@/types";
+import React, { createContext, useContext, useMemo, useCallback } from "react";
+import { Tables } from "@/types";
 import { useAuth } from "./AuthProvider";
 import {
   useTeacherList,
@@ -35,20 +35,31 @@ export default function FavoriteProvider({ children }: React.PropsWithChildren) 
     [teachers, favoriteIds]
   );
 
-  const toggleFavorite = (teacher: Tables<'teachers'>) => {
-    const isFav = favoriteIds.includes(teacher.id);
-    toggle({ teacherId: teacher.id, isFavorite: !isFav });
-  };
+  // Memoize toggleFavorite to prevent recreation on every render
+  const toggleFavorite = useCallback(
+    (teacher: Tables<'teachers'>) => {
+      const isFav = favoriteIds.includes(teacher.id);
+      toggle({ teacherId: teacher.id, isFavorite: !isFav });
+    },
+    [favoriteIds, toggle]
+  );
+
+  // Derive loading state
+  const loading = authLoading || favLoading;
+
+  // Memoize the entire context value to prevent unnecessary re-renders
+  const contextValue = useMemo<FavoriteCtx>(
+    () => ({
+      favorites,
+      favoriteIds,
+      toggleFavorite,
+      loading,
+    }),
+    [favorites, favoriteIds, toggleFavorite, loading]
+  );
 
   return (
-    <FavoriteContext.Provider
-      value={{
-        favorites,
-        favoriteIds,
-        toggleFavorite,
-        loading: authLoading || favLoading,
-      }}
-    >
+    <FavoriteContext.Provider value={contextValue}>
       {children}
     </FavoriteContext.Provider>
   );
