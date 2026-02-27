@@ -164,7 +164,7 @@ const ProfilePage = () => {
         {/* About Dev */}
         <Pressable
           style={[styles.row, styles.lastRow]}
-          onPress={() => WebBrowser.openBrowserAsync("https://github.com/uditya2004")}
+          onPress={() => WebBrowser.openBrowserAsync("https://github.com/uditya-kumar")}
         >
           <View style={styles.rowLeft}>
             <Feather name="info" size={20} color={iconColor} style={styles.icon} />
