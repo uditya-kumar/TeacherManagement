@@ -46,7 +46,10 @@ const index = () => {
 
   // Convert arrays to Sets for O(1) lookup - memoized to maintain stable references
   const favoriteIdsSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
-  const ratedIdsSet = useMemo(() => new Set(ratedTeacherIds), [ratedTeacherIds]);
+  const ratedIdsSet = useMemo(() => {
+    console.log("[HOME] ratedTeacherIds changed:", ratedTeacherIds);
+    return new Set(ratedTeacherIds);
+  }, [ratedTeacherIds]);
 
   useRealtimeTeachers();
 
@@ -285,7 +288,7 @@ const index = () => {
         data={filteredTeachers}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        extraData={favoriteIdsSet}
+        extraData={[favoriteIdsSet, ratedIdsSet]}
         ListEmptyComponent={renderEmptyComponent}
         ListHeaderComponent={listHeaderComponent}
         contentContainerStyle={styles.listContent}

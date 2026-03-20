@@ -16,6 +16,7 @@ import {
   useUserRatingForTeacher,
   useUpsertRating,
 } from "@/api/teachers/rating";
+import { useDeleteUserRatingForTeacher } from "@/api/teachers/profile";
 import { useAuth } from "@/providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -32,6 +33,8 @@ const RateTeacher = () => {
   });
   const { profile } = useAuth();
   const { mutate: upsertRating, isPending: isSubmitting } = useUpsertRating();
+  const { mutate: deleteRating, isPending: isDeleting } =
+    useDeleteUserRatingForTeacher(profile?.id);
 
   const { data: existingRating, isLoading: isLoadingRating } =
     useUserRatingForTeacher(id, profile?.id);
@@ -168,6 +171,38 @@ const RateTeacher = () => {
     );
   }, [upsertRating, from]);
 
+  const onDeleteRating = useCallback(() => {
+    const currentTeacherId = teacherIdRef.current;
+    if (!currentTeacherId) return;
+
+    console.log("[DELETE] Starting delete for teacher:", currentTeacherId);
+
+    deleteRating(
+      { teacherId: currentTeacherId },
+      {
+        onSuccess: async () => {
+          console.log("[DELETE] Mutation succeeded, refetching ratedTeachers...");
+          const before = queryClient.getQueryData(["ratedTeachers", profileIdRef.current]);
+          console.log("[DELETE] ratedTeachers BEFORE refetch:", before);
+
+          // Force refetch (not just invalidate) since the home page stays
+          // mounted and staleTime: Infinity prevents automatic refetch
+          await queryClient.refetchQueries({
+            queryKey: ["ratedTeachers", profileIdRef.current],
+          });
+
+          const after = queryClient.getQueryData(["ratedTeachers", profileIdRef.current]);
+          console.log("[DELETE] ratedTeachers AFTER refetch:", after);
+
+          router.back();
+        },
+        onError: (err) => {
+          console.log("[DELETE] Mutation FAILED:", err);
+        },
+      }
+    );
+  }, [deleteRating, queryClient]);
+
   return (
     <ScrollView
       style={containerStyle}
@@ -205,6 +240,19 @@ const RateTeacher = () => {
               loading={isSubmitting}
             />
           </View>
+
+          {existingRating && (
+            <View style={styles.deleteButtonWrapper}>
+              <CustomButton
+                text="Delete Rating"
+                textColor="#FFFFFF"
+                backgroundColor={isDeleting ? "#EF4444" : "#DC2626"}
+                onPress={onDeleteRating}
+                paddingVertical={13}
+                loading={isDeleting}
+              />
+            </View>
+          )}
         </>
       )}
     </ScrollView>
@@ -232,6 +280,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   submitButtonWrapper: {
+    marginHorizontal: 15,
+    marginTop: 15,
+  },
+  deleteButtonWrapper: {
     marginHorizontal: 15,
     marginTop: 15,
   },
