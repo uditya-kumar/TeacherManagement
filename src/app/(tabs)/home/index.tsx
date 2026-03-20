@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
+  Animated,
 } from "react-native";
 import React, { useMemo, useState } from "react";
 import { Feather } from "@expo/vector-icons";
@@ -39,6 +40,8 @@ const index = () => {
   const { colorScheme } = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const listRef = useRef<LegendListRef | null>(null); // For scroll control (optional)
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const scrollTopOpacity = useRef(new Animated.Value(0)).current;
   const { data: teachers, error, isLoading } = useTeacherList();
   const { profile } = useAuth();
   const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
@@ -49,6 +52,31 @@ const index = () => {
   const ratedIdsSet = useMemo(() => new Set(ratedTeacherIds), [ratedTeacherIds]);
 
   useRealtimeTeachers();
+
+  const handleScroll = useCallback(
+    (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+      const y = e.nativeEvent.contentOffset.y;
+      if (y > 300 && !showScrollTop) {
+        setShowScrollTop(true);
+        Animated.timing(scrollTopOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      } else if (y <= 300 && showScrollTop) {
+        Animated.timing(scrollTopOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start(() => setShowScrollTop(false));
+      }
+    },
+    [showScrollTop, scrollTopOpacity],
+  );
+
+  const scrollToTop = useCallback(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
 
   const filteredTeachers = useMemo(() => {
     const list = (teachers ?? []) as Tables<"teachers">[];
@@ -291,7 +319,25 @@ const index = () => {
         contentContainerStyle={styles.listContent}
         keyboardShouldPersistTaps="handled"
         recycleItems={true}
+        onScroll={handleScroll}
       />
+
+      {showScrollTop && (
+        <Animated.View style={[styles.scrollTopButton, { opacity: scrollTopOpacity }]}>
+          <Pressable
+            onPress={scrollToTop}
+            style={({ pressed }) => [
+              styles.scrollTopPressable,
+              {
+                backgroundColor: colors.buttonBackground,
+                opacity: pressed ? 0.8 : 1,
+              },
+            ]}
+          >
+            <Feather name="arrow-up" size={22} color="#FFFFFF" />
+          </Pressable>
+        </Animated.View>
+      )}
     </View>
   );
 };
@@ -356,6 +402,23 @@ const styles = StyleSheet.create({
   skeletonList: {
     gap: 25,
     paddingBottom: 20,
+  },
+  scrollTopButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+  },
+  scrollTopPressable: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 });
 
