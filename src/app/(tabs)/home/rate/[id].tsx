@@ -175,29 +175,16 @@ const RateTeacher = () => {
     const currentTeacherId = teacherIdRef.current;
     if (!currentTeacherId) return;
 
-    console.log("[DELETE] Starting delete for teacher:", currentTeacherId);
-
     deleteRating(
       { teacherId: currentTeacherId },
       {
         onSuccess: async () => {
-          console.log("[DELETE] Mutation succeeded, refetching ratedTeachers...");
-          const before = queryClient.getQueryData(["ratedTeachers", profileIdRef.current]);
-          console.log("[DELETE] ratedTeachers BEFORE refetch:", before);
-
           // Force refetch (not just invalidate) since the home page stays
           // mounted and staleTime: Infinity prevents automatic refetch
           await queryClient.refetchQueries({
             queryKey: ["ratedTeachers", profileIdRef.current],
           });
-
-          const after = queryClient.getQueryData(["ratedTeachers", profileIdRef.current]);
-          console.log("[DELETE] ratedTeachers AFTER refetch:", after);
-
           router.back();
-        },
-        onError: (err) => {
-          console.log("[DELETE] Mutation FAILED:", err);
         },
       }
     );
@@ -232,7 +219,7 @@ const RateTeacher = () => {
 
           <View style={styles.submitButtonWrapper}>
             <CustomButton
-              text="Submit Rating"
+              text={existingRating ? "Update Rating" : "Submit Rating"}
               textColor="#FFFFFF"
               backgroundColor={colors.buttonBackground}
               onPress={onSubmitRating}

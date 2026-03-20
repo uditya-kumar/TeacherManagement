@@ -46,10 +46,7 @@ const index = () => {
 
   // Convert arrays to Sets for O(1) lookup - memoized to maintain stable references
   const favoriteIdsSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
-  const ratedIdsSet = useMemo(() => {
-    console.log("[HOME] ratedTeacherIds changed:", ratedTeacherIds);
-    return new Set(ratedTeacherIds);
-  }, [ratedTeacherIds]);
+  const ratedIdsSet = useMemo(() => new Set(ratedTeacherIds), [ratedTeacherIds]);
 
   useRealtimeTeachers();
 

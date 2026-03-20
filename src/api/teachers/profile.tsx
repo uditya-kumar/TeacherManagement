@@ -41,19 +41,16 @@ export const useDeleteUserRatingForTeacher = (userId?: string) => {
     mutationKey: ["deleteUserRating", userId],
     mutationFn: async ({ teacherId }: { teacherId: string }) => {
       if (!userId) throw new Error("No user");
-      console.log("[DELETE mutationFn] Deleting rating for teacher:", teacherId, "user:", userId);
       const { error } = await supabase
         .from("ratings")
         .delete()
         .eq("teacher_id", teacherId)
         .eq("user_id", userId);
       if (error) throw new Error(error.message);
-      console.log("[DELETE mutationFn] Supabase delete succeeded");
       return { teacherId };
     },
     onSuccess: (_data, variables) => {
       const teacherId = variables.teacherId;
-      console.log("[DELETE onSuccess hook] Invalidating caches for teacher:", teacherId, "user:", userId);
       // Invalidate caches impacted by rating removal
       queryClient.invalidateQueries({
         queryKey: ["userRating", teacherId, userId],

@@ -66,16 +66,13 @@ export const ratedTeacherIdsQueryOptions = (userId?: string) =>
     queryKey: ["ratedTeachers", userId] as const,
     enabled: !!userId,
     queryFn: async (): Promise<string[]> => {
-      console.log("[ratedTeacherIds queryFn] Fetching rated teacher IDs for user:", userId);
       const { data, error } = await supabase
         .from("ratings")
         .select("teacher_id")
         .eq("user_id", userId!);
 
       if (error) throw new Error(error.message);
-      const ids = data.map((r) => r.teacher_id as string);
-      console.log("[ratedTeacherIds queryFn] Fetched IDs:", ids);
-      return ids;
+      return data.map((r) => r.teacher_id as string);
     },
     staleTime: Infinity, // Never stale - invalidated on rating
     gcTime: Infinity,    // Keep forever (consistent with staleTime)
