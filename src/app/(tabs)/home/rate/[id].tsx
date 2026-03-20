@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -175,18 +176,31 @@ const RateTeacher = () => {
     const currentTeacherId = teacherIdRef.current;
     if (!currentTeacherId) return;
 
-    deleteRating(
-      { teacherId: currentTeacherId },
-      {
-        onSuccess: async () => {
-          // Force refetch (not just invalidate) since the home page stays
-          // mounted and staleTime: Infinity prevents automatic refetch
-          await queryClient.refetchQueries({
-            queryKey: ["ratedTeachers", profileIdRef.current],
-          });
-          router.back();
+    Alert.alert(
+      "Delete Rating",
+      "Are you sure you want to delete your rating? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteRating(
+              { teacherId: currentTeacherId },
+              {
+                onSuccess: async () => {
+                  // Force refetch (not just invalidate) since the home page stays
+                  // mounted and staleTime: Infinity prevents automatic refetch
+                  await queryClient.refetchQueries({
+                    queryKey: ["ratedTeachers", profileIdRef.current],
+                  });
+                  router.back();
+                },
+              }
+            );
+          },
         },
-      }
+      ]
     );
   }, [deleteRating, queryClient]);
 

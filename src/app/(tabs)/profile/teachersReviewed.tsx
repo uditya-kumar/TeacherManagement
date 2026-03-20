@@ -3,6 +3,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import TeacherCard from "@/components/teacherManagement/TeacherCard";
@@ -53,18 +54,30 @@ const TeachersReviewed = () => {
 
   const handleDeleteRating = useCallback(
     (teacherId: string) => {
-      setDeletingIds((prev) => new Set(prev).add(teacherId));
-      deleteRating(
-        { teacherId },
-        {
-          // Keep spinner until item disappears; only clear early on error
-          onError: () =>
-            setDeletingIds((prev) => {
-              const next = new Set(prev);
-              next.delete(teacherId);
-              return next;
-            }),
-        }
+      Alert.alert(
+        "Delete Rating",
+        "Are you sure you want to delete your rating? This action cannot be undone.",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => {
+              setDeletingIds((prev) => new Set(prev).add(teacherId));
+              deleteRating(
+                { teacherId },
+                {
+                  onError: () =>
+                    setDeletingIds((prev) => {
+                      const next = new Set(prev);
+                      next.delete(teacherId);
+                      return next;
+                    }),
+                }
+              );
+            },
+          },
+        ]
       );
     },
     [deleteRating]
