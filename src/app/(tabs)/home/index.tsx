@@ -5,6 +5,7 @@ import {
   Pressable,
   ScrollView,
   Animated,
+  RefreshControl,
 } from "react-native";
 import React, { useMemo, useState } from "react";
 import { Feather } from "@expo/vector-icons";
@@ -46,6 +47,7 @@ const index = () => {
   const { profile } = useAuth();
   const { data: ratedTeacherIds = [] } = useUserRatedTeacherIds(profile?.id);
   const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
 
   // Convert arrays to Sets for O(1) lookup - memoized to maintain stable references
   const favoriteIdsSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
@@ -77,6 +79,15 @@ const index = () => {
   const scrollToTop = useCallback(() => {
     listRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([
+      queryClient.refetchQueries({ queryKey: ["teachers"] }),
+      queryClient.refetchQueries({ queryKey: ["ratedTeachers", profile?.id] }),
+    ]);
+    setRefreshing(false);
+  }, [queryClient, profile?.id]);
 
   const filteredTeachers = useMemo(() => {
     const list = (teachers ?? []) as Tables<"teachers">[];
@@ -320,6 +331,9 @@ const index = () => {
         keyboardShouldPersistTaps="handled"
         recycleItems={true}
         onScroll={handleScroll}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
 
       {showScrollTop && (
